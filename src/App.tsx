@@ -3,9 +3,28 @@ import reactLogo from './assets/react.svg'
 import viteLogo from './assets/vite.svg'
 import heroImg from './assets/hero.png'
 import './App.css'
+import {BackendConfig} from "./config/BackendConfig.ts";
 
 function App() {
   const [count, setCount] = useState(0)
+  const [dbStatus, setDbStatus] = useState<string>('')
+  const [loading, setLoading] = useState(false)
+
+  const testBackend = async () => {
+    setLoading(true)
+    setDbStatus('')
+
+    try {
+      const res = await fetch(`${BackendConfig.springApiUrl}/test-db`)
+      const text = await res.text()
+      setDbStatus(text)
+    } catch (err) {
+      console.error(err)
+      setDbStatus('Error connecting to backend')
+    } finally {
+      setLoading(false)
+    }
+  }
 
   return (
     <>
@@ -27,6 +46,21 @@ function App() {
         >
           Count is {count}
         </button>
+
+        <button
+          className="counter"
+          onClick={testBackend}
+          disabled={loading}
+        >
+          {loading ? 'Testing backend...' : 'Test Backend API'}
+        </button>
+
+        {dbStatus && (
+          <p style={{ marginTop: '12px' }}>
+            {dbStatus}
+          </p>
+        )}
+
       </section>
 
       <div className="ticks"></div>
