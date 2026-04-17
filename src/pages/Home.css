@@ -36,7 +36,12 @@
     border: 3px solid var(--border);
     box-shadow: var(--shadow);
 
-    transition: transform 0.3s ease;
+    filter: blur(8px);
+    transition: filter 0.8s ease, transform 0.8s ease;
+}
+
+.profile.loaded {
+    filter: blur(0);
 }
 
 .profile:hover {

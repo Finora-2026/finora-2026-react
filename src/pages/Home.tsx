@@ -1,12 +1,15 @@
-import {useEffect} from "react";
+import {useEffect, useState} from "react";
 
 import reactLogo from "../assets/react.svg";
 import viteLogo from "../assets/vite.svg";
 import bellamyPhoto from "../assets/BellamyProfile.jpg";
 
 import "./Home.css";
+import TypeWriter from "../components/TypeWriter.tsx";
 
 export default function Home() {
+
+  const [loaded, setLoaded] = useState(false);
 
   useEffect(() => {
     document.title = 'Bellamy Phan | Home'
@@ -16,12 +19,22 @@ export default function Home() {
     <>
       <section id="center">
         <div className="bellamy-profile">
-          <img src={bellamyPhoto} className="profile" alt="Profile picture" />
+          <img
+            src={bellamyPhoto}
+            className={`profile ${loaded ? "loaded" : ""}`}
+            alt="Profile picture"
+            onLoad={() => setLoaded(true)}
+          />
         </div>
 
         <div>
           <h1>Bellamy Phan</h1>
         </div>
+
+        <TypeWriter
+          text="I’m a passionate Software Engineer with a strong background in cloud computing and full-stack development. I specialize in building scalable, efficient applications using Java, Spring Boot, Angular, React, and AWS. I’m continually learning and improving my skills in software architecture, DevOps, and clean code practices to deliver reliable, production-ready solutions."
+          speed={25}
+        />
 
       </section>
 
