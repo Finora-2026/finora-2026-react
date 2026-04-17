@@ -174,3 +174,33 @@
         border-right-color: var(--border);
     }
 }
+
+.card {
+    flex: 1 1 0;
+    padding: 32px;
+    border-right: 1px solid var(--border);
+}
+
+.card:last-child {
+    border-right: none;
+}
+
+.card-buttons {
+    display: flex;
+    gap: 10px;
+    margin-top: 16px;
+    flex-wrap: wrap;
+}
+
+.card-buttons a {
+    padding: 8px 12px;
+    border-radius: 8px;
+    background: var(--social-bg);
+    color: var(--text-h);
+    text-decoration: none;
+    transition: 0.2s;
+}
+
+.card-buttons a:hover {
+    box-shadow: var(--shadow);
+}

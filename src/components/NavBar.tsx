@@ -20,7 +20,7 @@ export default function Navbar() {
         </Link>
       </div>
 
-      <div className="nav-name">Bellamy Phan</div>
+      <div className="nav-name">Bellamy Phan [User]</div>
     </nav>
   )
 }
