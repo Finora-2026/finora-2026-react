@@ -1,72 +1,27 @@
-import {useEffect, useState} from "react";
+import {useEffect} from "react";
 
-import heroImg from "../assets/hero.png";
 import reactLogo from "../assets/react.svg";
 import viteLogo from "../assets/vite.svg";
+import bellamyPhoto from "../assets/BellamyProfile.jpg";
 
 import "./Home.css";
-import {BackendConfig} from "../config/BackendConfig.ts";
 
 export default function Home() {
 
-  const [count, setCount] = useState(0);
-  const [dbStatus, setDbStatus] = useState<string>('');
-  const [loading, setLoading] = useState(false);
   useEffect(() => {
     document.title = 'Bellamy Phan | Home'
   }, [])
 
-  const testBackend = async () => {
-    setLoading(true)
-    setDbStatus('')
-
-    try {
-      const res = await fetch(`${BackendConfig.springApiUrl}/test-db`)
-      const text = await res.text()
-      setDbStatus(text)
-    } catch (err) {
-      console.error(err)
-      setDbStatus('Error connecting to backend')
-    } finally {
-      setLoading(false)
-    }
-  }
-
   return (
     <>
       <section id="center">
-        <div className="hero">
-          <img src={heroImg} className="base" width="170" height="179" alt="" />
-          <img src={reactLogo} className="framework" alt="React logo" />
-          <img src={viteLogo} className="vite" alt="Vite logo" />
+        <div className="bellamy-profile">
+          <img src={bellamyPhoto} className="profile" alt="Profile picture" />
         </div>
+
         <div>
           <h1>Bellamy Phan</h1>
-          <p>
-            Edit <code>src/App.tsx</code> and save to test <code>HMR</code>
-          </p>
         </div>
-
-        <button
-          className="counter"
-          onClick={() => setCount((count) => count + 1)}
-        >
-          Count is {count}
-        </button>
-
-        <button
-          className="counter"
-          onClick={testBackend}
-          disabled={loading}
-        >
-          {loading ? 'Testing backend...' : 'Test Backend API'}
-        </button>
-
-        {dbStatus && (
-          <p style={{ marginTop: '12px' }}>
-            {dbStatus}
-          </p>
-        )}
 
       </section>
 

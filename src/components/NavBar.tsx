@@ -6,8 +6,6 @@ export default function Navbar() {
 
   return (
     <nav className="navbar">
-      <div className="nav-left">Bellamy Phan</div>
-
       <div className="nav-links">
         <Link className={location.pathname === '/' ? 'active' : ''} to="/">
           Home
@@ -16,7 +14,13 @@ export default function Navbar() {
         <Link className={location.pathname === '/portfolio' ? 'active' : ''} to="/portfolio">
           Portfolio
         </Link>
+
+        <Link className={location.pathname === '/finora-login' ? 'active' : ''} to="/finora-login">
+          Finora
+        </Link>
       </div>
+
+      <div className="nav-name">Bellamy Phan</div>
     </nav>
   )
 }
