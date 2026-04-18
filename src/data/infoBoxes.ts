@@ -1,28 +1,23 @@
 export const infoBoxes = [
     {
-        title: "Scrum Board",
-        text: "Sprint planning and collaboration tools",
+        title: "Finora Development",
+        text: "Sprint planning, collaboration tools, and public Git source code",
         speed: 110,
         buttons: [
-            {
-                label: "Jira Board",
-                href: "https://bellamyphan.atlassian.net/jira/software/projects/FI/boards/101/backlog",
-            },
-            {
-                label: "Confluence",
-                href: "https://bellamyphan.atlassian.net/wiki/spaces/F2/pages/56983553/Finora+2026+Project+Overview",
-            },
+            {label: "Jira", href: "https://bellamyphan.atlassian.net/jira/software/projects/FI/boards/101/backlog",},
+            {label: "Confluence", href: "https://bellamyphan.atlassian.net/wiki/spaces/F2/pages/56983553/Finora+2026+Project+Overview",},
+            {label: "React", href: "https://github.com/Finora-2026/finora-2026-react"},
+            {label: "Spring", href: "https://github.com/Finora-2026/finora-2026-spring"},
+            {label: "Config", href: "https://github.com/Finora-2026/finora-2026-config"},
         ],
     },
     {
-        title: "Finora Web App",
-        text: "Finance tracking and budget planning for your future",
+        title: "Products",
+        text: "Finance tracking and budget planning for your future. Including small side projects",
         speed: 85,
         buttons: [
             { label: "Finora", to: "/finora-login" },
-            { label: "React", href: "https://github.com/Finora-2026/finora-2026-react" },
-            { label: "Spring", href: "https://github.com/Finora-2026/finora-2026-spring" },
-            { label: "Config", href: "https://github.com/Finora-2026/finora-2026-config" },
+            { label: "Investment Calculator", to: "/investment-calculator" },
         ],
     },
     {
