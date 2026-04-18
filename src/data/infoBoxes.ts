@@ -19,9 +19,9 @@ export const infoBoxes = [
         text: "Finance tracking and budget planning for your future",
         speed: 85,
         buttons: [
-            { label: "Finora", to: "/finora-login"  },
-            { label: "Spring", href: "https://github.com/Finora-2026/finora-2026-spring" },
+            { label: "Finora", to: "/finora-login" },
             { label: "React", href: "https://github.com/Finora-2026/finora-2026-react" },
+            { label: "Spring", href: "https://github.com/Finora-2026/finora-2026-spring" },
             { label: "Config", href: "https://github.com/Finora-2026/finora-2026-config" },
         ],
     },
@@ -45,9 +45,9 @@ export const infoBoxes = [
         text: "External services and integrations",
         speed: 180,
         buttons: [
-            { label: "Aiven DB", href: "https://console.aiven.io/account/a57638e0cd4e/project/finora/services/finora-aiven-db/overview" },
-            { label: "Render", href: "https://dashboard.render.com/web/srv-d7g4qrbeo5us73ambkrg" },
             { label: "Vercel", href: "https://vercel.com/bellamy-phans-projects/finora-2026-react" },
+            { label: "Render", href: "https://dashboard.render.com/web/srv-d7g4qrbeo5us73ambkrg" },
+            { label: "Aiven DB", href: "https://console.aiven.io/account/a57638e0cd4e/project/finora/services/finora-aiven-db/overview" },
             { label: "Uptime Robot", href: "https://dashboard.uptimerobot.com/monitors" },
             { label: "MailGun", href: "https://app.mailgun.com/dashboard?tab=send" },
         ],
