@@ -1,0 +1,49 @@
+name: React CI
+
+on:
+  push:
+    branches: [ "**" ]  # Run on every push
+  pull_request:
+    branches: [ main ] # Run on PRs targeting main
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    env:
+      CI: true
+
+    steps:
+      # Checkout repo
+      - name: Checkout repo
+        uses: actions/checkout@v4
+
+      # Setup Node
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: "npm"
+
+      # Install dependencies
+      - name: Install dependencies
+        run: npm ci
+
+      # Type check
+      - name: Type check
+        run: npx tsc --noEmit
+
+      - name: Lint
+        run: npm run lint
+
+      # Run tests (Vitest)
+      - name: Run tests
+        run: npm run test -- --run
+
+      # Build project
+      - name: Build React app
+        run: npm run build
+
+      # Run test with coverage
+#      - name: Run tests with coverage
+#        run: npm run coverage
