@@ -31,6 +31,16 @@ export default function Home() {
 
         <div>
           <h1>Bellamy Phan</h1>
+
+          <div>
+            <span>Email: </span>
+            <a
+                href="mailto:BellamyPhan@icloud.com"
+                className="email-link"
+            >
+              BellamyPhan@icloud.com
+            </a>
+          </div>
         </div>
 
         <TypeWriter
