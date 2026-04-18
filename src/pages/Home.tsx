@@ -6,6 +6,8 @@ import bellamyPhoto from "../assets/BellamyProfile.jpg";
 
 import "./Home.css";
 import TypeWriter from "../components/TypeWriter.tsx";
+import InfoBox from "../components/InfoBox.tsx";
+import {infoBoxes} from "../data/infoBoxes.ts";
 
 export default function Home() {
 
@@ -38,66 +40,15 @@ export default function Home() {
 
       </section>
 
-      <div className="ticks"></div>
-
-      <section id="next-steps">
-        {/* Scrum / Agile */}
-        <div className="card">
-          <h2>Scrum Board</h2>
-          <TypeWriter text="Sprint planning and collaboration tools" speed={110} />
-
-          <div className="card-buttons">
-            <a
-              href="https://bellamyphan.atlassian.net/jira/software/projects/FI/boards/101/backlog"
-              target="_blank">
-              Jira Board
-            </a>
-
-            <a
-              href="https://bellamyphan.atlassian.net/wiki/spaces/F2/pages/56983553/Finora+2026+Project+Overview"
-              target="_blank">
-              Confluence
-            </a>
-          </div>
-        </div>
-
-        {/* GitHub Projects */}
-        <div className="card">
-          <h2>GitHub Projects</h2>
-          <TypeWriter text="Code, experiments, and production apps" speed={100} />
-
-          <div className="card-buttons">
-            <a href="https://github.com/Finora-2026/finora-2026-spring" target="_blank">Spring</a>
-            <a href="https://github.com/Finora-2026/finora-2026-react" target="_blank">React</a>
-            <a href="https://github.com/Finora-2026/finora-2026-config" target="_blank">Config</a>
-          </div>
-        </div>
-
-        {/* Third Party Tools */}
-        <div className="card">
-          <h2>Third Party Tools</h2>
-          <TypeWriter text="External services and integrations" speed={180} />
-
-          <div className="card-buttons">
-            <a
-              href="https://console.aiven.io/account/a57638e0cd4e/project/finora/services/finora-aiven-db/overview"
-              target="_blank">Aiven DB</a>
-            <a
-              href="https://dashboard.render.com/web/srv-d7g4qrbeo5us73ambkrg"
-              target="_blank">Render</a>
-            <a
-              href="https://vercel.com/bellamy-phans-projects/finora-2026-react"
-              target="_blank">Vercel</a>
-            <a
-              href="https://dashboard.uptimerobot.com/monitors"
-              target="_blank">Uptime Robot</a>
-            <a
-              href="https://app.mailgun.com/dashboard?tab=send"
-              target="_blank">MailGun</a>
-          </div>
-        </div>
-
-      </section>
+      {infoBoxes.map((box, index) => (
+          <InfoBox
+              key={index}
+              title={box.title}
+              text={box.text}
+              speed={box.speed}
+              buttons={box.buttons}
+          />
+      ))}
 
       <section id="next-steps">
         <div id="docs">
