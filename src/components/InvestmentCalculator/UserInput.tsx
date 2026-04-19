@@ -1,30 +1,16 @@
-import { useState } from "react";
-import * as React from "react";
 
-type UserInputState = {
-  initialInvestment: number;
-  annualInvestment: number;
-  expectedReturn: number;
-  duration: number;
+import * as React from "react";
+import type {InvestmentCalculatorInput} from "../../data/InvestmentCalculatorInput.ts";
+
+type UserInputProps = {
+  userInput: InvestmentCalculatorInput;
+  onChange: (
+    inputIdentifier: keyof InvestmentCalculatorInput,
+    newValue: number
+  ) => void;
 };
 
-export default function UserInput() {
-  const [userInput, setUserInput] = useState<UserInputState>({
-    initialInvestment: 10000,
-    annualInvestment: 1200,
-    expectedReturn: 6,
-    duration: 10
-  });
-  
-  function handleChange(
-    inputIdentifier: keyof UserInputState,
-    newValue: number
-  ) {
-    setUserInput((prevUserInput) => ({
-      ...prevUserInput,
-      [inputIdentifier]: newValue
-    }));
-  }
+export default function UserInput({userInput, onChange}: UserInputProps) {
   
   return (
     <section className="container mt-4 p-4 bg-success bg-gradient rounded text-light">
@@ -39,7 +25,7 @@ export default function UserInput() {
             required
             value={userInput.initialInvestment}
             onChange={(event: React.ChangeEvent<HTMLInputElement>) =>
-              handleChange("initialInvestment", +event.target.value)
+              onChange("initialInvestment", +event.target.value)
             }
           />
         </div>
@@ -52,7 +38,7 @@ export default function UserInput() {
             required
             value={userInput.annualInvestment}
             onChange={(event: React.ChangeEvent<HTMLInputElement>) =>
-              handleChange("annualInvestment", +event.target.value)
+              onChange("annualInvestment", +event.target.value)
             }
           />
         </div>
@@ -68,7 +54,7 @@ export default function UserInput() {
             required
             value={userInput.expectedReturn}
             onChange={(event: React.ChangeEvent<HTMLInputElement>) =>
-              handleChange("expectedReturn", +event.target.value)
+              onChange("expectedReturn", +event.target.value)
             }
           />
         </div>
@@ -81,7 +67,7 @@ export default function UserInput() {
             required
             value={userInput.duration}
             onChange={(event: React.ChangeEvent<HTMLInputElement>) =>
-              handleChange("duration", +event.target.value)
+              onChange("duration", +event.target.value)
             }
           />
         </div>
