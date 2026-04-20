@@ -43,6 +43,7 @@ export const infoBoxes = [
             { label: "Vercel", href: "https://vercel.com/bellamy-phans-projects/finora-2026-react" },
             { label: "Render", href: "https://dashboard.render.com/web/srv-d7g4qrbeo5us73ambkrg" },
             { label: "Aiven DB", href: "https://console.aiven.io/account/a57638e0cd4e/project/finora/services/finora-aiven-db/overview" },
+            { label: "Mongo DB", href: "https://cloud.mongodb.com/v2/661c88b1dce24942d41aa828#/overview" },
             { label: "Uptime Robot", href: "https://dashboard.uptimerobot.com/monitors" },
             { label: "MailGun", href: "https://app.mailgun.com/dashboard?tab=send" },
         ],
