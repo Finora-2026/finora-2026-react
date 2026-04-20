@@ -18,6 +18,7 @@ export const infoBoxes = [
         buttons: [
             { label: "Finora", to: "/finora-login" },
             { label: "Investment Calculator", to: "/investment-calculator" },
+            { label: "Movies", to: "/movies" },
         ],
     },
     {
