@@ -7,6 +7,7 @@ import './App.css'
 import Navbar from "./components/NavBar.tsx";
 import FinoraLogin from "./pages/FinoraLogin.tsx";
 import InvestmentCalculator from "./pages/InvestmentCalculator.tsx";
+import Movie from "./pages/Movie.tsx";
 
 export default function App() {
   return (
@@ -18,6 +19,7 @@ export default function App() {
         <Route path="/portfolio" element={<Portfolio />} />
         <Route path="/finora-login" element={<FinoraLogin />} />
         <Route path="/investment-calculator" element={<InvestmentCalculator />} />
+        <Route path="/movies" element={<Movie />} />
       </Routes>
     </>
   )
