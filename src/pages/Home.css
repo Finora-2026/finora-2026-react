@@ -17,6 +17,10 @@
     }
 }
 
+.email-link {
+    color: var(--text-h);
+}
+
 .bellamy-profile {
     display: flex;
     flex-direction: column;
@@ -55,6 +59,7 @@
     place-content: center;
     place-items: center;
     flex-grow: 1;
+    border-bottom: 1px solid var(--border);
 
     @media (max-width: 1024px) {
         padding: 32px 20px 24px;
@@ -151,50 +156,4 @@
     @media (max-width: 1024px) {
         height: 48px;
     }
-}
-
-.card {
-    flex: 1 1 0;
-    padding: 32px;
-    border-right: 1px solid var(--border);
-    display: flex;
-    flex-direction: column;
-    justify-content: space-between;
-}
-
-.card:last-child {
-    border-right: none;
-}
-
-.card-buttons {
-    display: flex;
-    gap: 10px;
-    margin-top: 16px;
-    flex-wrap: wrap;
-    justify-content: flex-start;
-}
-
-@media (max-width: 1024px) {
-    .card-buttons {
-        justify-content: center;
-    }
-
-    .card-buttons a {
-        flex: 1 1 calc(50% - 10px);
-        text-align: center;
-    }
-}
-
-.card-buttons a {
-    padding: 8px 12px;
-    border-radius: 8px;
-    background: var(--social-bg);
-    color: var(--text-h);
-    text-decoration: none;
-    transition: 0.2s;
-    flex: 1 1 140px;
-}
-
-.card-buttons a:hover {
-    box-shadow: var(--shadow);
 }
