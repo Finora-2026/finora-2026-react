@@ -23,8 +23,8 @@ export default function Results({ userInput }: ResultsProps) {
         <div className="card-body">
           <h4 className="card-title mb-3 text-center">Investment Results</h4>
           
-          <div className="table-responsive">
-            <table className="table table-striped table-hover table-bordered text-center align-middle">
+          <div className="table-responsive-sm">
+            <table className="table table-striped table-hover table-bordered text-center align-middle small">
               <thead className="table-dark">
               <tr>
                 <th>Year</th>
