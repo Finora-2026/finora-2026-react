@@ -1,6 +1,7 @@
 import {useEffect, useState} from "react";
 
 import bellamyPhoto from "../../assets/BellamyProfile.jpg";
+import myResume from "../../assets/BellamyPhan_Resume.pdf";
 import styles from "./Portfolio.module.scss";
 
 export default function Portfolio() {
@@ -16,7 +17,7 @@ export default function Portfolio() {
 
       {/* Header */}
       <header className={styles.portfolioHeader}>
-        <div className="header-content">
+        <div className={styles.headerContent}>
           <div className={styles.bellamyProfile}>
             <img
               src={bellamyPhoto}
@@ -46,13 +47,19 @@ export default function Portfolio() {
       <main className={styles.portfolioContainer}>
 
         <div className={styles.actionButtons}>
-          <a href="https://finora-angular.vercel.app/" className={styles.button}>
-            Finora Web App
-          </a>
-          {/* todo:add resume link or file here */}
-          <a href="BellamyPhan_Resume.pdf" className={styles.button} target="_blank">
+
+          <a href={myResume} className={styles.button} target="_blank">
             Bellamy's Resume
           </a>
+
+          <a href="https://finora-angular.vercel.app/" className={styles.button}>
+            Finora Web App (Legacy with Angular)
+          </a>
+
+          <a href="https://bellamyphan.space/" className={styles.button} target="_blank">
+            Legacy Portfolio
+          </a>
+
         </div>
 
         {/* About Me Section */}
@@ -70,7 +77,7 @@ export default function Portfolio() {
         <section className={styles.sectionCard}>
           <h2>Professional Experience</h2>
 
-          <div className={styles.item}>
+          <div className={`${styles.item} ${styles.projectCard}`}>
             <h3>Baron & Budd, P.C. – Dallas, TX</h3>
             <p><strong>Software Developer</strong> | July 2025 – Present</p>
             <ul>
@@ -80,7 +87,7 @@ export default function Portfolio() {
             </ul>
           </div>
 
-          <div className={styles.item}>
+          <div className={`${styles.item} ${styles.projectCard}`}>
             <h3>Cognizant Technology Solutions – Irving, TX</h3>
             <p><strong>Software Engineer</strong> | June 2022 – April 2025</p>
             <ul>
@@ -95,7 +102,7 @@ export default function Portfolio() {
             </ul>
           </div>
 
-          <div className={styles.item}>
+          <div className={`${styles.item} ${styles.projectCard}`}>
             <h3>Micro Focus – Houston, TX</h3>
             <p><strong>Software Engineer Intern</strong> | August 2021 – June 2022</p>
             <ul>
@@ -105,7 +112,7 @@ export default function Portfolio() {
             </ul>
           </div>
 
-          <div className={styles.item}>
+          <div className={`${styles.item} ${styles.projectCard}`}>
             <h3>Illuma Labs – Dallas, TX</h3>
             <p><strong>Software Engineer Intern</strong> | January 2021 – June 2022</p>
             <ul>
@@ -211,21 +218,6 @@ export default function Portfolio() {
             </li>
           </ul>
         </section>
-
-        {/* Legacy */}
-        <section className={styles.sectionCard}>
-          <h2>Legacy Portfolio</h2>
-          <p>
-            <a
-              href="https://bellamyphan.space/"
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              bellamyphan.space
-            </a>
-          </p>
-        </section>
-
       </main>
     </div>
   )
