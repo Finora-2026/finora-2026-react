@@ -1,10 +1,12 @@
 import { useEffect, useState } from "react";
 import { fetchMovies, type Movie } from "../utils/movieApi";
+import { useNavigate } from "react-router-dom";
 
 export default function Movie() {
   const [movies, setMovies] = useState<Movie[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+  const navigate = useNavigate();
   
   useEffect(() => {
     document.title = "Finora | Movies";
@@ -36,7 +38,12 @@ export default function Movie() {
       
       <div className="row g-3">
         {movies.map((movie) => (
-          <div key={movie.imdbId} className="col-12 col-sm-6 col-md-4 col-lg-3">
+          <div
+            key={movie.imdbId}
+            className="col-12 col-sm-6 col-md-4 col-lg-3"
+            onClick={() => navigate(`/movies/${movie.imdbId}`)}
+            style={{ cursor: "pointer" }}
+          >
             <div className="card h-100 shadow-sm">
               
               <img
