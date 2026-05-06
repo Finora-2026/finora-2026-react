@@ -48,6 +48,13 @@ export default function FinoraLogin() {
 
         <button
           className="counter"
+          onClick={() => navigate("/sign-in")}
+        >
+          Go to Sign In
+        </button>
+
+        <button
+          className="counter"
           onClick={() => setCount((count) => count + 1)}
         >
           Count is {count}
