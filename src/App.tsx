@@ -9,6 +9,7 @@ import FinoraLogin from "./pages/FinoraLogin.tsx";
 import InvestmentCalculator from "./pages/InvestmentCalculator.tsx";
 import Movie from "./pages/Movie.tsx";
 import MovieDetail from "./pages/MovieDetail.tsx";
+import NotFound from "./pages/notFound/NotFound.tsx";
 
 export default function App() {
   return (
@@ -16,12 +17,18 @@ export default function App() {
       <Navbar />
 
       <Routes>
+        {/* Public Routes */}
         <Route path="/" element={<Home />} />
         <Route path="/portfolio" element={<Portfolio />} />
         <Route path="/finora-login" element={<FinoraLogin />} />
         <Route path="/investment-calculator" element={<InvestmentCalculator />} />
         <Route path="/movies" element={<Movie />} />
         <Route path="/movies/:imdbId" element={<MovieDetail />} />
+
+        {/* Protected Routes */}
+
+        {/* Handle error and all pages */}
+        <Route path="*" element={<NotFound />} />
       </Routes>
     </>
   )
