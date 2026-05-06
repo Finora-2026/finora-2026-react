@@ -1,31 +1,183 @@
 /* Portfolio.module.scss */
 
+// Variables for consistency
+$primary-green: #4CAF50;
+$dark-green: #2e7d32;
+$primary-blue: #005ecb;
+$dark-blue: #003a75;
+$glass-bg: rgba(255, 255, 255, 0.18);
+$glass-border: rgba(255, 255, 255, 0.25);
+
+.portfolioPage {
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  // Note: Background image is usually better handled in a global CSS file
+  // or via a direct import if the path is relative to the project.
+  min-height: 100vh;
+  padding-bottom: 4rem;
+  color: #222;
+  line-height: 1.7;
+}
+
+.portfolioHeader {
+  background: $glass-bg;
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
+  padding: 2.5rem 2rem;
+  margin: 3rem auto 2rem;
+  border-radius: 20px;
+  max-width: 960px;
+  text-align: center;
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.25);
+  border: 1px solid $glass-border;
+}
+
 .bellamyProfile {
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
   gap: 16px;
-}
 
-.profile {
-  width: clamp(130px, 24vw, 200px);
-  height: clamp(130px, 24vw, 200px);
+  .profile {
+    width: clamp(130px, 24vw, 200px);
+    height: clamp(130px, 24vw, 200px);
 
-  border-radius: 50%;
-  object-fit: cover;
+    border-radius: 50%;
+    object-fit: cover;
 
-  border: 3px solid var(--border);
-  box-shadow: var(--shadow);
+    border: 3px solid var(--border);
+    box-shadow: var(--shadow);
 
-  filter: blur(8px);
-  transition: filter 0.8s ease, transform 0.8s ease;
+    filter: blur(8px);
+    transition: filter 0.8s ease, transform 0.8s ease;
 
-  &:hover {
-    transform: scale(1.3);
+    &:hover {
+      transform: scale(1.3);
+    }
+  }
+
+  .profileLoaded {
+    filter: blur(0);
   }
 }
 
-.profileLoaded {
-  filter: blur(0);
+.headerText {
+  h1 {
+    font-size: 2.6rem;
+    font-weight: 700;
+    margin: 0.5rem 0 0.3rem;
+  }
+  p {
+    margin: 0.4rem 0;
+    font-size: 1.05rem;
+    color: #111;
+  }
+  a {
+    color: $primary-blue;
+    text-decoration: none;
+    font-weight: 500;
+    &:hover { text-decoration: underline; }
+  }
+}
+
+.socialLinks {
+  margin-top: 0.6rem;
+  display: flex;
+  gap: 1rem;
+  justify-content: center;
+
+  a {
+    background: $primary-blue;
+    color: white !important;
+    padding: 0.4rem 1.2rem;
+    border-radius: 12px;
+    font-weight: 700;
+    text-decoration: none;
+    box-shadow: 0 4px 12px rgba(0, 94, 203, 0.5);
+    transition: all 0.3s ease;
+
+    &:hover {
+      background-color: $dark-blue;
+      box-shadow: 0 6px 20px rgba(0, 58, 117, 0.7);
+      transform: translateY(-2px);
+    }
+  }
+}
+
+.portfolioContainer {
+  width: 92%;
+  max-width: 1080px;
+  margin: 0 auto;
+  background: rgba(255, 255, 255, 0.25);
+  backdrop-filter: blur(4px);
+  border-radius: 20px;
+  padding: 2.5rem 3rem;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+  animation: fadeIn 0.9s ease-in-out;
+
+  .actionButtons {
+    margin-bottom: 2rem;
+  }
+}
+
+.sectionCard {
+  margin-bottom: 3.5rem;
+
+  h2 {
+    font-size: 1.9rem;
+    border-left: 5px solid $primary-green;
+    padding-left: 1rem;
+    margin-bottom: 1.2rem;
+  }
+
+  .item {
+    margin-bottom: 1.5rem;
+    h3 { margin-bottom: 0.2rem; }
+  }
+}
+
+.projectCard {
+  background: rgba(255, 255, 255, 0.28);
+  backdrop-filter: blur(6px);
+  padding: 1.7rem 2rem;
+  margin-bottom: 2.5rem;
+  border-radius: 18px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+  transition: all 0.25s ease;
+
+  &:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 10px 28px rgba(0, 0, 0, 0.22);
+  }
+}
+
+.button {
+  display: inline-block;
+  margin: 0.5rem 0.75rem 1rem 0;
+  padding: 13px 26px;
+  font-size: 1.05rem;
+  border-radius: 10px;
+  background: linear-gradient(135deg, $primary-green, $dark-green);
+  color: white;
+  text-decoration: none;
+  box-shadow: 0 6px 14px rgba(0, 0, 0, 0.2);
+  transition: all 0.3s ease;
+
+  &:hover {
+    transform: translateY(-2px) scale(1.02);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.25);
+    color: white;
+  }
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(30px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+// Responsive overrides
+@media (max-width: 768px) {
+  .portfolioContainer { padding: 1.5rem; }
+  .socialLinks { flex-direction: column; }
+  .button { width: 100%; text-align: center; }
 }

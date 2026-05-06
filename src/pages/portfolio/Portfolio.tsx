@@ -12,10 +12,10 @@ export default function Portfolio() {
   }, [])
 
   return (
-    <div className="portfolio-page">
+    <div className={styles.portfolioPage}>
 
       {/* Header */}
-      <header className="portfolio-header">
+      <header className={styles.portfolioHeader}>
         <div className="header-content">
           <div className={styles.bellamyProfile}>
             <img
@@ -26,7 +26,7 @@ export default function Portfolio() {
             />
           </div>
 
-          <div className="header-text">
+          <div className={styles.headerText}>
             <h1>Bellamy Phan</h1>
             <p>Software Engineer | Cloud Enthusiast | Problem Solver</p>
             <p>
@@ -34,29 +34,29 @@ export default function Portfolio() {
               469-849-9856
             </p>
 
-            <div className="social-links">
+            <div className={styles.socialLinks}>
               <a href="https://www.linkedin.com/in/thanhhphan/" target="_blank">LinkedIn</a>
-              <a href="https://github.com/bellamyp" target="_blank">GitHub</a>
+              <a href="https://github.com/bellamyphan" target="_blank">GitHub</a>
             </div>
           </div>
         </div>
       </header>
 
       {/* Main Content Container */}
-      <main className="portfolio-container">
+      <main className={styles.portfolioContainer}>
 
-        <div className="action-buttons">
-          <a href="https://finora-angular.vercel.app/" className="button">
+        <div className={styles.actionButtons}>
+          <a href="https://finora-angular.vercel.app/" className={styles.button}>
             Finora Web App
           </a>
           {/* todo:add resume link or file here */}
-          <a href="BellamyPhan_Resume.pdf" className="button" target="_blank">
+          <a href="BellamyPhan_Resume.pdf" className={styles.button} target="_blank">
             Bellamy's Resume
           </a>
         </div>
 
         {/* About Me Section */}
-        <section className={"section-card"}>
+        <section className={styles.sectionCard}>
           <h2>About Me</h2>
           <p>
             I’m a passionate Software Engineer with a strong background in cloud computing and full-stack
@@ -67,10 +67,10 @@ export default function Portfolio() {
         </section>
 
         {/* Professional Experience Section */}
-        <section className="section-card">
+        <section className={styles.sectionCard}>
           <h2>Professional Experience</h2>
 
-          <div className="item">
+          <div className={styles.item}>
             <h3>Baron & Budd, P.C. – Dallas, TX</h3>
             <p><strong>Software Developer</strong> | July 2025 – Present</p>
             <ul>
@@ -80,7 +80,7 @@ export default function Portfolio() {
             </ul>
           </div>
 
-          <div className="item">
+          <div className={styles.item}>
             <h3>Cognizant Technology Solutions – Irving, TX</h3>
             <p><strong>Software Engineer</strong> | June 2022 – April 2025</p>
             <ul>
@@ -95,7 +95,7 @@ export default function Portfolio() {
             </ul>
           </div>
 
-          <div className="item">
+          <div className={styles.item}>
             <h3>Micro Focus – Houston, TX</h3>
             <p><strong>Software Engineer Intern</strong> | August 2021 – June 2022</p>
             <ul>
@@ -105,7 +105,7 @@ export default function Portfolio() {
             </ul>
           </div>
 
-          <div className="item">
+          <div className={styles.item}>
             <h3>Illuma Labs – Dallas, TX</h3>
             <p><strong>Software Engineer Intern</strong> | January 2021 – June 2022</p>
             <ul>
@@ -118,12 +118,12 @@ export default function Portfolio() {
         </section>
 
         {/* Projects */}
-        <section className="section-card">
+        <section className={styles.sectionCard}>
           <h2>My Projects</h2>
 
           {/* Finora Web App */}
-          <div className="project-card">
-            <a href="https://finora-angular.vercel.app/" target="_blank" className="button">
+          <div className={styles.projectCard}>
+            <a href="https://finora-angular.vercel.app/" target="_blank" className={styles.button}>
               Finora Web App – Personal Finance Tracking
             </a>
 
@@ -146,8 +146,8 @@ export default function Portfolio() {
           </div>
 
           {/* Angular Tic Tac Toe */}
-          <div className="project-card">
-            <a href="https://github.com/bellamyp/angular-tik-tac-toe" target="_blank" className="button">
+          <div className={styles.projectCard}>
+            <a href="https://github.com/bellamyp/angular-tik-tac-toe" target="_blank" className={styles.button}>
               Angular Tic Tac Toe – Small Game Project
             </a>
 
@@ -162,8 +162,8 @@ export default function Portfolio() {
           </div>
 
           {/* Tetris Game */}
-          <div className="project-card">
-            <a href="https://github.com/bellamyp/Tetris" target="_blank" className="button">
+          <div className={styles.projectCard}>
+            <a href="https://github.com/bellamyp/Tetris" target="_blank" className={styles.button}>
               Tetris Game – Java Desktop App
             </a>
 
@@ -177,7 +177,7 @@ export default function Portfolio() {
         </section>
 
         {/* Technical Skills Section */}
-        <section className="section-card">
+        <section className={styles.sectionCard}>
           <h2>Technical Skills</h2>
           <ul>
             <li><strong>Languages & Frameworks:</strong> Java, Spring Boot, Hibernate, JavaFX, REST APIs, JUnit,
@@ -194,7 +194,7 @@ export default function Portfolio() {
         </section>
 
         {/* Education & Certifications Section */}
-        <section className="section-card">
+        <section className={styles.sectionCard}>
           <h2>Education & Certifications</h2>
           <p><strong>Bachelor of Science in Computer Science</strong> | University of Texas at Dallas | GPA: 3.9/4.0
           </p>
@@ -213,7 +213,7 @@ export default function Portfolio() {
         </section>
 
         {/* Legacy */}
-        <section className="section-card">
+        <section className={styles.sectionCard}>
           <h2>Legacy Portfolio</h2>
           <p>
             <a
