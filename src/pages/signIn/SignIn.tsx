@@ -21,6 +21,7 @@ export default function SignIn() {
       const res = await authService.login({ email, password });
 
       if (res.success) {
+        window.dispatchEvent(new Event("auth-change"));
         navigate("/");
       } else {
         setError("Login failed");

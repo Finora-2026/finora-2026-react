@@ -1,4 +1,5 @@
 import { Link, useLocation, useNavigate } from "react-router-dom";
+import { useEffect, useState } from "react";
 import { authService } from "../utils/authService";
 import "./NavBar.css";
 
@@ -6,11 +7,24 @@ export default function Navbar() {
   const location = useLocation();
   const navigate = useNavigate();
 
-  const user = authService.getCurrentUser();
-  const isLoggedIn = authService.isLoggedIn();
+  const [token, setToken] = useState<string | null>(authService.getToken());
+
+  useEffect(() => {
+    const syncAuth = () => {
+      setToken(authService.getToken());
+    };
+
+    window.addEventListener("auth-change", syncAuth);
+    return () => window.removeEventListener("auth-change", syncAuth);
+  }, []);
+
+  const user = token ? authService.getCurrentUser() : null;
+  const isLoggedIn = !!token;
 
   const handleLogout = () => {
     authService.logout();
+    setToken(null);
+    window.dispatchEvent(new Event("auth-change"));
     navigate("/");
   };
 
