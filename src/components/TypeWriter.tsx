@@ -1,5 +1,4 @@
 import { useEffect, useState } from "react";
-
 import "./TypeWriter.css";
 
 type Props = {
@@ -12,8 +11,6 @@ export default function TypeWriter({ text, speed = 25 }: Props) {
 
   useEffect(() => {
     let i = 0;
-
-    setOutput(""); // reset when text changes
 
     const interval = setInterval(() => {
       setOutput(text.slice(0, i));
