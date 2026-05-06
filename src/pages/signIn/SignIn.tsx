@@ -1,6 +1,6 @@
 import { Link } from "react-router-dom";
 
-export default function SignUp() {
+export default function SignIn() {
   return (
     <div className="d-flex justify-content-center align-items-start py-5">
       <div
@@ -8,18 +8,10 @@ export default function SignUp() {
         style={{ maxWidth: "400px", width: "100%" }}
       >
         <h2 className="text-center mb-4 fw-bold text-primary">
-          Create Account
+          Welcome Back
         </h2>
 
         <form>
-          <div className="mb-3">
-            <input
-              type="text"
-              className="form-control form-control-lg rounded-3"
-              placeholder="Full Name"
-            />
-          </div>
-
           <div className="mb-3">
             <input
               type="email"
@@ -40,17 +32,34 @@ export default function SignUp() {
             type="button"
             className="btn btn-primary w-100 mb-3 btn-lg fw-semibold shadow-sm"
           >
-            Sign Up
+            Login
           </button>
         </form>
 
-        <p className="text-center text-muted small mt-3">
-          Already have an account?{" "}
+        {/* Optional links */}
+        <div className="d-flex justify-content-between mb-3">
           <Link
-            to="/sign-in"
+            to="/login-otp-request"
+            className="text-decoration-none small"
+          >
+            Login with Email OTP
+          </Link>
+
+          <Link
+            to="/forgot-password"
+            className="text-decoration-none small"
+          >
+            Forgot password?
+          </Link>
+        </div>
+
+        <p className="text-center text-muted small mt-3">
+          Don't have an account?{" "}
+          <Link
+            to="/sign-up"
             className="text-decoration-none fw-semibold"
           >
-            Sign in
+            Sign up
           </Link>
         </p>
       </div>
