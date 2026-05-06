@@ -49,6 +49,7 @@ export default function Portfolio() {
           <a href="https://finora-angular.vercel.app/" className="button">
             Finora Web App
           </a>
+          {/* todo:add resume link or file here */}
           <a href="BellamyPhan_Resume.pdf" className="button" target="_blank">
             Bellamy's Resume
           </a>
