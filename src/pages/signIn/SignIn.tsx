@@ -18,14 +18,10 @@ export default function SignIn() {
     setError(null);
 
     try {
-      const res = await authService.login({
-        email,
-        password,
-      });
+      const res = await authService.login({ email, password });
 
-      if (res.success && res.token) {
-        localStorage.setItem("token", res.token);
-        navigate("/"); // redirect after login
+      if (res.success) {
+        navigate("/");
       } else {
         setError("Login failed");
       }
