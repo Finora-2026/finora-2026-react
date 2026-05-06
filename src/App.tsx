@@ -4,7 +4,7 @@ import Home from "./pages/Home.tsx";
 import Portfolio from "./pages/portfolio/Portfolio.tsx";
 
 import './App.css'
-import Navbar from "./components/NavBar.tsx";
+import Navbar from "./components/NavBar/NavBar.tsx";
 import FinoraLogin from "./pages/FinoraLogin.tsx";
 import InvestmentCalculator from "./pages/InvestmentCalculator.tsx";
 import Movie from "./pages/Movie.tsx";

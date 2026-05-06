@@ -1,6 +1,6 @@
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
-import { authService } from "../utils/authService";
+import { authService } from "../../utils/authService.ts";
 import "./NavBar.css";
 
 export default function Navbar() {

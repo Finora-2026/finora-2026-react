@@ -5,8 +5,8 @@ import viteLogo from "../assets/vite.svg";
 import bellamyPhoto from "../assets/BellamyProfile.jpg";
 
 import "./Home.css";
-import TypeWriter from "../components/TypeWriter.tsx";
-import InfoBox from "../components/InfoBox.tsx";
+import TypeWriter from "../components/TypeWriter/TypeWriter.tsx";
+import InfoBox from "../components/InfoBox/InfoBox.tsx";
 import {infoBoxes} from "../data/infoBoxes.ts";
 
 export default function Home() {
