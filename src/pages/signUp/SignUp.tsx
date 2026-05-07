@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
 import { userService } from "../../utils/userService";
+import styles from "./SignUp.module.scss";
 
 export default function SignUp() {
   const [name, setName] = useState("");
@@ -37,40 +38,35 @@ export default function SignUp() {
   };
 
   return (
-    <div className="d-flex justify-content-center align-items-start py-5">
-      <div
-        className="card p-4 shadow-lg rounded-4"
-        style={{ maxWidth: "400px", width: "100%" }}
-      >
-        <h2 className="text-center mb-4 fw-bold text-primary">
-          Create Account
-        </h2>
+    <div className={styles.container}>
+      <div className={styles.card}>
+        <h2 className={styles.title}>Create Account</h2>
 
-        <form onSubmit={handleSubmit}>
-          <div className="mb-3">
+        <form onSubmit={handleSubmit} className={styles.form}>
+          <div className={styles.field}>
             <input
+              className={styles.input}
               type="text"
-              className="form-control form-control-lg rounded-3"
               placeholder="Full Name"
               value={name}
               onChange={(e) => setName(e.target.value)}
             />
           </div>
 
-          <div className="mb-3">
+          <div className={styles.field}>
             <input
+              className={styles.input}
               type="email"
-              className="form-control form-control-lg rounded-3"
               placeholder="Email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
             />
           </div>
 
-          <div className="mb-3">
+          <div className={styles.field}>
             <input
+              className={styles.input}
               type="password"
-              className="form-control form-control-lg rounded-3"
               placeholder="Password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
@@ -79,28 +75,19 @@ export default function SignUp() {
 
           <button
             type="submit"
-            className="btn btn-primary w-100 mb-3 btn-lg fw-semibold shadow-sm"
+            className={styles.button}
             disabled={loading}
           >
             {loading ? "Creating..." : "Sign Up"}
           </button>
 
-          {error && (
-            <div className="text-danger text-center mb-2">
-              {error}
-            </div>
-          )}
-
-          {success && (
-            <div className="text-success text-center mb-2">
-              {success}
-            </div>
-          )}
+          {error && <div className={styles.error}>{error}</div>}
+          {success && <div className={styles.success}>{success}</div>}
         </form>
 
-        <p className="text-center text-muted small mt-3">
+        <p className={styles.footer}>
           Already have an account?{" "}
-          <Link to="/sign-in" className="text-decoration-none fw-semibold">
+          <Link to="/sign-in" className={styles.link}>
             Sign in
           </Link>
         </p>
