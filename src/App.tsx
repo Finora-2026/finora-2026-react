@@ -7,8 +7,8 @@ import './App.css'
 import Navbar from "./components/NavBar/NavBar.tsx";
 import FinoraLogin from "./pages/FinoraLogin.tsx";
 import InvestmentCalculator from "./pages/InvestmentCalculator.tsx";
-import Movie from "./pages/Movie.tsx";
-import MovieDetail from "./pages/MovieDetail.tsx";
+import Movie from "./pages/movie/Movie.tsx";
+import MovieDetail from "./pages/movie/MovieDetail.tsx";
 import NotFound from "./pages/notFound/NotFound.tsx";
 import SignUp from "./pages/AuthPages/SignUp.tsx";
 import SignIn from "./pages/AuthPages/SignIn.tsx";

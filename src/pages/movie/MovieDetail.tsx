@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
-import { fetchMovieByImdbId, type Movie } from "../utils/movieApi";
+import { fetchMovieByImdbId, type Movie } from "../../utils/movieApi.ts";
 import { useNavigate } from "react-router-dom";
 
 export default function MovieDetail() {

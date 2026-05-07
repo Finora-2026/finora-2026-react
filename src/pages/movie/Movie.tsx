@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { fetchMovies, type Movie } from "../utils/movieApi";
+import { fetchMovies, type Movie } from "../../utils/movieApi.ts";
 import { useNavigate } from "react-router-dom";
 
 export default function Movie() {
