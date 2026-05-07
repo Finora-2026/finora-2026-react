@@ -1,19 +1,22 @@
-import { useState, useEffect, type ReactNode } from "react";
+import { useState, useEffect, useCallback, type ReactNode } from "react";
 import { authService } from "../../utils/authService";
 import { AuthContext, type AuthUser } from "./AuthContext.ts";
 import { useToast } from "../../components/ToastProvider/toastContext.ts";
-import {getTokenPayload} from "../../jwt/jwt.ts";
+import { getTokenPayload } from "../../jwt/jwt.ts";
 
 export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [user, setUser] = useState<AuthUser | null>(authService.getCurrentUser());
   const { showToast } = useToast();
 
-  const refreshAuth = () => setUser(authService.getCurrentUser());
+  // Wrap functions in useCallback to keep the linter (and performance) happy
+  const refreshAuth = useCallback(() => {
+    setUser(authService.getCurrentUser());
+  }, []);
 
-  const logout = () => {
+  const logout = useCallback(() => {
     authService.logout();
     setUser(null);
-  };
+  }, []);
 
   // Heartbeat check: Every 20 seconds
   useEffect(() => {
@@ -43,7 +46,9 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     const interval = setInterval(checkTokenStatus, 20000);
 
     return () => clearInterval(interval);
-  }, [user]); // Re-run effect when user logs in/out
+
+    // Added logout and showToast to the dependency array
+  }, [user, logout, showToast]);
 
   return (
     <AuthContext.Provider value={{ isLoggedIn: !!user, user, refreshAuth, logout }}>
