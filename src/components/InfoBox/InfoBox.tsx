@@ -1,4 +1,4 @@
-import TypeWriter from "./TypeWriter";
+import TypeWriter from "../TypeWriter/TypeWriter.tsx";
 import {Link} from "react-router-dom";
 import styles from "./InfoBox.module.css";
 
