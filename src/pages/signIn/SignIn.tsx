@@ -85,7 +85,7 @@ export default function SignIn() {
 
         <p className={styles.footer}>
           Don't have an account?{" "}
-          <Link to="/sign-up" className={styles.footerLink}>
+          <Link to="/sign-up" className={styles.link}>
             Sign up
           </Link>
         </p>
