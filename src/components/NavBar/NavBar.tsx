@@ -3,7 +3,6 @@ import { useEffect, useState } from "react";
 import { authService } from "../../utils/authService.ts";
 import styles from "./NavBar.module.scss";
 import {useToast} from "../ToastProvider/toastContext.ts";
-import {toastConfig} from "../ToastProvider/toastConfig.ts";
 
 export default function Navbar() {
   const location = useLocation();
@@ -31,10 +30,7 @@ export default function Navbar() {
     window.dispatchEvent(new Event("auth-change"));
 
     showToast("Logged out successfully, going back to home page", "success");
-
-    setTimeout(() => {
-      navigate("/", { replace: true });
-    }, toastConfig.routingDelay);
+    navigate("/", { replace: true });
 
   };
 
@@ -50,7 +46,7 @@ export default function Navbar() {
           Portfolio
         </Link>
 
-        <Link className={location.pathname === "/finora" ? styles.active : ""} to="/finora">
+        <Link className={location.pathname.startsWith("/finora") ? styles.active : ""} to="/finora">
           Finora
         </Link>
       </div>
