@@ -1,25 +1,16 @@
 import { Navigate, Outlet } from "react-router-dom";
-import { useEffect } from "react";
-import { authService } from "../utils/authService";
-import {useAuth} from "../pages/AuthPages/AuthContext.ts";
+import { useAuth } from "../pages/AuthPages/AuthContext.ts";
 
 export default function ProtectedRoute() {
-  const { isLoggedIn, refreshAuth } = useAuth();
+  // 1. Pull the reactive state from Context
+  const { isLoggedIn } = useAuth();
 
-  // If the service says we are logged out (expired),
-  // but the Context still thinks we are logged in:
-  const actualAuthStatus = authService.isLoggedIn();
-
-  useEffect(() => {
-    if (!actualAuthStatus && isLoggedIn) {
-      // The token expired! Tell the context to sync up.
-      refreshAuth();
-    }
-  }, [actualAuthStatus, isLoggedIn, refreshAuth]);
-
-  if (!actualAuthStatus) {
+  // 2. The moment Heartbeat sets user to null, isLoggedIn becomes false.
+  // React immediately re-renders this component.
+  if (!isLoggedIn) {
     return <Navigate to="/sign-in" replace />;
   }
 
+  // 3. If they are logged in, show the child route (Finora)
   return <Outlet />;
 }

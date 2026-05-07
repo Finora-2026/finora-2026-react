@@ -18,8 +18,8 @@ import {AuthProvider} from "./pages/AuthPages/AuthProvider.tsx";
 
 export default function App() {
   return (
-    <AuthProvider>
-      <ToastProvider>
+    <ToastProvider>
+      <AuthProvider>
         <Navbar />
 
         <Routes>
@@ -40,7 +40,7 @@ export default function App() {
           {/* Handle error and all pages */}
           <Route path="*" element={<NotFound />} />
         </Routes>
-      </ToastProvider>
-    </AuthProvider>
+      </AuthProvider>
+    </ToastProvider>
   );
 }
