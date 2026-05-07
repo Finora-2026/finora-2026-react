@@ -12,9 +12,9 @@ import NotFound from "./pages/notFound/NotFound.tsx";
 import SignUp from "./pages/AuthPages/SignUp.tsx";
 import SignIn from "./pages/AuthPages/SignIn.tsx";
 import {ToastProvider} from "./components/ToastProvider/ToastProvider.tsx";
-import FinoraPage from "./pages/finora/FinoraPage.tsx";
 import ProtectedRoute from "./route/ProtectedRoute.tsx";
 import {AuthProvider} from "./pages/AuthPages/AuthProvider.tsx";
+import {PROTECTED_ROUTES} from "./config/RouteConfig.ts";
 
 export default function App() {
   return (
@@ -32,9 +32,15 @@ export default function App() {
           <Route path="/movies" element={<Movie />} />
           <Route path="/movies/:imdbId" element={<MovieDetail />} />
 
-          {/* Protected Routes */}
+          {/* Protected Routes - Generated Dynamically */}
           <Route element={<ProtectedRoute />}>
-            <Route path="/finora" element={<FinoraPage />} />
+            {PROTECTED_ROUTES.map((route) => (
+              <Route
+                key={route.path}
+                path={route.path}
+                element={<route.element />}
+              />
+            ))}
           </Route>
 
           {/* Handle error and all pages */}
