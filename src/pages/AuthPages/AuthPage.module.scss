@@ -69,21 +69,18 @@
   }
 }
 
-.error {
-  color: #ef4444;
+.success {
+  color: #22c55e;
   text-align: center;
   margin-top: 10px;
   font-size: 14px;
 }
 
-.linksRow {
-  display: flex;
-  justify-content: space-between;
-  margin-top: 16px;
+.error {
+  color: #ef4444;
+  text-align: center;
+  margin-top: 10px;
   font-size: 14px;
-
-  gap: 12px;
-  flex-wrap: wrap;
 }
 
 .link {
@@ -114,9 +111,22 @@
   &:hover {
     text-decoration: underline;
   }
+
+  overflow-wrap: anywhere;
+  max-width: 100%;
 }
 
-/* mobile tuning */
+.linksRow {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 16px;
+  font-size: 14px;
+
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+/* mobile */
 @media (max-width: 600px) {
   .card {
     padding: 20px;
