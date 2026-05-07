@@ -10,8 +10,8 @@ import InvestmentCalculator from "./pages/InvestmentCalculator.tsx";
 import Movie from "./pages/Movie.tsx";
 import MovieDetail from "./pages/MovieDetail.tsx";
 import NotFound from "./pages/notFound/NotFound.tsx";
-import SignUp from "./pages/signUp/SignUp.tsx";
-import SignIn from "./pages/signIn/SignIn.tsx";
+import SignUp from "./pages/AuthPages/SignUp.tsx";
+import SignIn from "./pages/AuthPages/SignIn.tsx";
 
 export default function App() {
   return (
