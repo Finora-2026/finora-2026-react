@@ -50,7 +50,7 @@ export default function Navbar() {
           Portfolio
         </Link>
 
-        <Link className={location.pathname === "/finora-login" ? styles.active : ""} to="/finora-login">
+        <Link className={location.pathname === "/finora" ? styles.active : ""} to="/finora">
           Finora
         </Link>
       </div>

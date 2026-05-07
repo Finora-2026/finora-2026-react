@@ -1,4 +1,4 @@
-import { useState } from "react";
+import {useEffect, useState} from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { userService } from "../../utils/userService.ts";
 import { authService } from "../../utils/authService.ts";
@@ -16,6 +16,10 @@ export default function SignUp() {
 
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    document.title = 'Bellamy Phan | Signup'
+  }, [])
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();

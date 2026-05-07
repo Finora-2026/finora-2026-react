@@ -1,4 +1,4 @@
-import { useState } from "react";
+import {useEffect, useState} from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { authService } from "../../utils/authService.ts";
 import styles from "./AuthPage.module.scss";
@@ -14,6 +14,10 @@ export default function SignIn() {
 
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    document.title = 'Bellamy Phan | Login'
+  }, [])
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();

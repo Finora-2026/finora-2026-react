@@ -16,7 +16,7 @@ export const infoBoxes = [
         text: "Finance tracking and budget planning for your future. Including small side projects",
         speed: 85,
         buttons: [
-            { label: "Finora", to: "/finora-login" },
+            { label: "Finora", to: "/finora" },
             { label: "Investment Calculator", to: "/investment-calculator" },
             { label: "Movies", to: "/movies" },
         ],
