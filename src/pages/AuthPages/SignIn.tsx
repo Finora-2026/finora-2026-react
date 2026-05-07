@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { authService } from "../../utils/authService";
+import { authService } from "../../utils/authService.ts";
 import styles from "./SignIn.module.scss";
 
 export default function SignIn() {

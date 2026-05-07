@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
-import { userService } from "../../utils/userService";
+import { userService } from "../../utils/userService.ts";
 import styles from "./SignUp.module.scss";
 
 export default function SignUp() {
