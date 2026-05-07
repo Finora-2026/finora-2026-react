@@ -1,5 +1,4 @@
 import {useEffect, useState} from "react";
-import { useNavigate } from "react-router-dom";
 
 import {BackendConfig} from "../config/BackendConfig.ts";
 
@@ -9,7 +8,6 @@ export default function FinoraLogin() {
     document.title = 'Bellamy Phan | Finora Login'
   }, [])
 
-  const navigate = useNavigate();
   const [count, setCount] = useState(0);
   const [dbStatus, setDbStatus] = useState<string>('');
   const [loading, setLoading] = useState(false);
@@ -32,26 +30,7 @@ export default function FinoraLogin() {
 
   return (
     <>
-      <section>
-        <h1>Finora App</h1>
-        <p>Login page - Will coming soon</p>
-      </section>
-
       <section id="center">
-
-        <button
-          className="counter"
-          onClick={() => navigate("/sign-up")}
-        >
-          Go to Sign Up
-        </button>
-
-        <button
-          className="counter"
-          onClick={() => navigate("/sign-in")}
-        >
-          Go to Sign In
-        </button>
 
         <button
           className="counter"
