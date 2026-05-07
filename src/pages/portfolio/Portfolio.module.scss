@@ -183,9 +183,89 @@ $glass-border: rgba(255, 255, 255, 0.25);
   to { opacity: 1; transform: translateY(0); }
 }
 
-// Responsive overrides
 @media (max-width: 768px) {
-  .portfolioContainer { padding: 1.5rem; }
-  .socialLinks { flex-direction: column; }
-  .button { width: 100%; text-align: center; }
+
+  .portfolioHeader {
+    padding: 1.5rem 1rem;
+    margin: 1rem;
+  }
+
+  .portfolioContainer {
+    width: calc(100% - 1rem);
+    padding: 1.25rem;
+    border-radius: 16px;
+  }
+
+  .headerText {
+
+    h1 {
+      font-size: 2rem;
+      line-height: 1.2;
+    }
+
+    p {
+      font-size: 0.95rem;
+      word-break: break-word;
+    }
+  }
+
+  .sectionCard {
+
+    h2 {
+      font-size: 1.5rem;
+    }
+  }
+
+  .projectCard {
+    padding: 1.25rem;
+  }
+
+  .socialLinks {
+    flex-direction: column;
+    width: 100%;
+
+    a {
+      width: 100%;
+      text-align: center;
+    }
+  }
+
+  .button {
+    width: 100%;
+    margin-right: 0;
+    text-align: center;
+    box-sizing: border-box;
+  }
+
+  .bellamyProfile {
+
+    .profile {
+
+      &:hover {
+        transform: none;
+      }
+    }
+  }
+}
+
+@media (max-width: 480px) {
+
+  .headerText {
+
+    h1 {
+      font-size: 1.7rem;
+    }
+
+    p {
+      font-size: 0.9rem;
+    }
+  }
+
+  .portfolioContainer {
+    padding: 1rem;
+  }
+
+  .projectCard {
+    padding: 1rem;
+  }
 }
