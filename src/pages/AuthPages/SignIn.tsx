@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import {Link, useLocation, useNavigate} from "react-router-dom";
 import { authService } from "../../utils/authService.ts";
 import styles from "./AuthPage.module.scss";
 import { useToast } from "../../components/ToastProvider/toastContext.ts";
@@ -7,6 +7,11 @@ import {useAuth} from "./AuthContext.ts";
 
 export default function SignIn() {
   const navigate = useNavigate();
+
+  const location = useLocation();
+  // Retrieve the "from" path, or default to home "/"
+  const destination = location.state?.from?.pathname || "/";
+
   const { showToast } = useToast();
   const { refreshAuth } = useAuth(); // Grab refreshAuth from context
 
@@ -34,8 +39,9 @@ export default function SignIn() {
         // This tells the AuthProvider to read the new token and update the 'user' state
         refreshAuth();
 
-        showToast("Login successful, going to home page", "success");
-        navigate("/", { replace: true });
+        showToast("Login successful", "success");
+        // Navigate to the intended destination
+        navigate(destination, { replace: true });
       } else {
         showToast("Invalid email or password", "error");
         setError("Login failed");
