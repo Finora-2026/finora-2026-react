@@ -1,35 +1,48 @@
 import { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { userService } from "../../utils/userService.ts";
+import { authService } from "../../utils/authService.ts";
 import styles from "./AuthPage.module.scss";
 
 export default function SignUp() {
+  const navigate = useNavigate();
+
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [success, setSuccess] = useState<string | null>(null);
+  const [toast, setToast] = useState<string | null>(null);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
     setLoading(true);
     setError(null);
-    setSuccess(null);
+    setToast(null);
 
     try {
-      const result = await userService({
-        name,
-        email,
-        password,
-      });
+      // 1. Create account
+      await userService({ name, email, password });
 
-      setSuccess(`User created: ${result.email}`);
-      setName("");
-      setEmail("");
-      setPassword("");
+      // 2. Auto login
+      const loginRes = await authService.login({ email, password });
+
+      if (loginRes.success) {
+        window.dispatchEvent(new Event("auth-change"));
+
+        setToast("Account created! Signing you in...");
+
+        // 3. Redirect after toast delay
+        setTimeout(() => {
+          navigate("/", { replace: true });
+        }, 5000);
+
+      } else {
+        setError("Account created but login failed");
+      }
+
     } catch (err) {
       setError("Failed to create account: " + err);
     } finally {
@@ -78,12 +91,13 @@ export default function SignUp() {
             className={styles.button}
             disabled={loading}
           >
-            {loading ? "Creating..." : "Sign Up"}
+            {loading ? "Creating account..." : "Sign Up"}
           </button>
 
           {error && <div className={styles.error}>{error}</div>}
-          {success && <div className={styles.success}>{success}</div>}
         </form>
+
+        {toast && <div className={styles.toast}>{toast}</div>}
 
         <p className={styles.footer}>
           Already have an account?{" "}
