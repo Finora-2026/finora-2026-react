@@ -3,7 +3,6 @@ import { Link, useNavigate } from "react-router-dom";
 import { authService } from "../../utils/authService.ts";
 import styles from "./AuthPage.module.scss";
 import { useToast } from "../../components/ToastProvider/toastContext.ts";
-import {toastConfig} from "../../components/ToastProvider/toastConfig.ts";
 
 export default function SignIn() {
   const navigate = useNavigate();
@@ -32,10 +31,7 @@ export default function SignIn() {
         window.dispatchEvent(new Event("auth-change"));
 
         showToast("Login successful, going to home page", "success");
-
-        setTimeout(() => {
-          navigate("/", { replace: true });
-        }, toastConfig.routingDelay);
+        navigate("/", { replace: true });
 
       } else {
         showToast("Invalid email or password", "error");

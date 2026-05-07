@@ -4,7 +4,6 @@ import { userService } from "../../utils/userService.ts";
 import { authService } from "../../utils/authService.ts";
 import styles from "./AuthPage.module.scss";
 import {useToast} from "../../components/ToastProvider/toastContext.ts";
-import {toastConfig} from "../../components/ToastProvider/toastConfig.ts";
 
 export default function SignUp() {
   const navigate = useNavigate();
@@ -42,10 +41,8 @@ export default function SignUp() {
           "success"
         );
 
-        // 3. Redirect after toast delay
-        setTimeout(() => {
-          navigate("/", { replace: true });
-        }, toastConfig.routingDelay);
+        // 3. Redirect after toast
+        navigate("/", { replace: true });
 
       } else {
         showToast("Account created but login failed", "error");
