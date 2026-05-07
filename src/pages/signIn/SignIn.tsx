@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { authService } from "../../utils/authService";
+import styles from "./SignIn.module.scss";
 
 export default function SignIn() {
   const navigate = useNavigate();
@@ -34,20 +35,15 @@ export default function SignIn() {
   };
 
   return (
-    <div className="d-flex justify-content-center align-items-start py-5">
-      <div
-        className="card p-4 shadow-lg rounded-4"
-        style={{ maxWidth: "400px", width: "100%" }}
-      >
-        <h2 className="text-center mb-4 fw-bold text-primary">
-          Welcome Back
-        </h2>
+    <div className={styles.container}>
+      <div className={styles.card}>
+        <h2 className={styles.title}>Welcome Back</h2>
 
-        <form onSubmit={handleLogin}>
-          <div className="mb-3">
+        <form onSubmit={handleLogin} className={styles.form}>
+          <div className={styles.field}>
             <input
               type="email"
-              className="form-control form-control-lg rounded-3"
+              className={styles.input}
               placeholder="Email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
@@ -55,10 +51,10 @@ export default function SignIn() {
             />
           </div>
 
-          <div className="mb-3">
+          <div className={styles.field}>
             <input
               type="password"
-              className="form-control form-control-lg rounded-3"
+              className={styles.input}
               placeholder="Password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
@@ -68,32 +64,28 @@ export default function SignIn() {
 
           <button
             type="submit"
-            className="btn btn-primary w-100 mb-3 btn-lg fw-semibold shadow-sm"
+            className={styles.button}
             disabled={loading}
           >
             {loading ? "Logging in..." : "Login"}
           </button>
 
-          {error && (
-            <div className="text-danger text-center mb-2">
-              {error}
-            </div>
-          )}
+          {error && <div className={styles.error}>{error}</div>}
         </form>
 
-        <div className="d-flex justify-content-between mb-3">
-          <Link to="/login-otp-request" className="text-decoration-none small">
+        <div className={styles.linksRow}>
+          <Link to="/login-otp-request" className={styles.link}>
             Login with Email OTP
           </Link>
 
-          <Link to="/forgot-password" className="text-decoration-none small">
+          <Link to="/forgot-password" className={styles.link}>
             Forgot password?
           </Link>
         </div>
 
-        <p className="text-center text-muted small mt-3">
+        <p className={styles.footer}>
           Don't have an account?{" "}
-          <Link to="/sign-up" className="text-decoration-none fw-semibold">
+          <Link to="/sign-up" className={styles.footerLink}>
             Sign up
           </Link>
         </p>
