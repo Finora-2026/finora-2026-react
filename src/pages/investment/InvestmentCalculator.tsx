@@ -1,8 +1,8 @@
 import {useEffect, useState} from "react";
-import Header from "../components/InvestmentCalculator/Header.tsx";
-import UserInput from "../components/InvestmentCalculator/UserInput.tsx";
-import type {InvestmentCalculatorInput} from "../data/InvestmentCalculatorInput.ts";
-import Results from "../components/InvestmentCalculator/Results.tsx";
+import Header from "../../components/InvestmentCalculator/Header.tsx";
+import UserInput from "../../components/InvestmentCalculator/UserInput.tsx";
+import type {InvestmentCalculatorInput} from "../../data/InvestmentCalculatorInput.ts";
+import Results from "../../components/InvestmentCalculator/Results.tsx";
 
 export default function InvestmentCalculator() {
 

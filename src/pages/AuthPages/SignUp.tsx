@@ -1,14 +1,15 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { userService } from "../../utils/userService.ts";
 import { authService } from "../../utils/authService.ts";
 import styles from "./AuthPage.module.scss";
-import {useToast} from "../../components/ToastProvider/toastContext.ts";
-import {toastConfig} from "../../components/ToastProvider/toastConfig.ts";
+import { useToast } from "../../components/ToastProvider/toastContext.ts";
+import {useAuth} from "./AuthContext.ts";
 
 export default function SignUp() {
   const navigate = useNavigate();
   const { showToast } = useToast();
+  const { refreshAuth } = useAuth(); // Grab refreshAuth
 
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
@@ -16,6 +17,10 @@ export default function SignUp() {
 
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    document.title = 'Bellamy Phan | Signup'
+  }, [])
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -31,29 +36,20 @@ export default function SignUp() {
       const loginRes = await authService.login({ email, password });
 
       if (loginRes.success) {
-        window.dispatchEvent(new Event("auth-change"));
+        // TRIGGER THE UI UPDATE
+        // Crucial: The token is in storage, now update the React State
+        refreshAuth();
 
-        showToast(
-          "Account created! Signing you in...",
-          "success"
-        );
+        showToast("Account created! Signing you in...", "success");
 
-        // 3. Redirect after toast delay
-        setTimeout(() => {
-          navigate("/", { replace: true });
-        }, toastConfig.routingDelay);
-
+        // Redirect after toast
+        navigate("/", { replace: true });
       } else {
         showToast("Account created but login failed", "error");
       }
-
     } catch (err) {
       setError("Failed to create account: " + err);
-
-      showToast(
-        "Something went wrong during signup",
-        "error"
-      );
+      showToast("Something went wrong during signup", "error");
     } finally {
       setLoading(false);
     }
@@ -72,6 +68,7 @@ export default function SignUp() {
               placeholder="Full Name"
               value={name}
               onChange={(e) => setName(e.target.value)}
+              required
             />
           </div>
 
@@ -82,6 +79,7 @@ export default function SignUp() {
               placeholder="Email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
+              required
             />
           </div>
 
@@ -92,6 +90,7 @@ export default function SignUp() {
               placeholder="Password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
+              required
             />
           </div>
 

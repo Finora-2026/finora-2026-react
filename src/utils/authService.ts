@@ -1,5 +1,5 @@
 import { BackendConfig } from "../config/BackendConfig";
-import {getTokenPayload} from "../jwt/jwt.ts";
+import { getTokenPayload } from "../jwt/jwt.ts";
 
 export type LoginRequestDto = {
   email: string;
@@ -11,11 +11,28 @@ export type LoginResponseDto = {
   token: string;
 };
 
+/**
+ * Centralized token validation logic
+ * This is used internally to check if the token exists and is still valid.
+ */
+const getValidPayload = () => {
+  const token = localStorage.getItem("token");
+  if (!token) return null;
+
+  const payload = getTokenPayload(token);
+  if (!payload) return null;
+
+  const expired = payload.exp * 1000 < Date.now();
+  if (expired) return null;
+
+  return payload;
+};
+
 export const authService = {
   login: async (payload: LoginRequestDto): Promise<LoginResponseDto> => {
     const res = await fetch(`${BackendConfig.springApiUrl}/auth/login`, {
       method: "POST",
-      headers: {"Content-Type": "application/json",},
+      headers: { "Content-Type": "application/json" },
       body: JSON.stringify(payload),
     });
 
@@ -26,6 +43,9 @@ export const authService = {
 
     const data: LoginResponseDto = await res.json();
 
+    // Logic: If login is successful, we persist the token.
+    // The UI update is now triggered by the calling component
+    // running refreshAuth() from the AuthContext.
     if (data.success && data.token) {
       localStorage.setItem("token", data.token);
     }
@@ -38,18 +58,7 @@ export const authService = {
   },
 
   isLoggedIn: () => {
-    const token = localStorage.getItem("token");
-    const payload = getTokenPayload(token);
-
-    if (!payload) return false;
-
-    const expired = payload.exp * 1000 < Date.now();
-    if (expired) {
-      localStorage.removeItem("token");
-      return false;
-    }
-
-    return true;
+    return getValidPayload() !== null;
   },
 
   getToken: () => {
@@ -57,9 +66,7 @@ export const authService = {
   },
 
   getCurrentUser: () => {
-    const token = localStorage.getItem("token");
-    const payload = getTokenPayload(token);
-
+    const payload = getValidPayload();
     if (!payload) return null;
 
     return {

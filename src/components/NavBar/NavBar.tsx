@@ -1,41 +1,22 @@
 import { Link, useLocation, useNavigate } from "react-router-dom";
-import { useEffect, useState } from "react";
-import { authService } from "../../utils/authService.ts";
 import styles from "./NavBar.module.scss";
-import {useToast} from "../ToastProvider/toastContext.ts";
-import {toastConfig} from "../ToastProvider/toastConfig.ts";
+import { useToast } from "../ToastProvider/toastContext.ts";
+import {useAuth} from "../../pages/AuthPages/AuthContext.ts";
 
 export default function Navbar() {
   const location = useLocation();
   const navigate = useNavigate();
   const { showToast } = useToast();
 
-  const [token, setToken] = useState<string | null>(authService.getToken());
-
-  useEffect(() => {
-    const syncAuth = () => {
-      setToken(authService.getToken());
-    };
-
-    window.addEventListener("auth-change", syncAuth);
-    return () => window.removeEventListener("auth-change", syncAuth);
-  }, []);
-
-  const user = token ? authService.getCurrentUser() : null;
-  const isLoggedIn = !!token;
+  // Pull everything from the Auth Context
+  const { user, isLoggedIn, logout } = useAuth();
 
   const handleLogout = () => {
-    authService.logout();
-    setToken(null);
-
-    window.dispatchEvent(new Event("auth-change"));
+    // Use the logout from context (it calls the service AND updates UI)
+    logout();
 
     showToast("Logged out successfully, going back to home page", "success");
-
-    setTimeout(() => {
-      navigate("/", { replace: true });
-    }, toastConfig.routingDelay);
-
+    navigate("/", { replace: true });
   };
 
   return (
@@ -45,17 +26,17 @@ export default function Navbar() {
           Home
         </Link>
 
-
         <Link className={location.pathname === "/portfolio" ? styles.active : ""} to="/portfolio">
           Portfolio
         </Link>
 
-        <Link className={location.pathname === "/finora-login" ? styles.active : ""} to="/finora-login">
+        <Link className={location.pathname.startsWith("/finora") ? styles.active : ""} to="/finora">
           Finora
         </Link>
       </div>
 
       <div className={styles.navName}>
+        {/* Use the reactive 'isLoggedIn' and 'user' variables */}
         {isLoggedIn && user ? (
           <button onClick={handleLogout}>
             {user.email} (Log Out)
