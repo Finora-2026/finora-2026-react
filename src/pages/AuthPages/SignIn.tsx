@@ -2,9 +2,12 @@ import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { authService } from "../../utils/authService.ts";
 import styles from "./AuthPage.module.scss";
+import { useToast } from "../../components/ToastProvider/toastContext.ts";
+import {toastConfig} from "../../components/ToastProvider/toastConfig.ts";
 
 export default function SignIn() {
   const navigate = useNavigate();
+  const { showToast } = useToast();
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -23,11 +26,19 @@ export default function SignIn() {
 
       if (res.success) {
         window.dispatchEvent(new Event("auth-change"));
-        navigate("/");
+
+        showToast("Login successful, going to home page", "success");
+
+        setTimeout(() => {
+          navigate("/", { replace: true });
+        }, toastConfig.routingDelay);
+
       } else {
+        showToast("Invalid email or password", "error");
         setError("Login failed");
       }
     } catch (err) {
+      showToast("Something went wrong during login", "error");
       setError(String(err));
     } finally {
       setLoading(false);
@@ -62,11 +73,7 @@ export default function SignIn() {
             />
           </div>
 
-          <button
-            type="submit"
-            className={styles.button}
-            disabled={loading}
-          >
+          <button type="submit" className={styles.button} disabled={loading}>
             {loading ? "Logging in..." : "Login"}
           </button>
 

@@ -2,10 +2,13 @@ import { Link, useLocation, useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
 import { authService } from "../../utils/authService.ts";
 import styles from "./NavBar.module.scss";
+import {useToast} from "../ToastProvider/toastContext.ts";
+import {toastConfig} from "../ToastProvider/toastConfig.ts";
 
 export default function Navbar() {
   const location = useLocation();
   const navigate = useNavigate();
+  const { showToast } = useToast();
 
   const [token, setToken] = useState<string | null>(authService.getToken());
 
@@ -24,8 +27,15 @@ export default function Navbar() {
   const handleLogout = () => {
     authService.logout();
     setToken(null);
+
     window.dispatchEvent(new Event("auth-change"));
-    navigate("/");
+
+    showToast("Logged out successfully, going back to home page", "success");
+
+    setTimeout(() => {
+      navigate("/", { replace: true });
+    }, toastConfig.routingDelay);
+
   };
 
   return (
