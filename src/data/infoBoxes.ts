@@ -47,6 +47,7 @@ export const infoBoxes = [
             { label: "Mongo DB", href: "https://cloud.mongodb.com/v2/661c88b1dce24942d41aa828#/overview" },
             { label: "Uptime Robot", href: "https://dashboard.uptimerobot.com/monitors" },
             { label: "MailGun", href: "https://app.mailgun.com/dashboard?tab=send" },
+            { label: "Spaceship", href: "https://www.spaceship.com/application/domain-list-application/" },
         ],
     },
 ];
