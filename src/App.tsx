@@ -12,10 +12,11 @@ import MovieDetail from "./pages/MovieDetail.tsx";
 import NotFound from "./pages/notFound/NotFound.tsx";
 import SignUp from "./pages/AuthPages/SignUp.tsx";
 import SignIn from "./pages/AuthPages/SignIn.tsx";
+import {ToastProvider} from "./components/ToastProvider/ToastProvider.tsx";
 
 export default function App() {
   return (
-    <>
+    <ToastProvider>
       <Navbar />
 
       <Routes>
@@ -34,6 +35,6 @@ export default function App() {
         {/* Handle error and all pages */}
         <Route path="*" element={<NotFound />} />
       </Routes>
-    </>
-  )
+    </ToastProvider>
+  );
 }
