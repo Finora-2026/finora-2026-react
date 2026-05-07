@@ -3,9 +3,12 @@ import { Link, useNavigate } from "react-router-dom";
 import { userService } from "../../utils/userService.ts";
 import { authService } from "../../utils/authService.ts";
 import styles from "./AuthPage.module.scss";
+import {useToast} from "../../components/ToastProvider/toastContext.ts";
+import {toastConfig} from "../../components/ToastProvider/toastConfig.ts";
 
 export default function SignUp() {
   const navigate = useNavigate();
+  const { showToast } = useToast();
 
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
@@ -13,14 +16,12 @@ export default function SignUp() {
 
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [toast, setToast] = useState<string | null>(null);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
     setLoading(true);
     setError(null);
-    setToast(null);
 
     try {
       // 1. Create account
@@ -32,19 +33,27 @@ export default function SignUp() {
       if (loginRes.success) {
         window.dispatchEvent(new Event("auth-change"));
 
-        setToast("Account created! Signing you in...");
+        showToast(
+          "Account created! Signing you in...",
+          "success"
+        );
 
         // 3. Redirect after toast delay
         setTimeout(() => {
           navigate("/", { replace: true });
-        }, 5000);
+        }, toastConfig.routingDelay);
 
       } else {
-        setError("Account created but login failed");
+        showToast("Account created but login failed", "error");
       }
 
     } catch (err) {
       setError("Failed to create account: " + err);
+
+      showToast(
+        "Something went wrong during signup",
+        "error"
+      );
     } finally {
       setLoading(false);
     }
@@ -96,8 +105,6 @@ export default function SignUp() {
 
           {error && <div className={styles.error}>{error}</div>}
         </form>
-
-        {toast && <div className={styles.toast}>{toast}</div>}
 
         <p className={styles.footer}>
           Already have an account?{" "}
