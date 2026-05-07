@@ -5,8 +5,12 @@ $primary-green: #4CAF50;
 $dark-green: #2e7d32;
 $primary-blue: #005ecb;
 $dark-blue: #003a75;
-$glass-bg: rgba(255, 255, 255, 0.18);
-$glass-border: rgba(255, 255, 255, 0.25);
+
+$glass-bg-light: rgba(255, 255, 255, 0.18);
+$glass-card-light: rgba(255, 255, 255, 0.28);
+
+$glass-bg-dark: rgba(30, 32, 40, 0.55);
+$glass-card-dark: rgba(35, 37, 46, 0.65);
 
 .portfolioPage {
   font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
@@ -14,12 +18,12 @@ $glass-border: rgba(255, 255, 255, 0.25);
   // or via a direct import if the path is relative to the project.
   min-height: 100vh;
   padding-bottom: 4rem;
-  color: #222;
+  color: var(--text);
   line-height: 1.7;
 }
 
 .portfolioHeader {
-  background: $glass-bg;
+  background: $glass-bg-light;
   backdrop-filter: blur(4px);
   -webkit-backdrop-filter: blur(4px);
   padding: 2.5rem 2rem;
@@ -27,8 +31,8 @@ $glass-border: rgba(255, 255, 255, 0.25);
   border-radius: 20px;
   max-width: 960px;
   text-align: center;
-  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.25);
-  border: 1px solid $glass-border;
+  box-shadow: var(--shadow);
+  border: 1px solid var(--border);
 }
 
 .bellamyProfile {
@@ -70,7 +74,7 @@ $glass-border: rgba(255, 255, 255, 0.25);
   p {
     margin: 0.4rem 0;
     font-size: 1.05rem;
-    color: #111;
+    color: var(--text-h);
   }
   a {
     color: $primary-blue;
@@ -145,7 +149,7 @@ $glass-border: rgba(255, 255, 255, 0.25);
 }
 
 .projectCard {
-  background: rgba(255, 255, 255, 0.28);
+  background: $glass-card-light;
   backdrop-filter: blur(6px);
   padding: 1.7rem 2rem;
   margin-bottom: 2.5rem;
@@ -183,9 +187,119 @@ $glass-border: rgba(255, 255, 255, 0.25);
   to { opacity: 1; transform: translateY(0); }
 }
 
-// Responsive overrides
 @media (max-width: 768px) {
-  .portfolioContainer { padding: 1.5rem; }
-  .socialLinks { flex-direction: column; }
-  .button { width: 100%; text-align: center; }
+
+  .portfolioHeader {
+    padding: 1.5rem 1rem;
+    margin: 1rem;
+  }
+
+  .portfolioContainer {
+    width: calc(100% - 1rem);
+    padding: 1.25rem;
+    border-radius: 16px;
+  }
+
+  .headerText {
+
+    h1 {
+      font-size: 2rem;
+      line-height: 1.2;
+    }
+
+    p {
+      font-size: 0.95rem;
+      word-break: break-word;
+    }
+  }
+
+  .sectionCard {
+
+    h2 {
+      font-size: 1.5rem;
+    }
+  }
+
+  .projectCard {
+    padding: 1.25rem;
+  }
+
+  .socialLinks {
+    flex-direction: column;
+    width: 100%;
+
+    a {
+      width: 100%;
+      text-align: center;
+    }
+  }
+
+  .button {
+    width: 100%;
+    margin-right: 0;
+    text-align: center;
+    box-sizing: border-box;
+  }
+
+  .bellamyProfile {
+
+    .profile {
+
+      &:hover {
+        transform: none;
+      }
+    }
+  }
+}
+
+@media (max-width: 480px) {
+
+  .headerText {
+
+    h1 {
+      font-size: 1.7rem;
+    }
+
+    p {
+      font-size: 0.9rem;
+    }
+  }
+
+  .portfolioContainer {
+    padding: 1rem;
+  }
+
+  .projectCard {
+    padding: 1rem;
+  }
+}
+
+@media (prefers-color-scheme: dark) {
+
+  .portfolioHeader {
+    background: $glass-bg-dark;
+  }
+
+  .portfolioContainer {
+    background: $glass-bg-dark;
+  }
+
+  .projectCard {
+    background: $glass-card-dark;
+  }
+
+  .headerText {
+
+    p {
+      color: var(--text);
+    }
+
+    a {
+      color: #7db3ff;
+    }
+  }
+
+  .button {
+    background: linear-gradient(135deg, #3fae45, #256b2a);
+  }
 }
