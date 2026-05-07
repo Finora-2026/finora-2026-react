@@ -14,30 +14,33 @@ import SignIn from "./pages/AuthPages/SignIn.tsx";
 import {ToastProvider} from "./components/ToastProvider/ToastProvider.tsx";
 import FinoraPage from "./pages/finora/FinoraPage.tsx";
 import ProtectedRoute from "./route/ProtectedRoute.tsx";
+import {AuthProvider} from "./pages/AuthPages/AuthProvider.tsx";
 
 export default function App() {
   return (
-    <ToastProvider>
-      <Navbar />
+    <AuthProvider>
+      <ToastProvider>
+        <Navbar />
 
-      <Routes>
-        {/* Public Routes */}
-        <Route path="/" element={<Home />} />
-        <Route path="/portfolio" element={<Portfolio />} />
-        <Route path="/sign-up" element={<SignUp />} />
-        <Route path="/sign-in" element={<SignIn />} />
-        <Route path="/investment-calculator" element={<InvestmentCalculator />} />
-        <Route path="/movies" element={<Movie />} />
-        <Route path="/movies/:imdbId" element={<MovieDetail />} />
+        <Routes>
+          {/* Public Routes */}
+          <Route path="/" element={<Home />} />
+          <Route path="/portfolio" element={<Portfolio />} />
+          <Route path="/sign-up" element={<SignUp />} />
+          <Route path="/sign-in" element={<SignIn />} />
+          <Route path="/investment-calculator" element={<InvestmentCalculator />} />
+          <Route path="/movies" element={<Movie />} />
+          <Route path="/movies/:imdbId" element={<MovieDetail />} />
 
-        {/* Protected Routes */}
-        <Route element={<ProtectedRoute />}>
-          <Route path="/finora" element={<FinoraPage />} />
-        </Route>
+          {/* Protected Routes */}
+          <Route element={<ProtectedRoute />}>
+            <Route path="/finora" element={<FinoraPage />} />
+          </Route>
 
-        {/* Handle error and all pages */}
-        <Route path="*" element={<NotFound />} />
-      </Routes>
-    </ToastProvider>
+          {/* Handle error and all pages */}
+          <Route path="*" element={<NotFound />} />
+        </Routes>
+      </ToastProvider>
+    </AuthProvider>
   );
 }

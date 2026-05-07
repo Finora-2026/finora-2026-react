@@ -1,12 +1,14 @@
-import {useEffect, useState} from "react";
+import { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { authService } from "../../utils/authService.ts";
 import styles from "./AuthPage.module.scss";
 import { useToast } from "../../components/ToastProvider/toastContext.ts";
+import {useAuth} from "./AuthContext.ts";
 
 export default function SignIn() {
   const navigate = useNavigate();
   const { showToast } = useToast();
+  const { refreshAuth } = useAuth(); // Grab refreshAuth from context
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -28,11 +30,12 @@ export default function SignIn() {
       const res = await authService.login({ email, password });
 
       if (res.success) {
-        window.dispatchEvent(new Event("auth-change"));
+        // TRIGGER THE UI UPDATE
+        // This tells the AuthProvider to read the new token and update the 'user' state
+        refreshAuth();
 
         showToast("Login successful, going to home page", "success");
         navigate("/", { replace: true });
-
       } else {
         showToast("Invalid email or password", "error");
         setError("Login failed");
