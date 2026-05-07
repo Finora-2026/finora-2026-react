@@ -2,8 +2,9 @@ import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { userService } from "../../utils/userService.ts";
 import { authService } from "../../utils/authService.ts";
-import { useToast } from "../../components/ToastProvider/ToastProvider.tsx";
 import styles from "./AuthPage.module.scss";
+import {useToast} from "../../components/ToastProvider/toastContext.ts";
+import {toastConfig} from "../../components/ToastProvider/toastConfig.ts";
 
 export default function SignUp() {
   const navigate = useNavigate();
@@ -40,7 +41,7 @@ export default function SignUp() {
         // 3. Redirect after toast delay
         setTimeout(() => {
           navigate("/", { replace: true });
-        }, 5000);
+        }, toastConfig.routingDelay);
 
       } else {
         showToast("Account created but login failed", "error");
