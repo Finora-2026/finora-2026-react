@@ -13,6 +13,7 @@ import SignUp from "./pages/AuthPages/SignUp.tsx";
 import SignIn from "./pages/AuthPages/SignIn.tsx";
 import {ToastProvider} from "./components/ToastProvider/ToastProvider.tsx";
 import FinoraPage from "./pages/finora/FinoraPage.tsx";
+import ProtectedRoute from "./route/ProtectedRoute.tsx";
 
 export default function App() {
   return (
@@ -25,12 +26,14 @@ export default function App() {
         <Route path="/portfolio" element={<Portfolio />} />
         <Route path="/sign-up" element={<SignUp />} />
         <Route path="/sign-in" element={<SignIn />} />
-        <Route path="/finora" element={<FinoraPage />} />
         <Route path="/investment-calculator" element={<InvestmentCalculator />} />
         <Route path="/movies" element={<Movie />} />
         <Route path="/movies/:imdbId" element={<MovieDetail />} />
 
         {/* Protected Routes */}
+        <Route element={<ProtectedRoute />}>
+          <Route path="/finora" element={<FinoraPage />} />
+        </Route>
 
         {/* Handle error and all pages */}
         <Route path="*" element={<NotFound />} />
