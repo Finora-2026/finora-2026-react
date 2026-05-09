@@ -1,4 +1,4 @@
-export const infoBoxes = [
+export const boxesHomePage = [
     {
         title: "Finora Development",
         text: "Sprint planning, collaboration tools, and public Git source code",

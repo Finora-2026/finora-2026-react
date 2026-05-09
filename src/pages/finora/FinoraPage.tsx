@@ -1,44 +1,27 @@
-import {useEffect} from "react";
-import {Link, Route, Routes} from "react-router-dom";
+import { useEffect } from "react";
+import { Route, Routes } from "react-router-dom";
 import NotFound from "../notFound/NotFound.tsx";
+import FinoraMenu from "../finoraMenu/FinoraMenu.tsx";
+import FinoraNavBar from "../../components/NavBar/NavBarFinora.tsx";
 
-// Mock sub-components
-const FinoraDashboard = () => <div>Finora Dashboard Content</div>;
-const FinoraAnalytics = () => <div>Finora Analytics Content</div>;
+const FinoraAnalytics = () => <div className="p-10">Finora Analytics Content</div>;
 
-export default  function FinoraPage() {
-
+export default function FinoraPage() {
   useEffect(() => {
-    document.title = 'Bellamy Phan | Finora'
-  }, [])
+    document.title = 'Bellamy Phan | Finora';
+  }, []);
 
   return (
-    <>
-      <div style={{ display: 'flex' }}>
-        {/* Internal Finora Sidebar */}
-        <aside style={{ width: '200px', borderRight: '1px solid #ccc' }}>
-          <nav>
-            <ul>
-              <li><Link to="">Overview</Link></li>
-              <li><Link to="analytics">Analytics</Link></li>
-            </ul>
-          </nav>
-        </aside>
-      </div>
+    <div style={{ display: 'flex', flexDirection: 'column', minHeight: '100vh' }}>
+      <FinoraNavBar />
 
-      {/* Internal Finora Content Viewport */}
-      <main style={{ padding: '20px' }}>
+      <main>
         <Routes>
-          {/* This matches "/finora" exactly */}
-          <Route index element={<FinoraDashboard />} />
-
-          {/* This matches "/finora/analytics" */}
+          <Route index element={<FinoraMenu />} />
           <Route path="analytics" element={<FinoraAnalytics />} />
-
-          {/* Handle error and all pages */}
           <Route path="*" element={<NotFound />} />
         </Routes>
       </main>
-    </>
-  )
+    </div>
+  );
 }

@@ -7,7 +7,7 @@ import bellamyPhoto from "../../assets/BellamyProfile.jpg";
 import "./Home.css";
 import TypeWriter from "../../components/TypeWriter/TypeWriter.tsx";
 import InfoBox from "../../components/InfoBox/InfoBox.tsx";
-import {infoBoxes} from "../../data/infoBoxes.ts";
+import {boxesHomePage} from "../../data/BoxesHomePage.ts";
 
 export default function Home() {
 
@@ -50,7 +50,7 @@ export default function Home() {
 
       </section>
 
-      {infoBoxes.map((box, index) => (
+      {boxesHomePage.map((box, index) => (
           <InfoBox
               key={index}
               title={box.title}
