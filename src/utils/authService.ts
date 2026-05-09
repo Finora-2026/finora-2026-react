@@ -53,6 +53,26 @@ export const authService = {
     return data;
   },
 
+  loginDemo: async (): Promise<LoginResponseDto> => {
+    const res = await fetch(`${BackendConfig.springApiUrl}/auth/login-demo`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+    });
+
+    if (!res.ok) {
+      const msg = await res.text();
+      throw new Error(msg || "Demo login failed");
+    }
+
+    const data: LoginResponseDto = await res.json();
+
+    if (data.success && data.token) {
+      localStorage.setItem("token", data.token);
+    }
+
+    return data;
+  },
+
   logout: () => {
     localStorage.removeItem("token");
   },
