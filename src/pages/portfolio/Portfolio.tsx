@@ -56,7 +56,7 @@ export default function Portfolio() {
             Finora Web App (Legacy with Angular)
           </a>
 
-          <a href="https://bellamyphan.space/" className={styles.button} target="_blank">
+          <a href="https://bellamyphan.github.io/portfolio/" className={styles.button}>
             Legacy Portfolio
           </a>
 
