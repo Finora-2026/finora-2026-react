@@ -54,6 +54,30 @@ export default function SignIn() {
     }
   };
 
+  const handleDemoLogin = async () => {
+    setLoading(true);
+    setError(null);
+
+    try {
+      const res = await authService.loginDemo();
+
+      if (res.success) {
+        refreshAuth();
+
+        showToast("Logged in as demo user", "success");
+        navigate(destination, { replace: true });
+      } else {
+        showToast("Demo login failed", "error");
+        setError("Demo login failed");
+      }
+    } catch (err) {
+      showToast("Something went wrong during demo login", "error");
+      setError(String(err));
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return (
     <div className={styles.container}>
       <div className={styles.card}>
@@ -82,9 +106,20 @@ export default function SignIn() {
             />
           </div>
 
-          <button type="submit" className={styles.button} disabled={loading}>
-            {loading ? "Logging in..." : "Login"}
-          </button>
+          <div className={styles.buttonGroup}>
+            <button type="submit" className={styles.button} disabled={loading}>
+              {loading ? "Logging in..." : "Login"}
+            </button>
+
+            <button
+              type="button"
+              className={`${styles.button} ${styles.secondary}`}
+              onClick={handleDemoLogin}
+              disabled={loading}
+            >
+              {loading ? "Loading..." : "Continue as Demo"}
+            </button>
+          </div>
 
           {error && <div className={styles.error}>{error}</div>}
         </form>
