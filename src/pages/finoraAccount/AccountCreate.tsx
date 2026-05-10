@@ -26,7 +26,7 @@ export default function AccountCreate() {
   const [form, setForm] = useState<AccountForm>({
     bankId: "",
     accountName: "",
-    openingDate: "",
+    openingDate: new Date().toISOString().split("T")[0],
     closingDate: "",
     accountType: "",
   });
