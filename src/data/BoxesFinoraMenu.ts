@@ -27,12 +27,12 @@ export const boxesFinoraMenu = [
     },
     
     {
-        title: "Banks",
+        title: "Bank accounts",
         text: "Manage linked banks and account information",
         speed: 75,
         buttons: [
-            { label: "List Banks", to: "banks/list" },
-            { label: "Add Bank", to: "banks/add" },
+            { label: "List all accounts", to: "accounts/list" },
+            { label: "Add new account", to: "accounts/add" },
         ],
     },
     

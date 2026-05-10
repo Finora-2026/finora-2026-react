@@ -19,9 +19,9 @@ export const navItems: NavItem[] = [
     match: matchModule("transactions"),
   },
   {
-    label: "Banks",
-    to: "/finora/banks/list",
-    match: matchModule("banks"),
+    label: "Accounts",
+    to: "/finora/accounts/list",
+    match: matchModule("accounts"),
   },
   {
     label: "Reports",
