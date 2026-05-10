@@ -1,0 +1,217 @@
+.container {
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  padding: 48px 16px;
+}
+
+.card {
+  width: 100%;
+  max-width: 1100px;
+
+  padding: 32px;
+
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 18px;
+
+  box-shadow: var(--shadow);
+
+  box-sizing: border-box;
+}
+
+/* Title */
+.title {
+  margin: 0 0 24px 0;
+
+  text-align: center;
+
+  font-size: 30px;
+  font-weight: 700;
+
+  color: var(--accent);
+}
+
+/* Toggle group */
+.toggleGroup {
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+
+  margin-bottom: 24px;
+
+  flex-wrap: wrap;
+}
+
+/* Toggle buttons */
+.toggleButton {
+  padding: 8px 14px;
+
+  border-radius: 8px;
+  border: 1px solid var(--border);
+
+  background: var(--bg);
+  color: var(--text-h);
+
+  font-size: 14px;
+  font-weight: 600;
+
+  cursor: pointer;
+
+  transition:
+          background 0.2s ease,
+          color 0.2s ease,
+          border-color 0.2s ease,
+          transform 0.1s ease;
+
+  &:hover {
+    background: var(--social-bg);
+  }
+
+  &:active {
+    transform: scale(0.97);
+  }
+}
+
+/* Active toggle */
+.activeToggle {
+  background: var(--accent-bg);
+  border: 1px solid var(--accent-border);
+  color: var(--text-h);
+}
+
+/* Table wrapper */
+.tableWrapper {
+  width: 100%;
+  overflow-x: auto;
+}
+
+/* Table */
+.table {
+  width: 100%;
+  border-collapse: collapse;
+
+  font-size: 14px;
+
+  background: var(--bg);
+  color: var(--text);
+}
+
+.table th {
+  text-align: center;
+  padding: 12px 10px;
+
+  font-weight: 700;
+
+  border-bottom: 1px solid var(--border);
+
+  color: var(--text-h);
+}
+
+.table td {
+  text-align: center;
+  padding: 12px 10px;
+
+  border-bottom: 1px solid var(--border);
+}
+
+/* Status */
+.statusActive {
+  color: #1a7f37;
+  font-weight: 600;
+}
+
+.statusInactive {
+  color: #a11;
+  font-weight: 600;
+}
+
+/* Actions */
+.actionGroup {
+  display: flex;
+  justify-content: center;
+  gap: 8px;
+}
+
+.actionButton {
+  padding: 6px 10px;
+
+  border-radius: 8px;
+  border: 1px solid var(--border);
+
+  background: var(--bg);
+  color: var(--text-h);
+
+  font-size: 13px;
+  font-weight: 600;
+
+  cursor: pointer;
+
+  transition:
+          background 0.2s ease,
+          transform 0.1s ease;
+
+  &:hover {
+    background: var(--social-bg);
+  }
+
+  &:active {
+    transform: scale(0.97);
+  }
+}
+
+/* Empty state */
+.empty {
+  text-align: center;
+  padding: 32px 0;
+
+  color: var(--text);
+  font-size: 16px;
+}
+
+/* Mobile */
+@media (max-width: 600px) {
+  .container {
+    padding: 16px 10px;
+  }
+
+  .card {
+    padding: 16px;
+    border-radius: 14px;
+  }
+
+  .title {
+    font-size: 22px;
+    margin-bottom: 16px;
+  }
+
+  .toggleButton {
+    flex: 1;
+    min-width: 90px;
+    font-size: 13px;
+    padding: 8px 10px;
+  }
+
+  .table {
+    font-size: 13px;
+    min-width: 0; /* allow tighter layout when columns are hidden */
+  }
+
+  /* Hide Pending + Posted Balance columns */
+  .table th:nth-child(4),
+  .table th:nth-child(5),
+  .table td:nth-child(4),
+  .table td:nth-child(5) {
+    display: none;
+  }
+
+  .actionButton {
+    padding: 8px 12px;
+    font-size: 12px;
+  }
+
+  .actionGroup {
+    flex-direction: column;
+    gap: 6px;
+  }
+}
