@@ -3,6 +3,7 @@ import {useEffect, useState} from "react";
 import bellamyPhoto from "../../assets/BellamyProfile.jpg";
 import myResume from "../../assets/BellamyPhan_Resume.pdf";
 import styles from "./Portfolio.module.scss";
+import {Link} from "react-router-dom";
 
 export default function Portfolio() {
 
@@ -51,13 +52,13 @@ export default function Portfolio() {
           <a href={myResume} className={styles.button} target="_blank">
             Bellamy's Resume
           </a>
-
-          <a href="https://finora-angular.vercel.app/" className={styles.button}>
-            Finora Web App (Legacy with Angular)
-          </a>
+          
+          <Link to="/finora" className={styles.button}>
+            Finora Web App
+          </Link>
 
           <a href="https://bellamyphan.github.io/portfolio/" className={styles.button}>
-            Legacy Portfolio
+            Legacy Portfolio [temporary]
           </a>
 
         </div>
