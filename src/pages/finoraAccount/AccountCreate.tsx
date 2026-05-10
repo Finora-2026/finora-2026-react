@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import styles from "./AccountCreate.module.scss";
 import { type BankResponseDto, bankService } from "../../utils/bankService.ts";
 import { useToast } from "../../components/ToastProvider/toastContext.ts";
+import {type AccountTypeResponseDto, accountTypeService} from "../../utils/accountTypeService.ts";
 
 type AccountForm = {
   bankId: string;
@@ -17,6 +18,10 @@ export default function AccountCreate() {
   const [banks, setBanks] = useState<BankResponseDto[]>([]);
   const [loadingBanks, setLoadingBanks] = useState(true);
   const [bankError, setBankError] = useState<string | null>(null);
+  
+  const [accountTypes, setAccountTypes] = useState<AccountTypeResponseDto[]>([]);
+  const [loadingAccountTypes, setLoadingAccountTypes] = useState(true);
+  const [accountTypeError, setAccountTypeError] = useState<string | null>(null);
   
   const [form, setForm] = useState<AccountForm>({
     bankId: "",
@@ -46,6 +51,28 @@ export default function AccountCreate() {
     };
     
     loadBanks();
+  }, [showToast]);
+  
+  useEffect(() => {
+    const loadAccountTypes = async () => {
+      setLoadingAccountTypes(true);
+      setAccountTypeError(null);
+      
+      try {
+        const data = await accountTypeService.getAllAccountTypes();
+        setAccountTypes(data);
+      } catch (err) {
+        console.error("Failed to load account types", err);
+        
+        setAccountTypes([]);
+        setAccountTypeError("Failed to load account types");
+        showToast("Failed to load account types", "error");
+      } finally {
+        setLoadingAccountTypes(false);
+      }
+    };
+    
+    loadAccountTypes();
   }, [showToast]);
   
   const handleChange = (
@@ -172,13 +199,23 @@ export default function AccountCreate() {
               value={form.accountType}
               onChange={handleChange}
               className={styles.input}
+              disabled={loadingAccountTypes || !!accountTypeError}
             >
-              <option value="">Select account type</option>
-              <option value="checking">Checking</option>
-              <option value="savings">Savings</option>
-              <option value="credit-card">Credit Card</option>
-              <option value="investment">Investment</option>
-              <option value="cash">Cash</option>
+              <option value="">
+                {loadingAccountTypes
+                  ? "Loading account types..."
+                  : accountTypeError
+                    ? "Unable to load account types"
+                    : "Select account type"}
+              </option>
+              
+              {!loadingAccountTypes &&
+                !accountTypeError &&
+                accountTypes.map((type) => (
+                  <option key={type.id} value={type.id}>
+                    {type.name}
+                  </option>
+                ))}
             </select>
           </div>
           
