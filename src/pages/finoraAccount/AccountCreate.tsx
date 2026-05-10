@@ -3,12 +3,28 @@ import styles from "./AccountCreate.module.scss";
 import { type BankResponseDto, bankService } from "../../utils/bankService.ts";
 import { useToast } from "../../components/ToastProvider/toastContext.ts";
 
+type AccountForm = {
+  bankId: string;
+  accountName: string;
+  openingDate: string;
+  closingDate: string;
+  accountType: string;
+};
+
 export default function AccountCreate() {
   const { showToast } = useToast();
   
   const [banks, setBanks] = useState<BankResponseDto[]>([]);
   const [loadingBanks, setLoadingBanks] = useState(true);
   const [bankError, setBankError] = useState<string | null>(null);
+  
+  const [form, setForm] = useState<AccountForm>({
+    bankId: "",
+    accountName: "",
+    openingDate: "",
+    closingDate: "",
+    accountType: "",
+  });
   
   useEffect(() => {
     const loadBanks = async () => {
@@ -32,25 +48,56 @@ export default function AccountCreate() {
     loadBanks();
   }, [showToast]);
   
+  const handleChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
+  ) => {
+    const { id, value } = e.target;
+    
+    setForm((prev) => ({
+      ...prev,
+      [id]: value,
+    }));
+  };
+  
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    
+    if (
+      !form.bankId ||
+      !form.accountName ||
+      !form.openingDate ||
+      !form.accountType
+    ) {
+      showToast("Please fill in all required fields", "error");
+      return;
+    }
+    
+    // TODO: API call here
+    console.log("Submitting form:", form);
+    
+    showToast("Account created successfully", "success");
+  };
+  
   return (
     <div className={styles.container}>
       <div className={styles.card}>
         <h1 className={styles.title}>Add Account</h1>
         
-        <form className={styles.form}>
+        <form className={styles.form} onSubmit={handleSubmit}>
           {/* Bank */}
           <div className={styles.field}>
-            <label htmlFor="bank" className={styles.label}>
+            <label htmlFor="bankId" className={styles.label}>
               Bank
             </label>
             
             <select
-              id="bank"
-              defaultValue=""
+              id="bankId"
+              value={form.bankId}
+              onChange={handleChange}
               className={styles.input}
               disabled={loadingBanks || !!bankError}
             >
-              <option value="" disabled>
+              <option value="">
                 {loadingBanks
                   ? "Loading banks..."
                   : bankError
@@ -78,6 +125,8 @@ export default function AccountCreate() {
               type="text"
               placeholder="Enter account name"
               className={styles.input}
+              value={form.accountName}
+              onChange={handleChange}
             />
           </div>
           
@@ -87,7 +136,13 @@ export default function AccountCreate() {
               Opening Date
             </label>
             
-            <input id="openingDate" type="date" className={styles.input} />
+            <input
+              id="openingDate"
+              type="date"
+              className={styles.input}
+              value={form.openingDate}
+              onChange={handleChange}
+            />
           </div>
           
           {/* Closing Date */}
@@ -96,7 +151,14 @@ export default function AccountCreate() {
               Closing Date
             </label>
             
-            <input id="closingDate" type="date" disabled className={styles.input} />
+            <input
+              id="closingDate"
+              type="date"
+              disabled
+              className={styles.input}
+              value={form.closingDate}
+              onChange={handleChange}
+            />
           </div>
           
           {/* Account Type */}
@@ -105,11 +167,13 @@ export default function AccountCreate() {
               Account Type
             </label>
             
-            <select id="accountType" defaultValue="" className={styles.input}>
-              <option value="" disabled>
-                Select account type
-              </option>
-              
+            <select
+              id="accountType"
+              value={form.accountType}
+              onChange={handleChange}
+              className={styles.input}
+            >
+              <option value="">Select account type</option>
               <option value="checking">Checking</option>
               <option value="savings">Savings</option>
               <option value="credit-card">Credit Card</option>
