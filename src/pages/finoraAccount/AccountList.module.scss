@@ -32,16 +32,18 @@
   color: var(--accent);
 }
 
-/* Mode toggle wrapper */
+/* Toggle group */
 .toggleGroup {
   display: flex;
   justify-content: center;
   gap: 10px;
 
   margin-bottom: 24px;
+
+  flex-wrap: wrap;
 }
 
-/* Each toggle button */
+/* Toggle buttons */
 .toggleButton {
   padding: 8px 14px;
 
@@ -71,7 +73,7 @@
   }
 }
 
-/* Active toggle (similar to navbar active style) */
+/* Active toggle */
 .activeToggle {
   background: var(--accent-bg);
   border: 1px solid var(--accent-border);
@@ -84,7 +86,7 @@
   overflow-x: auto;
 }
 
-/* Table styling */
+/* Table */
 .table {
   width: 100%;
   border-collapse: collapse;
@@ -113,7 +115,7 @@
   border-bottom: 1px solid var(--border);
 }
 
-/* Status styling */
+/* Status */
 .statusActive {
   color: #1a7f37;
   font-weight: 600;
@@ -124,7 +126,7 @@
   font-weight: 600;
 }
 
-/* Action buttons */
+/* Actions */
 .actionGroup {
   display: flex;
   justify-content: center;
@@ -170,23 +172,37 @@
 /* Mobile */
 @media (max-width: 600px) {
   .container {
-    padding: 24px 12px;
+    padding: 16px 10px;
   }
 
   .card {
-    padding: 20px;
+    padding: 16px;
+    border-radius: 14px;
   }
 
   .title {
-    font-size: 24px;
+    font-size: 22px;
+    margin-bottom: 16px;
+  }
+
+  .toggleButton {
+    flex: 1;
+    min-width: 90px;
+    font-size: 13px;
+    padding: 8px 10px;
   }
 
   .table {
     font-size: 13px;
   }
 
-  .toggleButton {
-    font-size: 13px;
-    padding: 6px 10px;
+  .actionButton {
+    padding: 8px 12px;
+    font-size: 12px;
+  }
+
+  .actionGroup {
+    flex-direction: column;
+    gap: 6px;
   }
 }
