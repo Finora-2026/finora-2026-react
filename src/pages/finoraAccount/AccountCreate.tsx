@@ -3,6 +3,7 @@ import styles from "./AccountCreate.module.scss";
 import { type BankResponseDto, bankService } from "../../utils/bankService.ts";
 import { useToast } from "../../components/ToastProvider/toastContext.ts";
 import {type AccountTypeResponseDto, accountTypeService} from "../../utils/accountTypeService.ts";
+import {accountService} from "../../utils/accountService.ts";
 
 type AccountForm = {
   bankId: string;
@@ -86,7 +87,7 @@ export default function AccountCreate() {
     }));
   };
   
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
     if (
@@ -99,10 +100,30 @@ export default function AccountCreate() {
       return;
     }
     
-    // TODO: API call here
-    console.log("Submitting form:", form);
-    
-    showToast("Account created successfully", "success");
+    try {
+      await accountService.createAccount({
+        name: form.accountName,
+        bankId: form.bankId,
+        openingDate: new Date(form.openingDate).toISOString(),
+        closingDate: form.closingDate ? new Date(form.closingDate).toISOString() : null,
+        typeId: form.accountType,
+      });
+      
+      showToast("Account created successfully", "success");
+      
+      // optional reset
+      setForm({
+        bankId: "",
+        accountName: "",
+        openingDate: new Date().toISOString().split("T")[0],
+        closingDate: "",
+        accountType: "",
+      });
+      
+    } catch (err) {
+      console.error(err);
+      showToast(err instanceof Error ? err.message : "Failed to create account", "error");
+    }
   };
   
   return (
