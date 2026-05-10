@@ -1,28 +1,36 @@
 import { useEffect, useState } from "react";
 import styles from "./AccountCreate.module.scss";
-import {type BankResponseDto, bankService} from "../../utils/bankService.ts";
+import { type BankResponseDto, bankService } from "../../utils/bankService.ts";
+import { useToast } from "../../components/ToastProvider/toastContext.ts";
 
 export default function AccountCreate() {
+  const { showToast } = useToast();
   
   const [banks, setBanks] = useState<BankResponseDto[]>([]);
   const [loadingBanks, setLoadingBanks] = useState(true);
+  const [bankError, setBankError] = useState<string | null>(null);
   
   useEffect(() => {
-    
     const loadBanks = async () => {
+      setLoadingBanks(true);
+      setBankError(null);
+      
       try {
         const data = await bankService.getAllBanks();
         setBanks(data);
       } catch (err) {
         console.error("Failed to load banks", err);
+        
+        setBanks([]); // clear stale data
+        setBankError("Failed to load banks");
+        showToast("Failed to load banks", "error");
       } finally {
         setLoadingBanks(false);
       }
     };
     
     loadBanks();
-    
-  }, []);
+  }, [showToast]);
   
   return (
     <div className={styles.container}>
@@ -30,7 +38,6 @@ export default function AccountCreate() {
         <h1 className={styles.title}>Add Account</h1>
         
         <form className={styles.form}>
-          
           {/* Bank */}
           <div className={styles.field}>
             <label htmlFor="bank" className={styles.label}>
@@ -41,19 +48,22 @@ export default function AccountCreate() {
               id="bank"
               defaultValue=""
               className={styles.input}
-              disabled={loadingBanks}
+              disabled={loadingBanks || !!bankError}
             >
               <option value="" disabled>
                 {loadingBanks
                   ? "Loading banks..."
-                  : "Select bank"}
+                  : bankError
+                    ? "Unable to load banks"
+                    : "Select bank"}
               </option>
               
-              {banks.map((bank) => (
-                <option key={bank.id} value={bank.id}>
-                  {bank.name}
-                </option>
-              ))}
+              {!loadingBanks && !bankError &&
+                banks.map((bank) => (
+                  <option key={bank.id} value={bank.id}>
+                    {bank.name}
+                  </option>
+                ))}
             </select>
           </div>
           
@@ -77,11 +87,7 @@ export default function AccountCreate() {
               Opening Date
             </label>
             
-            <input
-              id="openingDate"
-              type="date"
-              className={styles.input}
-            />
+            <input id="openingDate" type="date" className={styles.input} />
           </div>
           
           {/* Closing Date */}
@@ -90,12 +96,7 @@ export default function AccountCreate() {
               Closing Date
             </label>
             
-            <input
-              id="closingDate"
-              type="date"
-              disabled
-              className={styles.input}
-            />
+            <input id="closingDate" type="date" disabled className={styles.input} />
           </div>
           
           {/* Account Type */}
@@ -104,11 +105,7 @@ export default function AccountCreate() {
               Account Type
             </label>
             
-            <select
-              id="accountType"
-              defaultValue=""
-              className={styles.input}
-            >
+            <select id="accountType" defaultValue="" className={styles.input}>
               <option value="" disabled>
                 Select account type
               </option>
@@ -121,11 +118,9 @@ export default function AccountCreate() {
             </select>
           </div>
           
-          {/* Submit */}
           <button type="submit" className={styles.button}>
             Create Account
           </button>
-        
         </form>
       </div>
     </div>
