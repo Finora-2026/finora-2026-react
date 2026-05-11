@@ -4,6 +4,7 @@ import { type BankResponseDto, bankService } from "../../utils/bankService.ts";
 import { useToast } from "../../components/ToastProvider/toastContext.ts";
 import {type AccountTypeResponseDto, accountTypeService} from "../../utils/accountTypeService.ts";
 import {accountService} from "../../utils/accountService.ts";
+import {useNavigate} from "react-router-dom";
 
 type AccountForm = {
   bankId: string;
@@ -15,6 +16,7 @@ type AccountForm = {
 
 export default function AccountCreate() {
   const { showToast } = useToast();
+  const navigate = useNavigate();
   
   const [banks, setBanks] = useState<BankResponseDto[]>([]);
   const [loadingBanks, setLoadingBanks] = useState(true);
@@ -111,7 +113,10 @@ export default function AccountCreate() {
       
       showToast("Account created successfully", "success");
       
-      // optional reset
+      // redirect to account home page
+      navigate("..");
+      
+      // optional reset, we will leave the page too, so this code is not important.
       setForm({
         bankId: "",
         accountName: "",
