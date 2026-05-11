@@ -1,46 +1,48 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import styles from "./AccountList.module.scss";
+import {
+  accountService,
+  type AccountResponseDto,
+} from "../../utils/accountService.ts";
 
 type Mode = "all" | "active" | "inactive";
-
-type Account = {
-  id: string;
-  bank: string;
-  name: string;
-  type: string;
-  pendingBalance: number;
-  postedBalance: number;
-  status: "active" | "inactive";
-};
 
 export default function AccountList() {
   const [mode, setMode] = useState<Mode>("active");
   
-  const accounts: Account[] = [
-    {
-      id: "1",
-      bank: "Chase",
-      name: "Checking Account",
-      type: "CHECKING",
-      pendingBalance: 120.5,
-      postedBalance: 100.0,
-      status: "active",
-    },
-    {
-      id: "2",
-      bank: "Bank of America",
-      name: "Savings",
-      type: "SAVINGS",
-      pendingBalance: 50,
-      postedBalance: 200,
-      status: "inactive",
-    },
-  ];
+  const [accounts, setAccounts] = useState<AccountResponseDto[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
   
-  const filteredAccounts = accounts.filter((acc) => {
-    if (mode === "all") return true;
-    return acc.status === mode;
-  });
+  useEffect(() => {
+    const loadAccounts = async () => {
+      setLoading(true);
+      setError("");
+      
+      try {
+        let data: AccountResponseDto[] = [];
+        
+        if (mode === "all") {
+          data = await accountService.getAllAccounts();
+        } else if (mode === "active") {
+          data = await accountService.getActiveAccounts();
+        } else {
+          data = await accountService.getInactiveAccounts();
+        }
+        
+        setAccounts(data);
+      } catch (err) {
+        console.error("Failed to load accounts", err);
+        
+        setAccounts([]);
+        setError("Failed to load accounts");
+      } finally {
+        setLoading(false);
+      }
+    };
+    
+    loadAccounts();
+  }, [mode]);
   
   return (
     <div className={styles.container}>
@@ -78,13 +80,23 @@ export default function AccountList() {
           </button>
         </div>
         
-        {/* Empty state */}
-        {filteredAccounts.length === 0 && (
+        {/* Loading */}
+        {loading && (
+          <div className={styles.empty}>Loading accounts...</div>
+        )}
+        
+        {/* Error */}
+        {!loading && error && (
+          <div className={styles.empty}>{error}</div>
+        )}
+        
+        {/* Empty */}
+        {!loading && !error && accounts.length === 0 && (
           <div className={styles.empty}>No accounts found.</div>
         )}
         
         {/* Table */}
-        {filteredAccounts.length > 0 && (
+        {!loading && !error && accounts.length > 0 && (
           <div className={styles.tableWrapper}>
             <table className={styles.table}>
               <thead>
@@ -100,36 +112,45 @@ export default function AccountList() {
               </thead>
               
               <tbody>
-              {filteredAccounts.map((account) => (
-                <tr key={account.id}>
-                  <td>{account.bank}</td>
-                  <td>{account.name}</td>
-                  <td>{account.type}</td>
-                  <td>{account.pendingBalance}</td>
-                  <td>{account.postedBalance}</td>
-                  
-                  <td
-                    className={
-                      account.status === "active"
-                        ? styles.statusActive
-                        : styles.statusInactive
-                    }
-                  >
-                    {account.status}
-                  </td>
-                  
-                  <td>
-                    <div className={styles.actionGroup}>
-                      <button className={styles.actionButton}>
-                        View
-                      </button>
-                      <button className={styles.actionButton}>
-                        Edit
-                      </button>
-                    </div>
-                  </td>
-                </tr>
-              ))}
+              {accounts.map((account) => {
+                const isActive = !account.closingDate;
+                
+                return (
+                  <tr key={account.id}>
+                    <td>{account.bankName}</td>
+                    
+                    <td>{account.name}</td>
+                    
+                    <td>{account.type}</td>
+                    
+                    <td>{account.pendingBalance ?? 0}</td>
+                    
+                    <td>{account.postedBalance ?? 0}</td>
+                    
+                    <td
+                      className={
+                        isActive
+                          ? styles.statusActive
+                          : styles.statusInactive
+                      }
+                    >
+                      {isActive ? "active" : "inactive"}
+                    </td>
+                    
+                    <td>
+                      <div className={styles.actionGroup}>
+                        <button className={styles.actionButton}>
+                          View
+                        </button>
+                        
+                        <button className={styles.actionButton}>
+                          Edit
+                        </button>
+                      </div>
+                    </td>
+                  </tr>
+                );
+              })}
               </tbody>
             </table>
           </div>
