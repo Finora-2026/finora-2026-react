@@ -10,7 +10,10 @@ export default function SignIn() {
 
   const location = useLocation();
   // Retrieve the "from" path, or default to home "/"
-  const destination = location.state?.from?.pathname || "/";
+  const destination =
+    location.state?.from?.pathname === "/sign-in"
+      ? "/"
+      : (location.state?.from?.pathname || "/");
 
   const { showToast } = useToast();
   const { refreshAuth } = useAuth(); // Grab refreshAuth from context
