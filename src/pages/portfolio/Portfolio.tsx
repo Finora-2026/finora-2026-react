@@ -127,11 +127,11 @@ export default function Portfolio() {
 
           {/* Finora Web App */}
           <div className={styles.projectCard}>
-            <a href="https://finora-angular.vercel.app/" target="_blank" className={styles.button}>
+            <Link to="/finora" className={styles.button}>
               Finora Web App – Personal Finance Tracking
-            </a>
+            </Link>
 
-            <p>A full-stack personal finance platform built with Angular & Spring Boot:</p>
+            <p>A full-stack personal finance platform built with React & Spring Boot:</p>
 
             <ul>
               <li>Frontend deployed on <strong>Vercel</strong> with GitHub Actions CI for automated unit tests and deploy on every commit.</li>
@@ -144,8 +144,10 @@ export default function Portfolio() {
 
             <p><strong>Repositories:</strong></p>
             <ul>
-              <li><a href="https://github.com/bellamyp/finora-angular" target="_blank">Angular Frontend Repository</a></li>
-              <li><a href="https://github.com/bellamyp/finora-spring" target="_blank">Spring Boot Backend Repository</a></li>
+              <li><a href="https://github.com/Finora-2026/finora-2026-react" target="_blank">React Frontend</a></li>
+              <li><a href="https://github.com/Finora-2026/finora-2026-spring" target="_blank">Spring Boot Backend</a></li>
+              <li><a href="https://github.com/bellamyphan/finora-angular" target="_blank">[Temporary] Legacy Angular</a></li>
+              <li><a href="https://github.com/bellamyphan/finora-spring2" target="_blank">[Temporary] Legacy Spring</a></li>
             </ul>
           </div>
 
