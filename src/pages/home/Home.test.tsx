@@ -25,13 +25,13 @@ describe("Home page", () => {
         expect(screen.getByText("Documentation")).toBeInTheDocument();
     });
     
-    it("renders bottom connect-with-us box", () => {
+    it("renders bottom connect-with-bellamy box", () => {
         render(
           <MemoryRouter>
               <Home />
           </MemoryRouter>
         );
         
-        expect(screen.getByText("Connect with us")).toBeInTheDocument();
+        expect(screen.getByText("Connect with Bellamy")).toBeInTheDocument();
     });
 });
