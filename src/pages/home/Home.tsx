@@ -1,8 +1,10 @@
 import {useEffect, useState} from "react";
 
-import reactLogo from "../../assets/react.svg";
-import viteLogo from "../../assets/vite.svg";
 import bellamyPhoto from "../../assets/BellamyProfile.jpg";
+import myResume from "../../assets/BellamyPhan_Resume.pdf";
+import { FaFacebook, FaEnvelope, FaLinkedin, FaGithub } from "react-icons/fa";
+import { FaBook } from "react-icons/fa";
+import { FaFileAlt } from "react-icons/fa";
 
 import "./Home.css";
 import TypeWriter from "../../components/TypeWriter/TypeWriter.tsx";
@@ -67,20 +69,49 @@ export default function Home() {
           </svg>
           <h2>Documentation</h2>
           <TypeWriter
-            text="Your questions, answered"
+            text="Public source codes, and files"
             speed={80}
           />
           <ul>
             <li>
-              <a href="https://vite.dev/" target="_blank">
-                <img className="logo" src={viteLogo} alt="" />
-                Explore Vite
+              <a
+                href="https://github.com/bellamyphan"
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                <FaGithub className="button-icon" />
+                Bellamy
               </a>
             </li>
             <li>
-              <a href="https://react.dev/" target="_blank">
-                <img className="button-icon" src={reactLogo} alt="" />
-                Learn more
+              <a
+                href="https://github.com/Finora-2026"
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                <FaGithub className="button-icon" />
+                Finora
+              </a>
+            </li>
+            
+            <li>
+              <a
+                href="https://bellamyphan.atlassian.net/wiki/spaces/F2/pages/56983553/Finora+2026+Project+Overview"
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                <FaBook className="button-icon" />
+                Confluence
+              </a>
+            </li>
+            <li>
+              <a
+                href={myResume}
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                <FaFileAlt className="button-icon" />
+                Resume
               </a>
             </li>
           </ul>
@@ -89,58 +120,38 @@ export default function Home() {
           <svg className="icon" role="presentation" aria-hidden="true">
             <use href="/icons.svg#social-icon"></use>
           </svg>
-          <h2>Connect with us</h2>
+          <h2>Connect with Bellamy</h2>
           <TypeWriter
-            text="Join the Vite community"
+            text="Direct message or send me an email"
             speed={120}
           />
           <ul>
             <li>
-              <a href="https://github.com/vitejs/vite" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#github-icon"></use>
-                </svg>
-                GitHub
+              <a href="mailto:BellamyPhan@icloud.com" className="social-link">
+                <FaEnvelope className="button-icon" />
+                Email
               </a>
             </li>
             <li>
-              <a href="https://chat.vite.dev/" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#discord-icon"></use>
-                </svg>
-                Discord
+              <a
+                href="https://www.facebook.com/bellamyphan69"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="social-link"
+              >
+                <FaFacebook className="button-icon" />
+                Facebook
               </a>
             </li>
             <li>
-              <a href="https://x.com/vite_js" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#x-icon"></use>
-                </svg>
-                X.com
-              </a>
-            </li>
-            <li>
-              <a href="https://bsky.app/profile/vite.dev" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#bluesky-icon"></use>
-                </svg>
-                Bluesky
+              <a
+                href="https://www.linkedin.com/in/bellamyphan/"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="social-link"
+              >
+                <FaLinkedin className="button-icon" />
+                LinkedIn
               </a>
             </li>
           </ul>
