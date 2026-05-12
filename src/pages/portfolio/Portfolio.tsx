@@ -57,10 +57,6 @@ export default function Portfolio() {
             Finora Web App
           </Link>
 
-          <a href="https://bellamyphan.github.io/portfolio/" className={styles.button}>
-            Legacy Portfolio [temporary]
-          </a>
-
         </div>
 
         {/* About Me Section */}
