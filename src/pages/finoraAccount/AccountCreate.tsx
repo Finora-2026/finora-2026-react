@@ -18,6 +18,8 @@ export default function AccountCreate() {
   const { showToast } = useToast();
   const navigate = useNavigate();
   
+  const [submitting, setSubmitting] = useState(false);
+  
   const [banks, setBanks] = useState<BankResponseDto[]>([]);
   const [loadingBanks, setLoadingBanks] = useState(true);
   const [bankError, setBankError] = useState<string | null>(null);
@@ -92,6 +94,8 @@ export default function AccountCreate() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
+    if (submitting) return;
+    
     if (
       !form.bankId ||
       !form.accountName ||
@@ -101,6 +105,8 @@ export default function AccountCreate() {
       showToast("Please fill in all required fields", "error");
       return;
     }
+    
+    setSubmitting(true);
     
     try {
       await accountService.createAccount({
@@ -127,7 +133,14 @@ export default function AccountCreate() {
       
     } catch (err) {
       console.error(err);
-      showToast(err instanceof Error ? err.message : "Failed to create account", "error");
+      showToast(
+        err instanceof Error
+          ? err.message
+          : "Failed to create account",
+        "error"
+      );
+    } finally {
+      setSubmitting(false);
     }
   };
   
@@ -148,7 +161,11 @@ export default function AccountCreate() {
               value={form.bankId}
               onChange={handleChange}
               className={styles.input}
-              disabled={loadingBanks || !!bankError}
+              disabled={
+                submitting ||
+                loadingBanks ||
+                !!bankError
+              }
             >
               <option value="">
                 {loadingBanks
@@ -158,9 +175,13 @@ export default function AccountCreate() {
                     : "Select bank"}
               </option>
               
-              {!loadingBanks && !bankError &&
+              {!loadingBanks &&
+                !bankError &&
                 banks.map((bank) => (
-                  <option key={bank.id} value={bank.id}>
+                  <option
+                    key={bank.id}
+                    value={bank.id}
+                  >
                     {bank.name}
                   </option>
                 ))}
@@ -180,6 +201,7 @@ export default function AccountCreate() {
               className={styles.input}
               value={form.accountName}
               onChange={handleChange}
+              disabled={submitting}
             />
           </div>
           
@@ -195,6 +217,7 @@ export default function AccountCreate() {
               className={styles.input}
               value={form.openingDate}
               onChange={handleChange}
+              disabled={submitting}
             />
           </div>
           
@@ -225,7 +248,11 @@ export default function AccountCreate() {
               value={form.accountType}
               onChange={handleChange}
               className={styles.input}
-              disabled={loadingAccountTypes || !!accountTypeError}
+              disabled={
+                submitting ||
+                loadingAccountTypes ||
+                !!accountTypeError
+              }
             >
               <option value="">
                 {loadingAccountTypes
@@ -245,8 +272,12 @@ export default function AccountCreate() {
             </select>
           </div>
           
-          <button type="submit" className={styles.button}>
-            Create Account
+          <button
+            type="submit"
+            className={styles.button}
+            disabled={submitting}
+          >
+            {submitting ? "Creating..." : "Create Account"}
           </button>
         </form>
       </div>
