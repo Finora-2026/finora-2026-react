@@ -66,10 +66,10 @@ export default function TransactionUpdate() {
     setTransactions((prev) => prev.filter((t) => t.id !== id));
   };
   
-  const updateField = (
+  const updateField = <K extends keyof Transaction>(
     id: string,
-    field: keyof Transaction,
-    value: any
+    field: K,
+    value: Transaction[K]
   ) => {
     setTransactions((prev) =>
       prev.map((t) =>
