@@ -20,11 +20,11 @@
 }
 
 .title {
+  margin: 0 0 28px 0;
   text-align: center;
-  font-size: 28px;
+  font-size: 30px;
   font-weight: 700;
   color: var(--accent);
-  margin-bottom: 24px;
 }
 
 .tableWrapper {
@@ -34,10 +34,11 @@
 .table {
   width: 100%;
   border-collapse: collapse;
-  table-layout: auto;
+  table-layout: fixed;
+  font-size: 13px;
 
   th, td {
-    padding: 10px;
+    padding: 2px;
     border-bottom: 1px solid var(--border);
     text-align: center;
   }
@@ -69,8 +70,9 @@
 
 .row {
   display: flex;
-  gap: 10px;
+  gap: 2px;
   flex-wrap: wrap;
+  font-size: 15px;
 }
 
 .inline {
@@ -80,7 +82,7 @@
 }
 
 button {
-  padding: 10px 12px;
+  padding: 8px 10px;
   border-radius: 10px;
   border: 1px solid var(--border);
   background: var(--accent);
@@ -105,61 +107,65 @@ button:disabled {
   margin: 10px 0;
 }
 
-/* Mobile */
+/* Reduce container padding on mobile to give the form more room */
 @media (max-width: 600px) {
-  .card {
-    padding: 16px;
-  }
-
   .title {
     font-size: 22px;
   }
 
-  .table th,
+  .container {
+    padding: 10px 4px; /* Much tighter */
+  }
+
+  .card {
+    padding: 12px;
+    border-radius: 8px;
+  }
+
+  /* Hide the table header on mobile */
+  .table thead {
+    display: none;
+  }
+
+  /* Force table rows to look like cards */
+  .table tr {
+    display: flex;
+    flex-direction: column;
+    border: 1px solid var(--border);
+    margin-bottom: 16px;
+    padding: 20px;
+    border-radius: 12px;
+  }
+
   .table td {
-    font-size: 13px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100% !important; /* Override colgroup */
+    border: none;
+    padding: 4px 0;
+  }
+
+  /* Optional: Add labels back using data-attributes */
+  .table td::before {
+    content: attr(data-label);
+    font-weight: bold;
+    font-size: 12px;
+    margin-right: 10px;
+  }
+
+  .table, .table tbody, .table tr, .table td {
+    display: block;
+    width: 100%;
+  }
+
+  .table td {
+    margin-bottom: 12px;
+    padding: 0; /* Let the input handle the spacing */
+  }
+
+  .table input, .table select {
+    width: 100% !important; /* This fills the 'weird' empty space */
+    height: 45px; /* Makes it easier to tap with a thumb */
   }
 }
-
-///* Reduce container padding on mobile to give the form more room */
-//@media (max-width: 600px) {
-//  .container {
-//    padding: 10px 4px; /* Much tighter */
-//  }
-//  .card {
-//    padding: 12px;
-//    border-radius: 8px;
-//  }
-//
-//  /* Hide the table header on mobile */
-//  .table thead {
-//    display: none;
-//  }
-//
-//  /* Force table rows to look like cards */
-//  .table tr {
-//    display: flex;
-//    flex-direction: column;
-//    border: 1px solid var(--border);
-//    margin-bottom: 16px;
-//    padding: 8px;
-//    border-radius: 12px;
-//  }
-//
-//  .table td {
-//    display: flex;
-//    justify-content: space-between;
-//    align-items: center;
-//    width: 100% !important; /* Override colgroup */
-//    border: none;
-//    padding: 4px 0;
-//  }
-//
-//  /* Optional: Add labels back using data-attributes */
-//  .table td::before {
-//    content: attr(data-label);
-//    font-weight: bold;
-//    font-size: 12px;
-//    margin-right: 10px;
-//  }
-//}
