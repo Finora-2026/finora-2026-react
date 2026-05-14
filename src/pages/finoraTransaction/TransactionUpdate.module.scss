@@ -1,0 +1,165 @@
+.container {
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  padding: 48px 16px;
+}
+
+.card {
+  width: 100%;
+
+  padding: 24px;
+
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 18px;
+
+  box-shadow: var(--shadow);
+
+  box-sizing: border-box;
+}
+
+.title {
+  text-align: center;
+  font-size: 28px;
+  font-weight: 700;
+  color: var(--accent);
+  margin-bottom: 24px;
+}
+
+.tableWrapper {
+  overflow-x: auto;
+}
+
+.table {
+  width: 100%;
+  border-collapse: collapse;
+  table-layout: auto;
+
+  th, td {
+    padding: 10px;
+    border-bottom: 1px solid var(--border);
+    text-align: center;
+  }
+
+  input, select {
+    width: 100%;
+    padding: 8px;
+    border-radius: 10px;
+    border: 1px solid var(--border);
+    background: var(--bg);
+    color: var(--text);
+  }
+
+  input {
+    white-space: normal;
+  }
+}
+
+.posted {
+  opacity: 0.6;
+}
+
+.actions {
+  margin-top: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.row {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.inline {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+button {
+  padding: 10px 12px;
+  border-radius: 10px;
+  border: 1px solid var(--border);
+  background: var(--accent);
+  color: white;
+  cursor: pointer;
+}
+
+button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.message {
+  text-align: center;
+  color: var(--text);
+  margin: 10px 0;
+}
+
+.error {
+  color: red;
+  text-align: center;
+  margin: 10px 0;
+}
+
+/* Mobile */
+@media (max-width: 600px) {
+  .card {
+    padding: 16px;
+  }
+
+  .title {
+    font-size: 22px;
+  }
+
+  .table th,
+  .table td {
+    font-size: 13px;
+  }
+}
+
+///* Reduce container padding on mobile to give the form more room */
+//@media (max-width: 600px) {
+//  .container {
+//    padding: 10px 4px; /* Much tighter */
+//  }
+//  .card {
+//    padding: 12px;
+//    border-radius: 8px;
+//  }
+//
+//  /* Hide the table header on mobile */
+//  .table thead {
+//    display: none;
+//  }
+//
+//  /* Force table rows to look like cards */
+//  .table tr {
+//    display: flex;
+//    flex-direction: column;
+//    border: 1px solid var(--border);
+//    margin-bottom: 16px;
+//    padding: 8px;
+//    border-radius: 12px;
+//  }
+//
+//  .table td {
+//    display: flex;
+//    justify-content: space-between;
+//    align-items: center;
+//    width: 100% !important; /* Override colgroup */
+//    border: none;
+//    padding: 4px 0;
+//  }
+//
+//  /* Optional: Add labels back using data-attributes */
+//  .table td::before {
+//    content: attr(data-label);
+//    font-weight: bold;
+//    font-size: 12px;
+//    margin-right: 10px;
+//  }
+//}
