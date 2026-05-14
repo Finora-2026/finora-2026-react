@@ -15,7 +15,7 @@ export const navItems: NavItem[] = [
   },
   {
     label: "Transactions",
-    to: "/finora/transactions/posted",
+    to: "/finora/transactions/add",
     match: matchModule("transactions"),
   },
   {

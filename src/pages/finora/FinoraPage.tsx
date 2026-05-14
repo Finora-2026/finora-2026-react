@@ -4,6 +4,7 @@ import NotFound from "../notFound/NotFound.tsx";
 import FinoraMenu from "../finoraMenu/FinoraMenu.tsx";
 import FinoraNavBar from "../../components/NavBar/NavBarFinora.tsx";
 import AccountRoutes from "../../route/AccountRoutes.tsx";
+import TransactionRoutes from "../../route/TransactionRoutes.tsx";
 
 const FinoraAnalytics = () => <div className="p-10">Finora Analytics Content</div>;
 
@@ -23,6 +24,7 @@ export default function FinoraPage() {
           
           {/* Modules */}
           <Route path="accounts/*" element={<AccountRoutes />} />
+          <Route path="transactions/*" element={<TransactionRoutes />} />
           
           {/* Placeholder modules */}
           <Route path="analytics" element={<FinoraAnalytics />} />
