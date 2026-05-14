@@ -1,12 +1,12 @@
 import { createContext, useContext } from "react";
 
 export type Toast = {
+  id: string;
   message: string;
   type?: "success" | "error";
 };
 
 export type ToastContextType = {
-  toast: Toast | null;
   showToast: (msg: string, type?: "success" | "error") => void;
 };
 
