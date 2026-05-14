@@ -4,7 +4,7 @@ import styles from "./TransactionUpdate.module.scss";
 type Transaction = {
   id: string;
   date: string;
-  typeId: string;
+  transactionTypeId: string;
   brandId: string;
   locationId: string;
   amount: number;
@@ -21,7 +21,7 @@ export default function TransactionUpdate() {
     {
       id: "t1",
       date: "",
-      typeId: "",
+      transactionTypeId: "",
       brandId: "",
       locationId: "",
       amount: 0,
@@ -51,7 +51,7 @@ export default function TransactionUpdate() {
       {
         id: crypto.randomUUID(),
         date: "",
-        typeId: "",
+        transactionTypeId: "",
         brandId: "",
         locationId: "",
         amount: 0,
@@ -134,14 +134,14 @@ export default function TransactionUpdate() {
         <div className={styles.tableWrapper}>
           <table className={styles.table}>
             <colgroup>
-              <col style={{ width: "10%" }} />  {/* Date */}
-              <col style={{ width: "10%" }} />  {/* Type */}
-              <col style={{ width: "10%" }} />  {/* Brand */}
-              <col style={{ width: "10%" }} />  {/* Location */}
-              <col style={{ width: "10%" }} />  {/* Amount */}
-              <col style={{ width: "40%" }} />  {/* Notes (big) */}
+              <col style={{ width: "11%" }} />  {/* Date */}
+              <col style={{ width: "8%" }} />  {/* Type */}
+              <col style={{ width: "8%" }} />  {/* Brand */}
+              <col style={{ width: "8%" }} />  {/* Location */}
+              <col style={{ width: "8%" }} />  {/* Amount */}
+              <col style={{ width: "25%" }} />  {/* Notes (big) */}
               <col style={{ width: "10%" }} />  {/* Account */}
-              <col style={{ width: "10%" }} />   {/* Actions */}
+              <col style={{ width: "12%" }} />   {/* Actions */}
             </colgroup>
             <thead>
             <tr>
@@ -172,9 +172,9 @@ export default function TransactionUpdate() {
                 
                 <td>
                   <select
-                    value={tx.typeId}
+                    value={tx.transactionTypeId}
                     onChange={(e) =>
-                      updateField(tx.id, "typeId", e.target.value)
+                      updateField(tx.id, "transactionTypeId", e.target.value)
                     }
                     disabled={tx.posted}
                   >
