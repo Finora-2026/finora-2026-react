@@ -1,10 +1,14 @@
 import {useEffect, useState} from "react";
+import {useToast} from "../../components/ToastProvider/toastContext.ts";
 import styles from "./TransactionUpdate.module.scss";
 import {
   accountService,
   type AccountResponseDto,
 } from "../../utils/accountService.ts";
-import {useToast} from "../../components/ToastProvider/toastContext.ts";
+import {
+  brandService,
+  type BrandResponseDto,
+} from "../../utils/brandService.ts";
 
 type Transaction = {
   id: string;
@@ -26,6 +30,10 @@ export default function TransactionUpdate() {
   const [accounts, setAccounts] = useState<AccountResponseDto[]>([]);
   const [accountsLoading, setAccountsLoading] = useState(true);
   const [accountsError, setAccountsError] = useState("");
+  
+  const [brands, setBrands] = useState<BrandResponseDto[]>([]);
+  const [brandsLoading, setBrandsLoading] = useState(true);
+  const [brandsError, setBrandsError] = useState("");
   
   const [transactions, setTransactions] = useState<Transaction[]>([
     {
@@ -70,25 +78,62 @@ export default function TransactionUpdate() {
         setAccountsLoading(false);
       }
     };
-    
     loadAccounts();
+  }, [showToast]);
+  
+  // Load brands
+  useEffect(() => {
+    const loadBrands = async () => {
+      setBrandsLoading(true);
+      setBrandsError("");
+      
+      try {
+        const data = await brandService.getAllBrands();
+        setBrands(data);
+      } catch (err) {
+        console.error("Failed to load brands", err);
+        setBrands([]);
+        setBrandsError("Failed to load brands");
+        showToast("Failed to load brands", "error");
+      } finally {
+        setBrandsLoading(false);
+      }
+    };
+    loadBrands();
   }, [showToast]);
   
   const renderAccountOptions = () => {
     if (accountsLoading) {
       return <option value="">Loading accounts...</option>;
     }
-    
     if (accountsError) {
       return <option value="">Error loading accounts</option>;
     }
-    
     return (
       <>
         <option value="">Select account</option>
         {accounts.map((acc) => (
           <option key={acc.id} value={acc.id}>
             {acc.name}
+          </option>
+        ))}
+      </>
+    );
+  };
+  
+  const renderBrandOptions = () => {
+    if (brandsLoading) {
+      return <option value="">Loading brands...</option>;
+    }
+    if (brandsError) {
+      return <option value="">Error loading brands</option>;
+    }
+    return (
+      <>
+        <option value="">Select brand</option>
+        {brands.map((brand) => (
+          <option key={brand.id} value={brand.id}>
+            {brand.name}
           </option>
         ))}
       </>
@@ -251,11 +296,9 @@ export default function TransactionUpdate() {
                     onChange={(e) =>
                       updateField(tx.id, "brandId", e.target.value)
                     }
-                    disabled={tx.posted}
+                    disabled={tx.posted || brandsLoading || !!brandsError}
                   >
-                    <option value="">Brand</option>
-                    <option value="1">Nike</option>
-                    <option value="2">Apple</option>
+                    {renderBrandOptions()}
                   </select>
                 </td>
                 
