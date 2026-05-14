@@ -22,7 +22,7 @@ export default function AccountList() {
       setError("");
       
       try {
-        let data: AccountResponseDto[] = [];
+        let data: AccountResponseDto[];
         
         if (mode === "all") {
           data = await accountService.getAllAccounts();
