@@ -4,10 +4,12 @@ import {
   accountService,
   type AccountResponseDto,
 } from "../../utils/accountService.ts";
+import {useToast} from "../../components/ToastProvider/toastContext.ts";
 
 type Mode = "all" | "active" | "inactive";
 
 export default function AccountList() {
+  const { showToast } = useToast();
   const [mode, setMode] = useState<Mode>("active");
   
   const [accounts, setAccounts] = useState<AccountResponseDto[]>([]);
@@ -20,7 +22,7 @@ export default function AccountList() {
       setError("");
       
       try {
-        let data: AccountResponseDto[] = [];
+        let data: AccountResponseDto[];
         
         if (mode === "all") {
           data = await accountService.getAllAccounts();
@@ -36,13 +38,14 @@ export default function AccountList() {
         
         setAccounts([]);
         setError("Failed to load accounts");
+        showToast("Failed to load accounts", "error");
       } finally {
         setLoading(false);
       }
     };
     
     loadAccounts();
-  }, [mode]);
+  }, [mode, showToast]);
   
   return (
     <div className={styles.container}>

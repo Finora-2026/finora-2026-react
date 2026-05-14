@@ -1,5 +1,10 @@
-import { useState } from "react";
+import {useEffect, useState} from "react";
 import styles from "./TransactionUpdate.module.scss";
+import {
+  accountService,
+  type AccountResponseDto,
+} from "../../utils/accountService.ts";
+import {useToast} from "../../components/ToastProvider/toastContext.ts";
 
 type Transaction = {
   id: string;
@@ -14,8 +19,13 @@ type Transaction = {
 };
 
 export default function TransactionUpdate() {
+  const { showToast } = useToast();
   const [loading] = useState(false);
   const [errorMessage] = useState<string | null>(null);
+  
+  const [accounts, setAccounts] = useState<AccountResponseDto[]>([]);
+  const [accountsLoading, setAccountsLoading] = useState(true);
+  const [accountsError, setAccountsError] = useState("");
   
   const [transactions, setTransactions] = useState<Transaction[]>([
     {
@@ -42,6 +52,49 @@ export default function TransactionUpdate() {
   
   const pageTitle = "Add new transaction [OR] Update transaction";
   
+  // Load accounts
+  useEffect(() => {
+    const loadAccounts = async () => {
+      setAccountsLoading(true);
+      setAccountsError("");
+      
+      try {
+        const data = await accountService.getActiveAccounts();
+        setAccounts(data);
+      } catch (err) {
+        console.error("Failed to load accounts", err);
+        setAccounts([]);
+        setAccountsError("Failed to load accounts");
+        showToast("Failed to load accounts", "error");
+      } finally {
+        setAccountsLoading(false);
+      }
+    };
+    
+    loadAccounts();
+  }, [showToast]);
+  
+  const renderAccountOptions = () => {
+    if (accountsLoading) {
+      return <option value="">Loading accounts...</option>;
+    }
+    
+    if (accountsError) {
+      return <option value="">Error loading accounts</option>;
+    }
+    
+    return (
+      <>
+        <option value="">Select account</option>
+        {accounts.map((acc) => (
+          <option key={acc.id} value={acc.id}>
+            {acc.name}
+          </option>
+        ))}
+      </>
+    );
+  };
+  
   // -----------------------------
   // Mock actions
   // -----------------------------
@@ -64,6 +117,7 @@ export default function TransactionUpdate() {
   
   const deleteTransaction = (id: string) => {
     setTransactions((prev) => prev.filter((t) => t.id !== id));
+    showToast("Transaction removed", "success");
   };
   
   const updateField = <K extends keyof Transaction>(
@@ -84,10 +138,17 @@ export default function TransactionUpdate() {
         t.id === id ? { ...t, posted: true } : t
       )
     );
+    showToast("Marked as posted", "success");
   };
   
   const submitAll = () => {
-    console.log("Submit transactions:", transactions);
+    try {
+      console.log("Submit transactions:", transactions);
+      showToast("Transactions submitted", "success");
+    } catch (err) {
+      console.error(err);
+      showToast("Failed to submit transactions", "error");
+    }
   };
   
   const cancel = () => {
@@ -240,11 +301,9 @@ export default function TransactionUpdate() {
                     onChange={(e) =>
                       updateField(tx.id, "accountId", e.target.value)
                     }
-                    disabled={tx.posted}
+                    disabled={tx.posted || accountsLoading || !!accountsError}
                   >
-                    <option value="">Account</option>
-                    <option value="1">Chase</option>
-                    <option value="2">BoA</option>
+                    {renderAccountOptions()}
                   </select>
                 </td>
                 
