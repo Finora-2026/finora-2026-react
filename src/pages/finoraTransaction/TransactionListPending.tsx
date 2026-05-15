@@ -27,10 +27,29 @@ export default function TransactionListPending() {
   const { showToast } = useToast();
   
   // Mock States (Wire useEffect API call here later)
-  const [loading, setLoading] = useState<boolean>(false);
+  // const [loading, setLoading] = useState<boolean>(false);
+  const [loading] = useState<boolean>(false);
   
   // Mocking 1 transaction record based on DTO structure
-  const [results, setResults] = useState<TransactionResponseDto[]>([
+  // const [results, setResults] = useState<TransactionResponseDto[]>([
+  //   {
+  //     id: "tx_123",
+  //     transactionGroupId: "group_abc",
+  //     transactionDate: "2026-05-15T14:30:00",
+  //     amount: -45.50,
+  //     notes: "Weekly grocery runWeekly grocery runWeekly grocery runWeekly grocery runWeekly grocery runWeekly grocery runWeekly grocery runWeekly grocery runWeekly grocery runWeekly grocery runWeekly grocery runWeekly grocery run",
+  //     accountId: "acc_99",
+  //     accountName: "BOA Checking 1",
+  //     brandId: "brand_target",
+  //     brandName: "Target",
+  //     locationId: "loc_rowlett",
+  //     locationName: "Rowlett",
+  //     transactionTypeId: "qwert",
+  //     transactionTypeName: "INCOME",
+  //     isPosted: false
+  //   }
+  // ]);
+  const [results] = useState<TransactionResponseDto[]>([
     {
       id: "tx_123",
       transactionGroupId: "group_abc",
