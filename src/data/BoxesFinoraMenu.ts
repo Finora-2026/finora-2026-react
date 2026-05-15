@@ -59,7 +59,7 @@ export const boxesFinoraMenu = [
     },
     
     {
-        title: "Investment",
+        title: "Investments",
         text: "Monitor investment accounts and transaction activity",
         speed: 110,
         buttons: [
