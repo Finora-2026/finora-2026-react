@@ -382,13 +382,17 @@ export default function TransactionUpdate() {
     showToast(`Mocking split all transaction: ${count}`, "success");
   };
   
+  const addAccount = () => {
+    navigate("../../accounts/add");
+  }
+  
   return (
     <div className={styles.container}>
       <div className={styles.card}>
         <div className={styles.row}>
           <button
             className={styles.button + " " + styles.secondary}
-            onClick={() => showToast("Mock add account button", "success")}>
+            onClick={addAccount}>
             + Account
           </button>
           <button
