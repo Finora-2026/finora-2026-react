@@ -27,7 +27,7 @@ export const boxesFinoraMenu = [
     },
     
     {
-        title: "Bank accounts",
+        title: "Accounts",
         text: "Manage linked banks and account information",
         speed: 75,
         buttons: [
