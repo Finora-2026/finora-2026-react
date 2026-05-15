@@ -10,6 +10,7 @@ export default function TransactionRoutes() {
       <Route index element={<TransactionList />} />
       <Route path="list" element={<TransactionList />} />
       <Route path="add" element={<TransactionUpdate />} />
+      <Route path="update/:groupId" element={<TransactionUpdate />} />
       <Route path="*" element={<NotFound />} />
     </Routes>
   );

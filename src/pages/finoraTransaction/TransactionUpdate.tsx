@@ -1,4 +1,5 @@
 import {useEffect, useState} from "react";
+import { useParams } from "react-router-dom";
 import {useToast} from "../../components/ToastProvider/toastContext.ts";
 import styles from "./TransactionUpdate.module.scss";
 import {
@@ -38,6 +39,9 @@ export default function TransactionUpdate() {
   const { showToast } = useToast();
   const navigate = useNavigate();
   
+  const { groupId } = useParams();
+  const isEditMode = !!groupId;
+  
   const [loading] = useState(false);
   const [errorMessage] = useState<string | null>(null);
   
@@ -57,10 +61,12 @@ export default function TransactionUpdate() {
   const [transactionTypesLoading, setTransactionTypesLoading] = useState(true);
   const [transactionTypesError, setTransactionTypesError] = useState("");
   
+  const getToday = () => new Date().toISOString().split("T")[0];
+  
   const [transactions, setTransactions] = useState<Transaction[]>([
     {
       id: "t1",
-      date: "",
+      date: getToday(),
       transactionTypeId: "",
       brandId: "",
       locationId: "",
@@ -84,7 +90,9 @@ export default function TransactionUpdate() {
     (t) => !t.date || !t.accountId || t.amount === 0
   );
   
-  const pageTitle = "Add new transaction [OR] Update transaction";
+  const pageTitle = isEditMode
+    ? "Update transaction group"
+    : "Add new transactions";
   
   // Load accounts
   useEffect(() => {
@@ -247,15 +255,12 @@ export default function TransactionUpdate() {
     );
   };
   
-  // -----------------------------
-  // Mock actions
-  // -----------------------------
-  const addTransaction = () => {
+  const addBlankTransaction = () => {
     setTransactions((prev) => [
       ...prev,
       {
         id: crypto.randomUUID(),
-        date: "",
+        date: getToday(),
         transactionTypeId: "",
         brandId: "",
         locationId: "",
@@ -265,6 +270,33 @@ export default function TransactionUpdate() {
         posted: false,
       },
     ]);
+  };
+  
+  const duplicateLastTransaction = () => {
+    setTransactions((prev) => {
+      const last = prev.length > 0 ? prev[prev.length - 1] : null;
+      
+      const lastDate = last?.date || getToday();
+      const lastType = last?.transactionTypeId || "";
+      const lastBrand = last?.brandId || "";
+      const lastLocation = last?.locationId || "";
+      const lastNotes = last?.notes || "";
+      
+      return [
+        ...prev,
+        {
+          id: crypto.randomUUID(),
+          date: lastDate,
+          transactionTypeId: lastType,
+          brandId: lastBrand,
+          locationId: lastLocation,
+          amount: 0,
+          notes: lastNotes,
+          accountId: "",
+          posted: false,
+        },
+      ];
+    });
   };
   
   const deleteTransaction = (id: string) => {
@@ -325,28 +357,39 @@ export default function TransactionUpdate() {
   };
   
   const cancel = () => {
-    console.log("Reset");
+    window.location.reload();
   };
   
   const goBack = () => {
-    console.log("Navigate to pending transactions");
+    showToast("Mocking Navigate to pending transactions button");
   };
   
   const addCashbackTransaction = (percent: number) => {
-    console.log("Cashback %:", percent);
+    showToast(`Mocking cashback transaction: ${percent}%`, "success");
   };
   
   const splitFirst = (count: number) => {
-    console.log("Split first:", count);
+    showToast(`Mocking split first transaction: ${count}`, "success");
   };
   
   const splitAll = (count: number) => {
-    console.log("Split all:", count);
+    showToast(`Mocking split all transaction: ${count}`, "success");
   };
   
   return (
     <div className={styles.container}>
       <div className={styles.card}>
+        <div className={styles.row}>
+          <button onClick={() => showToast("Mock add account button", "success")}>
+            + Account
+          </button>
+          <button onClick={() => showToast("Mock add brand button", "success")}>
+            + Brand
+          </button>
+          <button onClick={() => showToast("Mock add location button", "success")}>
+            + Location
+          </button>
+        </div>
         <h1 className={styles.title}>{pageTitle}</h1>
         
         {/* Loading */}
@@ -499,10 +542,10 @@ export default function TransactionUpdate() {
         {/* ACTIONS */}
         <div className={styles.actions}>
           <div className={styles.row}>
-            <button onClick={addTransaction}>+ Add</button>
-            
+            <button onClick={duplicateLastTransaction}>+ Duplicate last row</button>
+            <button onClick={addBlankTransaction}>+ New Transaction</button>
             <button onClick={() => setShowCashbackInput(true)}>
-              Cashback %
+              + Cashback %
             </button>
             
             {showCashbackInput && (
@@ -524,7 +567,7 @@ export default function TransactionUpdate() {
             )}
             
             <button onClick={() => setShowSplitFirstInput(true)}>
-              Split First
+              + Split First
             </button>
             
             {showSplitFirstInput && (
@@ -543,7 +586,7 @@ export default function TransactionUpdate() {
             )}
             
             <button onClick={() => setShowSplitAllInput(true)}>
-              Split All
+              + Split All
             </button>
             
             {showSplitAllInput && (
@@ -564,7 +607,7 @@ export default function TransactionUpdate() {
           
           <div className={styles.row}>
             <button onClick={submitAll} disabled={isInvalid}>
-              Submit
+              {isEditMode ? "Update" : "Submit"}
             </button>
             <button onClick={cancel}>Reset</button>
             <button onClick={goBack}>Pending</button>
