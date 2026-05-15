@@ -656,7 +656,7 @@ export default function TransactionUpdate() {
             )}
           </div>
           
-          <div className={styles.row}>
+          <div className={styles.stackRow}>
             <button className={styles.button + " " + styles.primary} onClick={submitAll} disabled={isInvalid}>
               {isEditMode ? "Update transactions" : "Submit transactions"}
             </button>

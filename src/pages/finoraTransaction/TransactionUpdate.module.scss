@@ -75,6 +75,20 @@
   font-size: 15px;
 }
 
+.stackRow {
+  display: flex;
+  flex-direction: column; /* Stacks buttons vertically */
+  gap: 5px;              /* Space between the buttons */
+  width: 100%;            /* Ensure container spans the card */
+  margin-top: 10px;
+}
+
+.stackRow .button {
+  width: 100%;            /* Each button fills the whole line */
+  padding: 10px;          /* Makes them slightly larger for easier clicking */
+  text-align: center;
+}
+
 .inline {
   display: flex;
   gap: 8px;
@@ -140,7 +154,7 @@
 /* Reduce container padding on mobile to give the form more room */
 @media (max-width: 600px) {
   .title {
-    font-size: 22px;
+    font-size: 25px;
   }
 
   .container {
