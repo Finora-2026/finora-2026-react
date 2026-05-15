@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import {useToast} from "../../components/ToastProvider/toastContext.ts";
+import styles from "./TransactionUpdate.module.scss";
 
 type Transaction = {
   id: string;
@@ -91,60 +92,70 @@ export default function TransactionDetails() {
   const editButtonLabel = canEditGroup ? "Edit Group [mocking]" : "View Only [mocking]";
   
   return (
-    <div className="container py-5">
-      <h2 className="text-center mb-4 fw-bold text-primary">
-        Transaction Group Id: {groupId}
-      </h2>
-      
-      {/* Loading */}
-      {loading && (
-        <div className="text-center text-muted fs-5">
-          Loading transaction group...
-        </div>
-      )}
-      
-      {/* No transactions */}
-      {!loading && transactions.length === 0 && (
-        <div className="text-center text-muted fs-5">
-          No transactions found in this group.
-        </div>
-      )}
-      
-      {/* Table */}
-      {transactions.length > 0 && (
-        <div className="table-responsive">
-          <table className="table table-hover table-bordered align-middle shadow-sm bg-white">
-            <thead className="table-primary text-center">
-            <tr>
-              <th>Date</th>
-              <th>Type</th>
-              <th>Brand</th>
-              <th>Location</th>
-              <th>Amount</th>
-              <th>Notes</th>
-              <th>Account</th>
-              <th>Status</th>
-            </tr>
-            </thead>
-            
-            <tbody>
-            {transactions.map((tx) => (
-              <tr
-                key={tx.id}
-                className={tx.posted ? "table-success" : "table-warning"}
-              >
-                <td>{tx.date}</td>
-                <td className="text-center">{tx.typeId}</td>
-                <td>{getBrandName(tx.brandId)}</td>
-                <td>{getLocationName(tx.locationId)}</td>
-                <td className={getAmountClass(tx.amount)}>
-                  ${tx.amount.toFixed(2)}
-                </td>
-                <td style={{ maxWidth: "400px", whiteSpace: "pre-wrap" }}>
-                  {tx.notes}
-                </td>
-                <td>{getAccountName(tx.accountId)}</td>
-                <td className="text-center">
+    <div className={styles.container}>
+      <div className={styles.card}>
+        <h1 className={styles.title}>
+          Transaction Group Id: {groupId}
+        </h1>
+        
+        {/* Loading */}
+        {loading && (
+          <div className={styles.message}>
+            Loading transaction group...
+          </div>
+        )}
+        
+        {/* No transactions */}
+        {!loading && transactions.length === 0 && (
+          <div className={styles.message}>
+            No transactions found in this group.
+          </div>
+        )}
+        
+        {/* Table */}
+        {!loading && transactions.length > 0 && (
+          <div className={styles.tableWrapper}>
+            <table className={styles.table}>
+              <colgroup>
+                <col style={{ width: "11%" }} />  {/* Date */}
+                <col style={{ width: "8%" }} />  {/* Type */}
+                <col style={{ width: "8%" }} />  {/* Brand */}
+                <col style={{ width: "8%" }} />  {/* Location */}
+                <col style={{ width: "8%" }} />  {/* Amount */}
+                <col style={{ width: "25%" }} />  {/* Notes (big) */}
+                <col style={{ width: "10%" }} />  {/* Account */}
+                <col style={{ width: "12%" }} />   {/* Status */}
+              </colgroup>
+              <thead>
+                <tr>
+                  <th>Date</th>
+                  <th>Type</th>
+                  <th>Brand</th>
+                  <th>Location</th>
+                  <th>Amount</th>
+                  <th>Notes</th>
+                  <th>Account</th>
+                  <th>Status</th>
+                </tr>
+              </thead>
+              
+              <tbody>
+              {transactions.map((tx) => (
+                <tr
+                  key={tx.id}
+                >
+                  <td>{tx.date}</td>
+                  <td>{tx.typeId}</td>
+                  <td>{getBrandName(tx.brandId)}</td>
+                  <td>{getLocationName(tx.locationId)}</td>
+                  <td className={getAmountClass(tx.amount)}>
+                    ${tx.amount.toFixed(2)}
+                  </td>
+                  <td style={{ maxWidth: "400px", whiteSpace: "pre-wrap" }}>
+                    {tx.notes}
+                  </td>
+                  <td>{getAccountName(tx.accountId)}</td>
+                  <td>
                     <span
                       className={`badge ${
                         tx.posted ? "bg-success" : "bg-warning text-dark"
@@ -152,48 +163,59 @@ export default function TransactionDetails() {
                     >
                       {tx.posted ? "Posted" : "Pending"}
                     </span>
-                </td>
-              </tr>
-            ))}
-            </tbody>
-          </table>
+                  </td>
+                </tr>
+              ))}
+              </tbody>
+            </table>
+          </div>
+        )}
+        
+        {/* Group actions */}
+        <div className={styles.actions}>
+          <div className={styles.row}>
+            <button
+              className={styles.button + " " + styles.primary}
+              disabled={!canEditGroup}
+              onClick={() => editThisGroup(groupId!)}
+            >
+              {editButtonLabel}
+            </button>
+            
+            <button
+              className={styles.button + " " + styles.primary}
+              disabled={isRepeat}
+              onClick={() => markAsRepeat(groupId!)}
+            >
+              {isRepeat ? "Already Marked as Repeat" : "Mark as Repeat"}
+            </button>
+            
+            <button
+              className={styles.button + " " + styles.primary}
+              onClick={() => repeatThisGroup(groupId)}
+            >
+              Repeat This Group
+            </button>
+          </div>
         </div>
-      )}
-      
-      {/* Group actions */}
-      <div className="btn-toolbar mb-3 flex-wrap justify-content-center gap-2">
-        <button
-          className="btn btn-primary"
-          disabled={!canEditGroup}
-          onClick={() => editThisGroup(groupId!)}
-        >
-          {editButtonLabel}
-        </button>
         
-        <button
-          className="btn btn-outline-secondary"
-          disabled={isRepeat}
-          onClick={() => markAsRepeat(groupId!)}
-        >
-          {isRepeat ? "Already Marked as Repeat" : "Mark as Repeat"}
-        </button>
-        
-        <button
-          className="btn btn-warning"
-          onClick={() => repeatThisGroup(groupId)}
-        >
-          Repeat This Group
-        </button>
-      </div>
-      
-      {/* Navigation */}
-      <div className="btn-toolbar flex-wrap justify-content-center gap-2">
-        <button className="btn btn-outline-primary" onClick={() => navigate("../list-posted")}>
-          Posted Transactions
-        </button>
-        <button className="btn btn-outline-warning" onClick={() => navigate("../list-pending")}>
-          Pending Transactions
-        </button>
+        {/* Navigation */}
+        <div className={styles.actions}>
+          <div className={styles.row}>
+            <button
+              className={styles.button + " " + styles.secondary}
+              onClick={() => navigate("../list-posted")}
+            >
+              List all posted transactions
+            </button>
+            <button
+              className={styles.button + " " + styles.secondary}
+              onClick={() => navigate("../list-pending")}
+            >
+              List all pending transactions
+            </button>
+          </div>
+        </div>
       </div>
     </div>
   );
