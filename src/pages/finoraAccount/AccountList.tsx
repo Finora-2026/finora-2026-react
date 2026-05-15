@@ -142,11 +142,13 @@ export default function AccountList() {
                     
                     <td>
                       <div className={styles.actionGroup}>
-                        <button className={styles.actionButton}>
+                        <button className={styles.actionButton}
+                                onClick={() => showToast("Mock view account", "success")}>
                           View
                         </button>
                         
-                        <button className={styles.actionButton}>
+                        <button className={styles.actionButton}
+                                onClick={() => showToast("Mock edit account", "success")}>
                           Edit
                         </button>
                       </div>
