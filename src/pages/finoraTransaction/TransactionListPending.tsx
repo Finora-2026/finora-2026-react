@@ -1,79 +1,41 @@
 import {useEffect, useState} from "react";
 import { useToast } from "../../components/ToastProvider/toastContext.ts";
-import styles from "./TransactionUpdate.module.scss"; // Reusing your existing SCSS file
+import transactionService, {
+  type TransactionResponseDto
+} from "../../utils/transactionService.ts";
 
-// Define the TypeScript interface matching backend TransactionResponseDto
-interface TransactionResponseDto {
-  id: string;
-  transactionGroupId: string;
-  transactionDate: string; // LocalDateTime serializes as string ISO
-  amount: number;
-  notes: string;
-  accountId: string;
-  brandId: string | null;
-  locationId: string | null;
-  transactionTypeId: string;
-  isPosted: boolean;
-  
-  // Note: Added missing string placeholders for UI display since DTO only had IDs
-  brandName?: string;
-  locationName?: string;
-  transactionTypeName?: string;
-  accountName: string;
-}
+import styles from "./TransactionUpdate.module.scss";
 
 export default function TransactionListPending() {
   
   const { showToast } = useToast();
   
-  // Mock States (Wire useEffect API call here later)
-  // const [loading, setLoading] = useState<boolean>(false);
-  const [loading] = useState<boolean>(false);
+  const [loading, setLoading] = useState<boolean>(true);
   
-  // Mocking 1 transaction record based on DTO structure
-  // const [results, setResults] = useState<TransactionResponseDto[]>([
-  //   {
-  //     id: "tx_123",
-  //     transactionGroupId: "group_abc",
-  //     transactionDate: "2026-05-15T14:30:00",
-  //     amount: -45.50,
-  //     notes: "Weekly grocery runWeekly grocery runWeekly grocery runWeekly grocery runWeekly grocery runWeekly grocery runWeekly grocery runWeekly grocery runWeekly grocery runWeekly grocery runWeekly grocery runWeekly grocery run",
-  //     accountId: "acc_99",
-  //     accountName: "BOA Checking 1",
-  //     brandId: "brand_target",
-  //     brandName: "Target",
-  //     locationId: "loc_rowlett",
-  //     locationName: "Rowlett",
-  //     transactionTypeId: "qwert",
-  //     transactionTypeName: "INCOME",
-  //     isPosted: false
-  //   }
-  // ]);
-  const [results] = useState<TransactionResponseDto[]>([
-    {
-      id: "tx_123",
-      transactionGroupId: "group_abc",
-      transactionDate: "2026-05-15T14:30:00",
-      amount: -45.50,
-      notes: "Weekly grocery runWeekly grocery runWeekly grocery runWeekly grocery runWeekly grocery runWeekly grocery runWeekly grocery runWeekly grocery runWeekly grocery runWeekly grocery runWeekly grocery runWeekly grocery run",
-      accountId: "acc_99",
-      accountName: "BOA Checking 1",
-      brandId: "brand_target",
-      brandName: "Target",
-      locationId: "loc_rowlett",
-      locationName: "Rowlett",
-      transactionTypeId: "qwert",
-      transactionTypeName: "INCOME",
-      isPosted: false
-    }
-  ]);
+  const [results, setResults] = useState<TransactionResponseDto[]>([]);
   
   // Show an instruction when first loading
   useEffect(() => {
     showToast("Click on each transaction to see the details");
   }, [showToast]);
   
-  // Mock Handlers
+  // Load pending transactions
+  useEffect(() => {
+    const loadPendingTransactions = async () => {
+      try {
+        setLoading(true);
+        const data = await transactionService.getPendingTransactions();
+        setResults(data);
+      } catch (error) {
+        console.error(error);
+        showToast("Failed to load pending transactions");
+      } finally {
+        setLoading(false);
+      }
+    };
+    loadPendingTransactions();
+  }, [showToast]);
+  
   const openTransactionGroup = (groupId: string) => {
     showToast(`Mock open transaction group: ${groupId}`);
   };
@@ -140,16 +102,29 @@ export default function TransactionListPending() {
                     onClick={() => isClickable ? openTransactionGroup(tx.transactionGroupId) : null}
                     className={isClickable ? styles.clickableRow : ""}
                   >
-                    {/* Responsive Labels added with data-label for your mobile CSS breakpoint */}
-                    <td data-label="Date">{new Date(tx.transactionDate).toLocaleDateString()}</td>
-                    <td data-label="Type">{tx.transactionTypeName || tx.transactionTypeId}</td>
-                    <td data-label="Brand">{tx.brandName || tx.brandId || '—'}</td>
-                    <td data-label="Location">{tx.locationName || tx.locationId || '—'}</td>
-                    <td data-label="Amount" className={amountData.className}>
+                    
+                    <td data-label="Date">
+                      {new Date(tx.transactionDate).toLocaleDateString()}
+                    </td>
+                    <td data-label="Type">
+                      {tx.transactionTypeId || "—"}
+                    </td>
+                    <td data-label="Brand">
+                      {tx.brandId || "—"}
+                    </td>
+                    <td data-label="Location">
+                      {tx.locationId || "—"}
+                    </td>
+                    <td data-label="Amount" className={amountData.className}
+                    >
                       {amountData.display}
                     </td>
-                    <td data-label="Notes">{tx.notes}</td>
-                    <td data-label="Bank">{tx.accountName || tx.accountId}</td>
+                    <td data-label="Notes">
+                      {tx.notes || "—"}
+                    </td>
+                    <td data-label="Account">
+                      {tx.accountId}
+                    </td>
                   </tr>
                 );
               })}
