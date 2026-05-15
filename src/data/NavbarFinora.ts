@@ -15,7 +15,7 @@ export const navItems: NavItem[] = [
   },
   {
     label: "Transactions",
-    to: "/finora/transactions/add",
+    to: "/finora/transactions/list-pending",
     match: matchModule("transactions"),
   },
   {
