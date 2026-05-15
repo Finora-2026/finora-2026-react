@@ -3,6 +3,7 @@ import { Route, Routes } from "react-router-dom";
 import NotFound from "../pages/notFound/NotFound.tsx";
 import TransactionUpdate from "../pages/finoraTransaction/TransactionUpdate.tsx";
 import TransactionListPending from "../pages/finoraTransaction/TransactionListPending.tsx";
+import TransactionDetails from "../pages/finoraTransaction/TransactionDetails.tsx";
 
 export default function TransactionRoutes() {
   return (
@@ -11,6 +12,7 @@ export default function TransactionRoutes() {
       <Route path="list-pending" element={<TransactionListPending />} />
       <Route path="add" element={<TransactionUpdate />} />
       <Route path="update/:groupId" element={<TransactionUpdate />} />
+      <Route path="details/:groupId" element={<TransactionDetails />} />
       <Route path="*" element={<NotFound />} />
     </Routes>
   );
