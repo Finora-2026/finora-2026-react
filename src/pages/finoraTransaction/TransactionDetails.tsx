@@ -1,19 +1,22 @@
 import { useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
+import {useToast} from "../../components/ToastProvider/toastContext.ts";
 
 type Transaction = {
   id: string;
   date: string;
   typeId: string;
   brandId: string;
+  locationId: string;
   amount: number;
   notes: string;
-  bankId: string;
+  accountId: string;
   posted: boolean;
 };
 
 export default function TransactionDetails() {
   const { groupId } = useParams();
+  const { showToast } = useToast();
   const navigate = useNavigate();
   
   const [loading] = useState(false);
@@ -26,9 +29,10 @@ export default function TransactionDetails() {
       date: "2026-01-01",
       typeId: "EXPENSE",
       brandId: "BR1",
+      locationId: "LOC1",
       amount: 120.5,
       notes: "Mock transaction 1",
-      bankId: "BANK1",
+      accountId: "ACC1",
       posted: true,
     },
     {
@@ -36,9 +40,10 @@ export default function TransactionDetails() {
       date: "2026-01-02",
       typeId: "INCOME",
       brandId: "BR2",
+      locationId: "LOC2",
       amount: 250,
       notes: "Mock transaction 2",
-      bankId: "BANK2",
+      accountId: "ACC2",
       posted: false,
     },
   ];
@@ -51,10 +56,18 @@ export default function TransactionDetails() {
     return map[id] ?? id;
   };
   
-  const getBankName = (id: string) => {
+  const getAccountName = (id: string) => {
     const map: Record<string, string> = {
-      BANK1: "Chase",
-      BANK2: "Bank of America",
+      ACC1: "Chase Checking",
+      ACC2: "BOA Savings",
+    };
+    return map[id] ?? id;
+  };
+  
+  const getLocationName = (id: string) => {
+    const map: Record<string, string> = {
+      LOC1: "Dallas, Texas",
+      LOC2: "Houston, Texas",
     };
     return map[id] ?? id;
   };
@@ -64,19 +77,23 @@ export default function TransactionDetails() {
   };
   
   const markAsRepeat = (id: string) => {
-    console.log("mark as repeat", id);
+    showToast(`Mocking mark as repeat this group ${id}`);
   };
   
   const repeatThisGroup = (id: string | undefined) => {
-    console.log("repeat group", id);
+    showToast(`Mocking repeat group ${id}`);
   };
   
-  const editButtonLabel = canEditGroup ? "Edit Group" : "View Only";
+  const editThisGroup = (id: string) => {
+    showToast(`Mocking editing this group ${id}`);
+  }
+  
+  const editButtonLabel = canEditGroup ? "Edit Group [mocking]" : "View Only [mocking]";
   
   return (
     <div className="container py-5">
       <h2 className="text-center mb-4 fw-bold text-primary">
-        Transaction Group: {groupId}
+        Transaction Group Id: {groupId}
       </h2>
       
       {/* Loading */}
@@ -102,9 +119,10 @@ export default function TransactionDetails() {
               <th>Date</th>
               <th>Type</th>
               <th>Brand</th>
+              <th>Location</th>
               <th>Amount</th>
               <th>Notes</th>
-              <th>Bank</th>
+              <th>Account</th>
               <th>Status</th>
             </tr>
             </thead>
@@ -118,13 +136,14 @@ export default function TransactionDetails() {
                 <td>{tx.date}</td>
                 <td className="text-center">{tx.typeId}</td>
                 <td>{getBrandName(tx.brandId)}</td>
+                <td>{getLocationName(tx.locationId)}</td>
                 <td className={getAmountClass(tx.amount)}>
                   ${tx.amount.toFixed(2)}
                 </td>
                 <td style={{ maxWidth: "400px", whiteSpace: "pre-wrap" }}>
                   {tx.notes}
                 </td>
-                <td>{getBankName(tx.bankId)}</td>
+                <td>{getAccountName(tx.accountId)}</td>
                 <td className="text-center">
                     <span
                       className={`badge ${
@@ -146,7 +165,7 @@ export default function TransactionDetails() {
         <button
           className="btn btn-primary"
           disabled={!canEditGroup}
-          onClick={() => navigate(`/transaction-update/${groupId}`)}
+          onClick={() => editThisGroup(groupId!)}
         >
           {editButtonLabel}
         </button>
@@ -169,15 +188,10 @@ export default function TransactionDetails() {
       
       {/* Navigation */}
       <div className="btn-toolbar flex-wrap justify-content-center gap-2">
-        <button className="btn btn-outline-primary" onClick={() => navigate("/transaction-list")}>
+        <button className="btn btn-outline-primary" onClick={() => navigate("../list-posted")}>
           Posted Transactions
         </button>
-        
-        <button className="btn btn-outline-dark" onClick={() => navigate("/menu-user")}>
-          Main Menu
-        </button>
-        
-        <button className="btn btn-outline-warning" onClick={() => navigate("/transaction-pending-list")}>
+        <button className="btn btn-outline-warning" onClick={() => navigate("../list-pending")}>
           Pending Transactions
         </button>
       </div>
