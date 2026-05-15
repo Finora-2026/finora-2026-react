@@ -1,8 +1,25 @@
-import {useEffect, useState} from "react";
+import {useEffect, useMemo, useState} from "react";
 import { useToast } from "../../components/ToastProvider/toastContext.ts";
+
 import transactionService, {
   type TransactionResponseDto
 } from "../../utils/transactionService.ts";
+import {
+  brandService,
+  type BrandResponseDto,
+} from "../../utils/brandService.ts";
+import {
+  locationService,
+  type LocationResponseDto,
+} from "../../utils/locationService.ts";
+import {
+  transactionTypeService,
+  type TransactionTypeDto,
+} from "../../utils/transactionTypeService.ts";
+import {
+  accountService,
+  type AccountResponseDto,
+} from "../../utils/accountService.ts";
 
 import styles from "./TransactionUpdate.module.scss";
 
@@ -11,30 +28,70 @@ export default function TransactionListPending() {
   const { showToast } = useToast();
   
   const [loading, setLoading] = useState<boolean>(true);
-  
   const [results, setResults] = useState<TransactionResponseDto[]>([]);
+  const [brands, setBrands] = useState<BrandResponseDto[]>([]);
+  const [locations, setLocations] = useState<LocationResponseDto[]>([]);
+  const [transactionTypes, setTransactionTypes] = useState<TransactionTypeDto[]>([]);
+  const [accounts, setAccounts] = useState<AccountResponseDto[]>([]);
   
   // Show an instruction when first loading
   useEffect(() => {
     showToast("Click on each transaction to see the details");
   }, [showToast]);
   
-  // Load pending transactions
+  // Load all lookup data and pending transactions
   useEffect(() => {
-    const loadPendingTransactions = async () => {
+    const loadData = async () => {
       try {
         setLoading(true);
-        const data = await transactionService.getPendingTransactions();
-        setResults(data);
+        const [
+          transactions,
+          brandsData,
+          locationsData,
+          transactionTypesData,
+          accountsData
+        ] = await Promise.all([
+          transactionService.getPendingTransactions(),
+          brandService.getAllBrands(),
+          locationService.getAllLocations(),
+          transactionTypeService.getAllTransactionTypes(),
+          accountService.getActiveAccounts(),
+        ]);
+        setResults(transactions);
+        setBrands(brandsData);
+        setLocations(locationsData);
+        setTransactionTypes(transactionTypesData);
+        setAccounts(accountsData);
       } catch (error) {
         console.error(error);
-        showToast("Failed to load pending transactions");
+        showToast("Failed to load pending transactions", "error");
       } finally {
         setLoading(false);
       }
     };
-    loadPendingTransactions();
+    loadData();
   }, [showToast]);
+  
+  // Fast lookup maps
+  const brandMap = useMemo(
+    () => Object.fromEntries(brands.map(b => [b.id, b.name])),
+    [brands]
+  );
+  const locationMap = useMemo(
+    () =>
+      Object.fromEntries(
+        locations.map(l => [l.id, `${l.city}, ${l.state}`])
+      ),
+    [locations]
+  );
+  const transactionTypeMap = useMemo(
+    () => Object.fromEntries(transactionTypes.map(t => [t.id, t.name])),
+    [transactionTypes]
+  );
+  const accountMap = useMemo(
+    () => Object.fromEntries(accounts.map(a => [a.id, a.name])),
+    [accounts]
+  );
   
   const openTransactionGroup = (groupId: string) => {
     showToast(`Mock open transaction group: ${groupId}`);
@@ -66,7 +123,7 @@ export default function TransactionListPending() {
           <div className={styles.message}>No pending transactions found.</div>
         )}
         
-        {/* Table state */}
+        {/* Table */}
         {!loading && results.length > 0 && (
           <div className={styles.tableWrapper}>
             <table className={styles.table}>
@@ -107,13 +164,19 @@ export default function TransactionListPending() {
                       {new Date(tx.transactionDate).toLocaleDateString()}
                     </td>
                     <td data-label="Type">
-                      {tx.transactionTypeId || "—"}
+                      {tx.transactionTypeId
+                        ? transactionTypeMap[tx.transactionTypeId] || tx.transactionTypeId
+                        : "—"}
                     </td>
                     <td data-label="Brand">
-                      {tx.brandId || "—"}
+                      {tx.brandId
+                        ? brandMap[tx.brandId] || tx.brandId
+                        : "—"}
                     </td>
                     <td data-label="Location">
-                      {tx.locationId || "—"}
+                      {tx.locationId
+                        ? locationMap[tx.locationId] || tx.locationId
+                        : "—"}
                     </td>
                     <td data-label="Amount" className={amountData.className}
                     >
@@ -123,7 +186,7 @@ export default function TransactionListPending() {
                       {tx.notes || "—"}
                     </td>
                     <td data-label="Account">
-                      {tx.accountId}
+                      {accountMap[tx.accountId] || tx.accountId}
                     </td>
                   </tr>
                 );
