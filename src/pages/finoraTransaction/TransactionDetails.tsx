@@ -156,11 +156,13 @@ export default function TransactionDetails() {
                   </td>
                   <td>{getAccountName(tx.accountId)}</td>
                   <td>
-                    <span
-                      className={`badge ${
-                        tx.posted ? "bg-success" : "bg-warning text-dark"
-                      }`}
-                    >
+                   <span
+                     className={
+                       styles.badge +
+                       " " +
+                       (tx.posted ? styles.badgeSuccess : styles.badgeWarning)
+                     }
+                   >
                       {tx.posted ? "Posted" : "Pending"}
                     </span>
                   </td>
