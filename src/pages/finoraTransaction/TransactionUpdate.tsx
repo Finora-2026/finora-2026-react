@@ -9,6 +9,10 @@ import {
   brandService,
   type BrandResponseDto,
 } from "../../utils/brandService.ts";
+import {
+  locationService,
+  type LocationResponseDto,
+} from "../../utils/locationService.ts";
 
 type Transaction = {
   id: string;
@@ -34,6 +38,10 @@ export default function TransactionUpdate() {
   const [brands, setBrands] = useState<BrandResponseDto[]>([]);
   const [brandsLoading, setBrandsLoading] = useState(true);
   const [brandsError, setBrandsError] = useState("");
+  
+  const [locations, setLocations] = useState<LocationResponseDto[]>([]);
+  const [locationsLoading, setLocationsLoading] = useState(true);
+  const [locationsError, setLocationsError] = useState("");
   
   const [transactions, setTransactions] = useState<Transaction[]>([
     {
@@ -102,6 +110,26 @@ export default function TransactionUpdate() {
     loadBrands();
   }, [showToast]);
   
+  // Load locations
+  useEffect(() => {
+    const loadLocations = async () => {
+      setLocationsLoading(true);
+      setLocationsError("");
+      try {
+        const data = await locationService.getAllLocations();
+        setLocations(data);
+      } catch (err) {
+        console.error("Failed to load locations", err);
+        setLocations([]);
+        setLocationsError("Failed to load locations");
+        showToast("Failed to load locations", "error");
+      } finally {
+        setLocationsLoading(false);
+      }
+    };
+    loadLocations();
+  }, [showToast]);
+  
   const renderAccountOptions = () => {
     if (accountsLoading) {
       return <option value="">Loading accounts...</option>;
@@ -134,6 +162,25 @@ export default function TransactionUpdate() {
         {brands.map((brand) => (
           <option key={brand.id} value={brand.id}>
             {brand.name}
+          </option>
+        ))}
+      </>
+    );
+  };
+  
+  const renderLocationOptions = () => {
+    if (locationsLoading) {
+      return <option value="">Loading locations...</option>;
+    }
+    if (locationsError) {
+      return <option value="">Error loading locations</option>;
+    }
+    return (
+      <>
+        <option value="">Select location</option>
+        {locations.map((location) => (
+          <option key={location.id} value={location.id}>
+            {location.city}, {location.state}
           </option>
         ))}
       </>
@@ -308,11 +355,9 @@ export default function TransactionUpdate() {
                     onChange={(e) =>
                       updateField(tx.id, "locationId", e.target.value)
                     }
-                    disabled={tx.posted}
+                    disabled={tx.posted || locationsLoading || !!locationsError}
                   >
-                    <option value="">Location</option>
-                    <option value="1">Dallas</option>
-                    <option value="2">Austin</option>
+                    {renderLocationOptions()}
                   </select>
                 </td>
                 
