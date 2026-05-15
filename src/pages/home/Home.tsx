@@ -2,9 +2,7 @@ import {useEffect, useState} from "react";
 
 import bellamyPhoto from "../../assets/BellamyProfile.jpg";
 import myResume from "../../assets/BellamyPhan_Resume.pdf";
-import { FaFacebook, FaEnvelope, FaLinkedin, FaGithub } from "react-icons/fa";
-import { FaBook } from "react-icons/fa";
-import { FaFileAlt } from "react-icons/fa";
+import {FaFacebook, FaLinkedin, FaGithub, FaShareAlt, FaFolderOpen, FaEnvelope, FaBook, FaFileAlt} from "react-icons/fa";
 
 import "./Home.css";
 import TypeWriter from "../../components/TypeWriter/TypeWriter.tsx";
@@ -64,9 +62,7 @@ export default function Home() {
 
       <section id="next-steps">
         <div id="docs">
-          <svg className="icon" role="presentation" aria-hidden="true">
-            <use href="/icons.svg#documentation-icon"></use>
-          </svg>
+          <FaFolderOpen className="icon" aria-hidden="true" />
           <h2>Documentation</h2>
           <TypeWriter
             text="Public source codes, and files"
@@ -117,9 +113,7 @@ export default function Home() {
           </ul>
         </div>
         <div id="social">
-          <svg className="icon" role="presentation" aria-hidden="true">
-            <use href="/icons.svg#social-icon"></use>
-          </svg>
+          <FaShareAlt className="icon" aria-hidden="true" />
           <h2>Connect with Bellamy</h2>
           <TypeWriter
             text="Direct message or send me an email"
