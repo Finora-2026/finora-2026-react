@@ -36,7 +36,7 @@ export default function TransactionListPending() {
       transactionGroupId: "group_abc",
       transactionDate: "2026-05-15T14:30:00",
       amount: -45.50,
-      notes: "Weekly grocery run",
+      notes: "Weekly grocery runWeekly grocery runWeekly grocery runWeekly grocery runWeekly grocery runWeekly grocery runWeekly grocery runWeekly grocery runWeekly grocery runWeekly grocery runWeekly grocery runWeekly grocery run",
       accountId: "acc_99",
       accountName: "BOA Checking 1",
       brandId: "brand_target",
@@ -89,6 +89,15 @@ export default function TransactionListPending() {
         {!loading && results.length > 0 && (
           <div className={styles.tableWrapper}>
             <table className={styles.table}>
+              <colgroup>
+                <col style={{ width: "11%" }} /> {/* Date */}
+                <col style={{ width: "9%" }} />  {/* Type */}
+                <col style={{ width: "10%" }} /> {/* Brand */}
+                <col style={{ width: "10%" }} /> {/* Location */}
+                <col style={{ width: "10%" }} /> {/* Amount */}
+                <col style={{ width: "35%" }} /> {/* Notes (Given maximum real estate) */}
+                <col style={{ width: "15%" }} /> {/* Account */}
+              </colgroup>
               <thead>
               <tr>
                 <th>Date</th>
