@@ -64,6 +64,16 @@
   }
 }
 
+/* READ-ONLY ROW HOVER (non-clickable tables) */
+.table tbody tr {
+  transition: background-color 0.15s ease;
+}
+
+/* Only apply hover if row is NOT "posted faded row" (optional safe enhancement) */
+.table tbody tr:hover {
+  background-color: rgba(var(--accent-rgb, 0, 0, 0), 0.05);
+}
+
 .posted {
   opacity: 0.6;
 }
@@ -175,6 +185,26 @@
   color: red;
   text-align: center;
   margin: 10px 0;
+}
+
+.badge {
+  padding: 4px 10px;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 600;
+  display: inline-block;
+}
+
+/* Posted */
+.badgeSuccess {
+  background: #198754;
+  color: white;
+}
+
+/* Pending */
+.badgeWarning {
+  background: #ffc107;
+  color: #1f1f1f;
 }
 
 /* Reduce container padding on mobile to give the form more room */

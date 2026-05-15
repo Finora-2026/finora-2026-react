@@ -1,4 +1,5 @@
 import {useEffect, useMemo, useState} from "react";
+import { useNavigate } from "react-router-dom";
 import { useToast } from "../../components/ToastProvider/toastContext.ts";
 
 import transactionService, {
@@ -26,6 +27,7 @@ import styles from "./TransactionUpdate.module.scss";
 export default function TransactionListPending() {
   
   const { showToast } = useToast();
+  const navigate = useNavigate();
   
   const [loading, setLoading] = useState<boolean>(true);
   const [results, setResults] = useState<TransactionResponseDto[]>([]);
@@ -94,7 +96,7 @@ export default function TransactionListPending() {
   );
   
   const openTransactionGroup = (groupId: string) => {
-    showToast(`Mock open transaction group: ${groupId}`);
+    navigate(`../details/${groupId}`);
   };
   
   const getAmountDisplay = (amount: number) => {
