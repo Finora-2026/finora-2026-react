@@ -380,13 +380,19 @@ export default function TransactionUpdate() {
     <div className={styles.container}>
       <div className={styles.card}>
         <div className={styles.row}>
-          <button onClick={() => showToast("Mock add account button", "success")}>
+          <button
+            className={styles.button + " " + styles.secondary}
+            onClick={() => showToast("Mock add account button", "success")}>
             + Account
           </button>
-          <button onClick={() => showToast("Mock add brand button", "success")}>
+          <button
+            className={styles.button + " " + styles.secondary}
+            onClick={() => showToast("Mock add brand button", "success")}>
             + Brand
           </button>
-          <button onClick={() => showToast("Mock add location button", "success")}>
+          <button
+            className={styles.button + " " + styles.secondary}
+            onClick={() => showToast("Mock add location button", "success")}>
             + Location
           </button>
         </div>
@@ -523,13 +529,16 @@ export default function TransactionUpdate() {
                 
                 <td>
                   <button
+                    className={styles.button + " " + styles.primary}
                     onClick={() => markAsPosted(tx.id)}
                     disabled={tx.posted}
                   >
                     Posted
                   </button>
                   
-                  <button onClick={() => deleteTransaction(tx.id)}>
+                  <button
+                    className={styles.button + " " + styles.danger}
+                    onClick={() => deleteTransaction(tx.id)}>
                     Delete
                   </button>
                 </td>
@@ -542,9 +551,15 @@ export default function TransactionUpdate() {
         {/* ACTIONS */}
         <div className={styles.actions}>
           <div className={styles.row}>
-            <button onClick={duplicateLastTransaction}>+ Duplicate last row</button>
-            <button onClick={addBlankTransaction}>+ New Transaction</button>
-            <button onClick={() => setShowCashbackInput(true)}>
+            <button
+              className={styles.button + " " + styles.secondary}
+              onClick={duplicateLastTransaction}>+ Duplicate last row</button>
+            <button
+              className={styles.button + " " + styles.secondary}
+              onClick={addBlankTransaction}>+ New Transaction</button>
+            <button
+              className={styles.button + " " + styles.secondary}
+              onClick={() => setShowCashbackInput(true)}>
               + Cashback %
             </button>
             
@@ -557,16 +572,22 @@ export default function TransactionUpdate() {
                     setCashbackPercent(Number(e.target.value))
                   }
                 />
-                <button onClick={() => addCashbackTransaction(cashbackPercent)}>
+                <button
+                  className={styles.button + " " + styles.primary}
+                  onClick={() => addCashbackTransaction(cashbackPercent)}>
                   Add
                 </button>
-                <button onClick={() => setShowCashbackInput(false)}>
+                <button
+                  className={styles.button + " " + styles.danger}
+                  onClick={() => setShowCashbackInput(false)}>
                   Cancel
                 </button>
               </div>
             )}
             
-            <button onClick={() => setShowSplitFirstInput(true)}>
+            <button
+              className={styles.button + " " + styles.secondary}
+              onClick={() => setShowSplitFirstInput(true)}>
               + Split First
             </button>
             
@@ -579,13 +600,24 @@ export default function TransactionUpdate() {
                     setSplitFirstCount(Number(e.target.value))
                   }
                 />
-                <button onClick={() => splitFirst(splitFirstCount)}>
+                
+                <button
+                  className={styles.button + " " + styles.primary}
+                  onClick={() => splitFirst(splitFirstCount)}>
                   Split
+                </button>
+                
+                <button
+                  className={styles.button + " " + styles.danger}
+                  onClick={() => setShowSplitFirstInput(false)}>
+                  Cancel
                 </button>
               </div>
             )}
             
-            <button onClick={() => setShowSplitAllInput(true)}>
+            <button
+              className={styles.button + " " + styles.secondary}
+              onClick={() => setShowSplitAllInput(true)}>
               + Split All
             </button>
             
@@ -598,19 +630,28 @@ export default function TransactionUpdate() {
                     setSplitAllCount(Number(e.target.value))
                   }
                 />
-                <button onClick={() => splitAll(splitAllCount)}>
+                
+                <button
+                  className={styles.button + " " + styles.primary}
+                  onClick={() => splitAll(splitAllCount)}>
                   Split
+                </button>
+                
+                <button
+                  className={styles.button + " " + styles.danger}
+                  onClick={() => setShowSplitAllInput(false)}>
+                  Cancel
                 </button>
               </div>
             )}
           </div>
           
           <div className={styles.row}>
-            <button onClick={submitAll} disabled={isInvalid}>
-              {isEditMode ? "Update" : "Submit"}
+            <button className={styles.button + " " + styles.primary} onClick={submitAll} disabled={isInvalid}>
+              {isEditMode ? "Update transactions" : "Submit transactions"}
             </button>
-            <button onClick={cancel}>Reset</button>
-            <button onClick={goBack}>Pending</button>
+            <button className={styles.button + " " + styles.danger} onClick={cancel}>Cancel / Reset this page</button>
+            <button className={styles.button + " " + styles.secondary} onClick={goBack}>Go to Pending list</button>
           </div>
         </div>
       </div>
