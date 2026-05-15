@@ -39,12 +39,12 @@ export const navItems: NavItem[] = [
     match: matchModule("loans"),
   },
   {
-    label: "Investment",
-    to: "/finora/investment",
+    label: "Investments",
+    to: "/finora/investments",
     match: matchModule("investment"),
   },
   {
-    label: "Analytics [Testing]",
+    label: "Analytics [or Dashboard]",
     to: "/finora/analytics",
     match: matchModule("analytics"),
   },

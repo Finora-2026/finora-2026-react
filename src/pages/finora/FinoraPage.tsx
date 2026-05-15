@@ -6,7 +6,8 @@ import FinoraNavBar from "../../components/NavBar/NavBarFinora.tsx";
 import AccountRoutes from "../../route/AccountRoutes.tsx";
 import TransactionRoutes from "../../route/TransactionRoutes.tsx";
 
-const FinoraAnalytics = () => <div className="p-10">Finora Analytics Content</div>;
+const FinoraAnalytics = () =>
+  <div className="p-10">Finora Analytics Content [Building or Pending]</div>;
 
 export default function FinoraPage() {
   
@@ -14,12 +15,20 @@ export default function FinoraPage() {
   
   useEffect(() => {
     const path = location.pathname;
-    let subtitle = "";
+    let subtitle = " | Main Menu";
     // Determine the subtitle based on the path
     if (path.includes("/accounts")) {
       subtitle = " | Accounts";
     } else if (path.includes("/transactions")) {
       subtitle = " | Transactions";
+    } else if (path.includes("/reports")) {
+      subtitle = " | Reports";
+    } else if (path.includes("/records")) {
+      subtitle = " | Records";
+    } else if (path.includes("/loans")) {
+      subtitle = " | Loans";
+    } else if (path.includes("/investments")) {
+      subtitle = " | Investments";
     } else if (path.includes("/analytics")) {
       subtitle = " | Analytics";
     }
