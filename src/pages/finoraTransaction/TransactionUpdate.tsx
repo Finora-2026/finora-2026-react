@@ -17,6 +17,10 @@ import {
   transactionTypeService,
   type TransactionTypeDto,
 } from "../../utils/transactionTypeService.ts";
+import {
+  transactionGroupService,
+} from "../../utils/transactionGroupService.ts";
+import {useNavigate} from "react-router-dom";
 
 type Transaction = {
   id: string;
@@ -32,6 +36,8 @@ type Transaction = {
 
 export default function TransactionUpdate() {
   const { showToast } = useToast();
+  const navigate = useNavigate();
+  
   const [loading] = useState(false);
   const [errorMessage] = useState<string | null>(null);
   
@@ -73,6 +79,10 @@ export default function TransactionUpdate() {
   
   const [showSplitAllInput, setShowSplitAllInput] = useState(false);
   const [splitAllCount, setSplitAllCount] = useState<number>(2);
+  
+  const isInvalid = transactions.some(
+    (t) => !t.date || !t.accountId || t.amount === 0
+  );
   
   const pageTitle = "Add new transaction [OR] Update transaction";
   
@@ -283,10 +293,31 @@ export default function TransactionUpdate() {
     showToast("Marked as posted", "success");
   };
   
-  const submitAll = () => {
+  const submitAll = async () => {
     try {
-      console.log("Submit transactions:", transactions);
-      showToast("Transactions submitted", "success");
+      const validTransactions = transactions.filter(
+        (tx) => tx.date && tx.accountId && tx.amount !== 0
+      );
+      
+      const payload = {
+        transactions: validTransactions.map((tx) => ({
+          transactionDate: new Date(tx.date).toISOString(),
+          
+          amount: tx.amount,
+          notes: tx.notes,
+          
+          accountId: tx.accountId,
+          brandId: tx.brandId || undefined,
+          locationId: tx.locationId || undefined,
+          transactionTypeId: tx.transactionTypeId || undefined,
+        })),
+      };
+      
+      const res = await transactionGroupService.createTransactionGroup(payload);
+      showToast(res.message || "Transactions submitted", "success");
+      console.log("Group created:", res.groupId);
+      // redirect to account home page
+      navigate("..");
     } catch (err) {
       console.error(err);
       showToast("Failed to submit transactions", "error");
@@ -532,7 +563,9 @@ export default function TransactionUpdate() {
           </div>
           
           <div className={styles.row}>
-            <button onClick={submitAll}>Submit</button>
+            <button onClick={submitAll} disabled={isInvalid}>
+              Submit
+            </button>
             <button onClick={cancel}>Reset</button>
             <button onClick={goBack}>Pending</button>
           </div>
