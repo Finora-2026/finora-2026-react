@@ -5,10 +5,10 @@ export const boxesFinoraMenu = [
         speed: 85,
         buttons: [
             { label: "Add Transaction", to: "transactions/add" },
-            { label: "Pending Transactions", to: "transactions/pending" },
+            { label: "Pending Transactions", to: "transactions/list-pending" },
             { label: "Search Transaction", to: "transactions/search" },
-            { label: "Posted Transactions", to: "transactions/posted" },
-            { label: "Repeat Transactions", to: "transactions/repeat" },
+            { label: "Posted Transactions", to: "transactions/list-posted" },
+            { label: "Repeat Transactions", to: "transactions/list-repeat" },
         ],
     },
     

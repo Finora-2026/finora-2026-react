@@ -57,6 +57,13 @@
   }
 }
 
+/* Enhancing existing table rules for read-only typography safety */
+.table td {
+  span {
+    font-weight: 500;
+  }
+}
+
 .posted {
   opacity: 0.6;
 }
@@ -102,6 +109,25 @@
   cursor: pointer;
   font-weight: 500;
   transition: all 0.15s ease;
+}
+
+.clickableRow {
+  cursor: pointer;
+  transition: background-color 0.15s ease;
+
+  &:hover {
+    background-color: rgba(var(--accent-rgb, 0, 0, 0), 0.05); /* Subtle tint on hover */
+  }
+}
+
+.amountNegative {
+  color: #dc3545; /* Bootstrap-style Red */
+  font-weight: 600;
+}
+
+.amountPositive {
+  color: #198754; /* Bootstrap-style Green */
+  font-weight: 600;
 }
 
 /* PRIMARY */
