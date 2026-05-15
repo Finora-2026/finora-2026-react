@@ -1,5 +1,6 @@
-import { useState } from "react";
-import {useToast} from "../../components/ToastProvider/toastContext.ts";
+import {useEffect, useState} from "react";
+import { useToast } from "../../components/ToastProvider/toastContext.ts";
+import styles from "./TransactionUpdate.module.scss"; // Reusing your existing SCSS file
 
 // Define the TypeScript interface matching backend TransactionResponseDto
 interface TransactionResponseDto {
@@ -17,7 +18,8 @@ interface TransactionResponseDto {
   // Note: Added missing string placeholders for UI display since DTO only had IDs
   brandName?: string;
   locationName?: string;
-  bankName?: string;
+  transactionTypeName?: string;
+  accountName: string;
 }
 
 export default function TransactionListPending() {
@@ -36,15 +38,21 @@ export default function TransactionListPending() {
       amount: -45.50,
       notes: "Weekly grocery run",
       accountId: "acc_99",
+      accountName: "BOA Checking 1",
       brandId: "brand_target",
-      brandName: "Target",        // Fallback placeholder
+      brandName: "Target",
       locationId: "loc_rowlett",
-      locationName: "Rowlett",    // Fallback placeholder
-      transactionTypeId: "Expense",
-      bankName: "Chase Bank",     // Fallback placeholder
+      locationName: "Rowlett",
+      transactionTypeId: "qwert",
+      transactionTypeName: "INCOME",
       isPosted: false
     }
   ]);
+  
+  // Show an instruction when first loading
+  useEffect(() => {
+    showToast("Click on each transaction to see the details");
+  }, [showToast]);
   
   // Mock Handlers
   const openTransactionGroup = (groupId: string) => {
@@ -53,88 +61,75 @@ export default function TransactionListPending() {
   
   const getAmountDisplay = (amount: number) => {
     if (amount < 0) {
-      return { display: `-$${Math.abs(amount).toFixed(2)}`, classes: "negative-amount" };
+      return {
+        display: `-$${Math.abs(amount).toFixed(2)}`,
+        className: styles.amountNegative
+      };
     }
-    return { display: `$${amount.toFixed(2)}`, classes: "positive-amount" };
+    return {
+      display: `$${amount.toFixed(2)}`,
+      className: styles.amountPositive
+    };
   };
   
   return (
-    <div>
-      <h2>Pending Transactions</h2>
-      
-      {/* Loading state (*ngIf="loading") */}
-      {loading && (
-        <div>
-          <i>[Icon: Hourglass]</i>
-          <div>Loading pending transactions...</div>
-        </div>
-      )}
-      
-      {/* Empty state (*ngIf="!loading && results.length === 0") */}
-      {!loading && results.length === 0 && (
-        <div>
-          <i>[Icon: Clock History]</i>
-          <div>No pending transactions found.</div>
-        </div>
-      )}
-      
-      {/* Table state (*ngIf="results.length > 0") */}
-      {!loading && results.length > 0 && (
-        <div>
-          <table>
-            <thead>
-            <tr>
-              <th>Date</th>
-              <th>Type</th>
-              <th>Brand</th>
-              <th>Location</th>
-              <th>Amount</th>
-              <th>Notes</th>
-              <th>Bank</th>
-            </tr>
-            </thead>
-            
-            <tbody>
-            {results.map((tx) => {
-              const amountData = getAmountDisplay(tx.amount);
+    <div className={styles.container}>
+      <div className={styles.card}>
+        <h1 className={styles.title}>Pending Transactions</h1>
+        
+        {/* Loading state */}
+        {loading && <div className={styles.message}>Loading pending transactions...</div>}
+        
+        {/* Empty state */}
+        {!loading && results.length === 0 && (
+          <div className={styles.message}>No pending transactions found.</div>
+        )}
+        
+        {/* Table state */}
+        {!loading && results.length > 0 && (
+          <div className={styles.tableWrapper}>
+            <table className={styles.table}>
+              <thead>
+              <tr>
+                <th>Date</th>
+                <th>Type</th>
+                <th>Brand</th>
+                <th>Location</th>
+                <th>Amount</th>
+                <th>Notes</th>
+                <th>Account</th>
+              </tr>
+              </thead>
               
-              return (
-                <tr
-                  key={tx.id}
-                  onClick={() => tx.transactionGroupId ? openTransactionGroup(tx.transactionGroupId) : null}
-                  style={{ cursor: tx.transactionGroupId ? 'pointer' : 'default' }}
-                >
-                  {/* Date */}
-                  <td>{new Date(tx.transactionDate).toLocaleDateString()}</td>
-                  
-                  {/* Type */}
-                  <td>
-                    <span>{tx.transactionTypeId}</span>
-                  </td>
-                  
-                  {/* Brand */}
-                  <td>{tx.brandName || tx.brandId || '—'}</td>
-                  
-                  {/* Location */}
-                  <td>{tx.locationName || tx.locationId || '—'}</td>
-                  
-                  {/* Amount */}
-                  <td className={amountData.classes}>
-                    {amountData.display}
-                  </td>
-                  
-                  {/* Notes */}
-                  <td>{tx.notes}</td>
-                  
-                  {/* Bank / Account */}
-                  <td>{tx.bankName || tx.accountId}</td>
-                </tr>
-              );
-            })}
-            </tbody>
-          </table>
-        </div>
-      )}
+              <tbody>
+              {results.map((tx) => {
+                const amountData = getAmountDisplay(tx.amount);
+                const isClickable = !!tx.transactionGroupId;
+                
+                return (
+                  <tr
+                    key={tx.id}
+                    onClick={() => isClickable ? openTransactionGroup(tx.transactionGroupId) : null}
+                    className={isClickable ? styles.clickableRow : ""}
+                  >
+                    {/* Responsive Labels added with data-label for your mobile CSS breakpoint */}
+                    <td data-label="Date">{new Date(tx.transactionDate).toLocaleDateString()}</td>
+                    <td data-label="Type">{tx.transactionTypeName || tx.transactionTypeId}</td>
+                    <td data-label="Brand">{tx.brandName || tx.brandId || '—'}</td>
+                    <td data-label="Location">{tx.locationName || tx.locationId || '—'}</td>
+                    <td data-label="Amount" className={amountData.className}>
+                      {amountData.display}
+                    </td>
+                    <td data-label="Notes">{tx.notes}</td>
+                    <td data-label="Bank">{tx.accountName || tx.accountId}</td>
+                  </tr>
+                );
+              })}
+              </tbody>
+            </table>
+          </div>
+        )}
+      </div>
     </div>
   );
 }
