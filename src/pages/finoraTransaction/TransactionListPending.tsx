@@ -1,79 +1,98 @@
-import {useEffect, useState} from "react";
+import {useEffect, useMemo, useState} from "react";
 import { useToast } from "../../components/ToastProvider/toastContext.ts";
-import styles from "./TransactionUpdate.module.scss"; // Reusing your existing SCSS file
 
-// Define the TypeScript interface matching backend TransactionResponseDto
-interface TransactionResponseDto {
-  id: string;
-  transactionGroupId: string;
-  transactionDate: string; // LocalDateTime serializes as string ISO
-  amount: number;
-  notes: string;
-  accountId: string;
-  brandId: string | null;
-  locationId: string | null;
-  transactionTypeId: string;
-  isPosted: boolean;
-  
-  // Note: Added missing string placeholders for UI display since DTO only had IDs
-  brandName?: string;
-  locationName?: string;
-  transactionTypeName?: string;
-  accountName: string;
-}
+import transactionService, {
+  type TransactionResponseDto
+} from "../../utils/transactionService.ts";
+import {
+  brandService,
+  type BrandResponseDto,
+} from "../../utils/brandService.ts";
+import {
+  locationService,
+  type LocationResponseDto,
+} from "../../utils/locationService.ts";
+import {
+  transactionTypeService,
+  type TransactionTypeDto,
+} from "../../utils/transactionTypeService.ts";
+import {
+  accountService,
+  type AccountResponseDto,
+} from "../../utils/accountService.ts";
+
+import styles from "./TransactionUpdate.module.scss";
 
 export default function TransactionListPending() {
   
   const { showToast } = useToast();
   
-  // Mock States (Wire useEffect API call here later)
-  // const [loading, setLoading] = useState<boolean>(false);
-  const [loading] = useState<boolean>(false);
-  
-  // Mocking 1 transaction record based on DTO structure
-  // const [results, setResults] = useState<TransactionResponseDto[]>([
-  //   {
-  //     id: "tx_123",
-  //     transactionGroupId: "group_abc",
-  //     transactionDate: "2026-05-15T14:30:00",
-  //     amount: -45.50,
-  //     notes: "Weekly grocery runWeekly grocery runWeekly grocery runWeekly grocery runWeekly grocery runWeekly grocery runWeekly grocery runWeekly grocery runWeekly grocery runWeekly grocery runWeekly grocery runWeekly grocery run",
-  //     accountId: "acc_99",
-  //     accountName: "BOA Checking 1",
-  //     brandId: "brand_target",
-  //     brandName: "Target",
-  //     locationId: "loc_rowlett",
-  //     locationName: "Rowlett",
-  //     transactionTypeId: "qwert",
-  //     transactionTypeName: "INCOME",
-  //     isPosted: false
-  //   }
-  // ]);
-  const [results] = useState<TransactionResponseDto[]>([
-    {
-      id: "tx_123",
-      transactionGroupId: "group_abc",
-      transactionDate: "2026-05-15T14:30:00",
-      amount: -45.50,
-      notes: "Weekly grocery runWeekly grocery runWeekly grocery runWeekly grocery runWeekly grocery runWeekly grocery runWeekly grocery runWeekly grocery runWeekly grocery runWeekly grocery runWeekly grocery runWeekly grocery run",
-      accountId: "acc_99",
-      accountName: "BOA Checking 1",
-      brandId: "brand_target",
-      brandName: "Target",
-      locationId: "loc_rowlett",
-      locationName: "Rowlett",
-      transactionTypeId: "qwert",
-      transactionTypeName: "INCOME",
-      isPosted: false
-    }
-  ]);
+  const [loading, setLoading] = useState<boolean>(true);
+  const [results, setResults] = useState<TransactionResponseDto[]>([]);
+  const [brands, setBrands] = useState<BrandResponseDto[]>([]);
+  const [locations, setLocations] = useState<LocationResponseDto[]>([]);
+  const [transactionTypes, setTransactionTypes] = useState<TransactionTypeDto[]>([]);
+  const [accounts, setAccounts] = useState<AccountResponseDto[]>([]);
   
   // Show an instruction when first loading
   useEffect(() => {
     showToast("Click on each transaction to see the details");
   }, [showToast]);
   
-  // Mock Handlers
+  // Load all lookup data and pending transactions
+  useEffect(() => {
+    const loadData = async () => {
+      try {
+        setLoading(true);
+        const [
+          transactions,
+          brandsData,
+          locationsData,
+          transactionTypesData,
+          accountsData
+        ] = await Promise.all([
+          transactionService.getPendingTransactions(),
+          brandService.getAllBrands(),
+          locationService.getAllLocations(),
+          transactionTypeService.getAllTransactionTypes(),
+          accountService.getActiveAccounts(),
+        ]);
+        setResults(transactions);
+        setBrands(brandsData);
+        setLocations(locationsData);
+        setTransactionTypes(transactionTypesData);
+        setAccounts(accountsData);
+      } catch (error) {
+        console.error(error);
+        showToast("Failed to load pending transactions", "error");
+      } finally {
+        setLoading(false);
+      }
+    };
+    loadData();
+  }, [showToast]);
+  
+  // Fast lookup maps
+  const brandMap = useMemo(
+    () => Object.fromEntries(brands.map(b => [b.id, b.name])),
+    [brands]
+  );
+  const locationMap = useMemo(
+    () =>
+      Object.fromEntries(
+        locations.map(l => [l.id, `${l.city}, ${l.state}`])
+      ),
+    [locations]
+  );
+  const transactionTypeMap = useMemo(
+    () => Object.fromEntries(transactionTypes.map(t => [t.id, t.name])),
+    [transactionTypes]
+  );
+  const accountMap = useMemo(
+    () => Object.fromEntries(accounts.map(a => [a.id, a.name])),
+    [accounts]
+  );
+  
   const openTransactionGroup = (groupId: string) => {
     showToast(`Mock open transaction group: ${groupId}`);
   };
@@ -104,7 +123,7 @@ export default function TransactionListPending() {
           <div className={styles.message}>No pending transactions found.</div>
         )}
         
-        {/* Table state */}
+        {/* Table */}
         {!loading && results.length > 0 && (
           <div className={styles.tableWrapper}>
             <table className={styles.table}>
@@ -140,16 +159,35 @@ export default function TransactionListPending() {
                     onClick={() => isClickable ? openTransactionGroup(tx.transactionGroupId) : null}
                     className={isClickable ? styles.clickableRow : ""}
                   >
-                    {/* Responsive Labels added with data-label for your mobile CSS breakpoint */}
-                    <td data-label="Date">{new Date(tx.transactionDate).toLocaleDateString()}</td>
-                    <td data-label="Type">{tx.transactionTypeName || tx.transactionTypeId}</td>
-                    <td data-label="Brand">{tx.brandName || tx.brandId || '—'}</td>
-                    <td data-label="Location">{tx.locationName || tx.locationId || '—'}</td>
-                    <td data-label="Amount" className={amountData.className}>
+                    
+                    <td data-label="Date">
+                      {new Date(tx.transactionDate).toLocaleDateString()}
+                    </td>
+                    <td data-label="Type">
+                      {tx.transactionTypeId
+                        ? transactionTypeMap[tx.transactionTypeId] || tx.transactionTypeId
+                        : "—"}
+                    </td>
+                    <td data-label="Brand">
+                      {tx.brandId
+                        ? brandMap[tx.brandId] || tx.brandId
+                        : "—"}
+                    </td>
+                    <td data-label="Location">
+                      {tx.locationId
+                        ? locationMap[tx.locationId] || tx.locationId
+                        : "—"}
+                    </td>
+                    <td data-label="Amount" className={amountData.className}
+                    >
                       {amountData.display}
                     </td>
-                    <td data-label="Notes">{tx.notes}</td>
-                    <td data-label="Bank">{tx.accountName || tx.accountId}</td>
+                    <td data-label="Notes">
+                      {tx.notes || "—"}
+                    </td>
+                    <td data-label="Account">
+                      {accountMap[tx.accountId] || tx.accountId}
+                    </td>
                   </tr>
                 );
               })}
