@@ -13,6 +13,10 @@ import {
   locationService,
   type LocationResponseDto,
 } from "../../utils/locationService.ts";
+import {
+  transactionTypeService,
+  type TransactionTypeDto,
+} from "../../utils/transactionTypeService.ts";
 
 type Transaction = {
   id: string;
@@ -42,6 +46,10 @@ export default function TransactionUpdate() {
   const [locations, setLocations] = useState<LocationResponseDto[]>([]);
   const [locationsLoading, setLocationsLoading] = useState(true);
   const [locationsError, setLocationsError] = useState("");
+  
+  const [transactionTypes, setTransactionTypes] = useState<TransactionTypeDto[]>([]);
+  const [transactionTypesLoading, setTransactionTypesLoading] = useState(true);
+  const [transactionTypesError, setTransactionTypesError] = useState("");
   
   const [transactions, setTransactions] = useState<Transaction[]>([
     {
@@ -130,6 +138,26 @@ export default function TransactionUpdate() {
     loadLocations();
   }, [showToast]);
   
+  // Load transaction types
+  useEffect(() => {
+    const loadTransactionTypes = async () => {
+      setTransactionTypesLoading(true);
+      setTransactionTypesError("");
+      try {
+        const data = await transactionTypeService.getAllTransactionTypes();
+        setTransactionTypes(data);
+      } catch (err) {
+        console.error("Failed to load transaction types", err);
+        setTransactionTypes([]);
+        setTransactionTypesError("Failed to load transaction types");
+        showToast("Failed to load transaction types", "error");
+      } finally {
+        setTransactionTypesLoading(false);
+      }
+    };
+    loadTransactionTypes();
+  }, [showToast]);
+  
   const renderAccountOptions = () => {
     if (accountsLoading) {
       return <option value="">Loading accounts...</option>;
@@ -181,6 +209,28 @@ export default function TransactionUpdate() {
         {locations.map((location) => (
           <option key={location.id} value={location.id}>
             {location.city}, {location.state}
+          </option>
+        ))}
+      </>
+    );
+  };
+  
+  const renderTransactionTypeOptions = () => {
+    if (transactionTypesLoading) {
+      return <option value="">Loading transaction types...</option>;
+    }
+    
+    if (transactionTypesError) {
+      return <option value="">Error loading transaction types</option>;
+    }
+    
+    return (
+      <>
+        <option value="">Select type</option>
+        
+        {transactionTypes.map((type) => (
+          <option key={type.id} value={type.id}>
+            {type.name}
           </option>
         ))}
       </>
@@ -329,11 +379,13 @@ export default function TransactionUpdate() {
                     onChange={(e) =>
                       updateField(tx.id, "transactionTypeId", e.target.value)
                     }
-                    disabled={tx.posted}
+                    disabled={
+                      tx.posted ||
+                      transactionTypesLoading ||
+                      !!transactionTypesError
+                    }
                   >
-                    <option value="">Type</option>
-                    <option value="1">Food</option>
-                    <option value="2">Shopping</option>
+                    {renderTransactionTypeOptions()}
                   </select>
                 </td>
                 
