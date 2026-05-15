@@ -29,7 +29,7 @@ type Transaction = {
   transactionTypeId: string;
   brandId: string;
   locationId: string;
-  amount: number;
+  amount: string;
   notes: string;
   accountId: string;
   posted: boolean;
@@ -70,7 +70,7 @@ export default function TransactionUpdate() {
       transactionTypeId: "",
       brandId: "",
       locationId: "",
-      amount: 0,
+      amount: "",
       notes: "",
       accountId: "",
       posted: false,
@@ -86,9 +86,17 @@ export default function TransactionUpdate() {
   const [showSplitAllInput, setShowSplitAllInput] = useState(false);
   const [splitAllCount, setSplitAllCount] = useState<number>(2);
   
-  const isInvalid = transactions.some(
-    (t) => !t.date || !t.accountId || t.amount === 0
-  );
+  const isInvalid = transactions.some((t) => {
+    const amount = Number(t.amount);
+    
+    return (
+      !t.date ||
+      !t.accountId ||
+      t.amount === "" ||
+      Number.isNaN(amount) ||
+      amount === 0
+    );
+  });
   
   const pageTitle = isEditMode
     ? "Update transaction group"
@@ -264,7 +272,7 @@ export default function TransactionUpdate() {
         transactionTypeId: "",
         brandId: "",
         locationId: "",
-        amount: 0,
+        amount: "",
         notes: "",
         accountId: "",
         posted: false,
@@ -290,7 +298,7 @@ export default function TransactionUpdate() {
           transactionTypeId: lastType,
           brandId: lastBrand,
           locationId: lastLocation,
-          amount: 0,
+          amount: "",
           notes: lastNotes,
           accountId: "",
           posted: false,
@@ -328,16 +336,14 @@ export default function TransactionUpdate() {
   const submitAll = async () => {
     try {
       const validTransactions = transactions.filter(
-        (tx) => tx.date && tx.accountId && tx.amount !== 0
+        (tx) => tx.date && tx.accountId && Number(tx.amount) !== 0
       );
       
       const payload = {
         transactions: validTransactions.map((tx) => ({
           transactionDate: new Date(tx.date).toISOString(),
-          
-          amount: tx.amount,
+          amount: Number(tx.amount),
           notes: tx.notes,
-          
           accountId: tx.accountId,
           brandId: tx.brandId || undefined,
           locationId: tx.locationId || undefined,
@@ -498,7 +504,7 @@ export default function TransactionUpdate() {
                     type="number"
                     value={tx.amount}
                     onChange={(e) =>
-                      updateField(tx.id, "amount", Number(e.target.value))
+                      updateField(tx.id, "amount", e.target.value)
                     }
                     disabled={tx.posted}
                   />
@@ -531,7 +537,7 @@ export default function TransactionUpdate() {
                   <button
                     className={styles.button + " " + styles.primary}
                     onClick={() => markAsPosted(tx.id)}
-                    disabled={tx.posted}
+                    disabled={tx.posted || !isEditMode}
                   >
                     Posted
                   </button>
