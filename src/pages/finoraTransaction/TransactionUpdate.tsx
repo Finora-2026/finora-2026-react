@@ -1,4 +1,5 @@
 import {useEffect, useState} from "react";
+import { useParams } from "react-router-dom";
 import {useToast} from "../../components/ToastProvider/toastContext.ts";
 import styles from "./TransactionUpdate.module.scss";
 import {
@@ -28,7 +29,7 @@ type Transaction = {
   transactionTypeId: string;
   brandId: string;
   locationId: string;
-  amount: number;
+  amount: string;
   notes: string;
   accountId: string;
   posted: boolean;
@@ -37,6 +38,9 @@ type Transaction = {
 export default function TransactionUpdate() {
   const { showToast } = useToast();
   const navigate = useNavigate();
+  
+  const { groupId } = useParams();
+  const isEditMode = !!groupId;
   
   const [loading] = useState(false);
   const [errorMessage] = useState<string | null>(null);
@@ -57,14 +61,16 @@ export default function TransactionUpdate() {
   const [transactionTypesLoading, setTransactionTypesLoading] = useState(true);
   const [transactionTypesError, setTransactionTypesError] = useState("");
   
+  const getToday = () => new Date().toISOString().split("T")[0];
+  
   const [transactions, setTransactions] = useState<Transaction[]>([
     {
       id: "t1",
-      date: "",
+      date: getToday(),
       transactionTypeId: "",
       brandId: "",
       locationId: "",
-      amount: 0,
+      amount: "",
       notes: "",
       accountId: "",
       posted: false,
@@ -80,11 +86,21 @@ export default function TransactionUpdate() {
   const [showSplitAllInput, setShowSplitAllInput] = useState(false);
   const [splitAllCount, setSplitAllCount] = useState<number>(2);
   
-  const isInvalid = transactions.some(
-    (t) => !t.date || !t.accountId || t.amount === 0
-  );
+  const isInvalid = transactions.some((t) => {
+    const amount = Number(t.amount);
+    
+    return (
+      !t.date ||
+      !t.accountId ||
+      t.amount === "" ||
+      Number.isNaN(amount) ||
+      amount === 0
+    );
+  });
   
-  const pageTitle = "Add new transaction [OR] Update transaction";
+  const pageTitle = isEditMode
+    ? "Update transaction group"
+    : "Add new transactions";
   
   // Load accounts
   useEffect(() => {
@@ -247,24 +263,48 @@ export default function TransactionUpdate() {
     );
   };
   
-  // -----------------------------
-  // Mock actions
-  // -----------------------------
-  const addTransaction = () => {
+  const addBlankTransaction = () => {
     setTransactions((prev) => [
       ...prev,
       {
         id: crypto.randomUUID(),
-        date: "",
+        date: getToday(),
         transactionTypeId: "",
         brandId: "",
         locationId: "",
-        amount: 0,
+        amount: "",
         notes: "",
         accountId: "",
         posted: false,
       },
     ]);
+  };
+  
+  const duplicateLastTransaction = () => {
+    setTransactions((prev) => {
+      const last = prev.length > 0 ? prev[prev.length - 1] : null;
+      
+      const lastDate = last?.date || getToday();
+      const lastType = last?.transactionTypeId || "";
+      const lastBrand = last?.brandId || "";
+      const lastLocation = last?.locationId || "";
+      const lastNotes = last?.notes || "";
+      
+      return [
+        ...prev,
+        {
+          id: crypto.randomUUID(),
+          date: lastDate,
+          transactionTypeId: lastType,
+          brandId: lastBrand,
+          locationId: lastLocation,
+          amount: "",
+          notes: lastNotes,
+          accountId: "",
+          posted: false,
+        },
+      ];
+    });
   };
   
   const deleteTransaction = (id: string) => {
@@ -296,16 +336,14 @@ export default function TransactionUpdate() {
   const submitAll = async () => {
     try {
       const validTransactions = transactions.filter(
-        (tx) => tx.date && tx.accountId && tx.amount !== 0
+        (tx) => tx.date && tx.accountId && Number(tx.amount) !== 0
       );
       
       const payload = {
         transactions: validTransactions.map((tx) => ({
           transactionDate: new Date(tx.date).toISOString(),
-          
-          amount: tx.amount,
+          amount: Number(tx.amount),
           notes: tx.notes,
-          
           accountId: tx.accountId,
           brandId: tx.brandId || undefined,
           locationId: tx.locationId || undefined,
@@ -325,28 +363,49 @@ export default function TransactionUpdate() {
   };
   
   const cancel = () => {
-    console.log("Reset");
+    window.location.reload();
   };
   
   const goBack = () => {
-    console.log("Navigate to pending transactions");
+    showToast("Mocking Navigate to pending transactions button");
   };
   
   const addCashbackTransaction = (percent: number) => {
-    console.log("Cashback %:", percent);
+    showToast(`Mocking cashback transaction: ${percent}%`, "success");
   };
   
   const splitFirst = (count: number) => {
-    console.log("Split first:", count);
+    showToast(`Mocking split first transaction: ${count}`, "success");
   };
   
   const splitAll = (count: number) => {
-    console.log("Split all:", count);
+    showToast(`Mocking split all transaction: ${count}`, "success");
   };
+  
+  const addAccount = () => {
+    navigate("../../accounts/add");
+  }
   
   return (
     <div className={styles.container}>
       <div className={styles.card}>
+        <div className={styles.row}>
+          <button
+            className={styles.button + " " + styles.secondary}
+            onClick={addAccount}>
+            + Account
+          </button>
+          <button
+            className={styles.button + " " + styles.secondary}
+            onClick={() => showToast("Mock add brand button", "success")}>
+            + Brand
+          </button>
+          <button
+            className={styles.button + " " + styles.secondary}
+            onClick={() => showToast("Mock add location button", "success")}>
+            + Location
+          </button>
+        </div>
         <h1 className={styles.title}>{pageTitle}</h1>
         
         {/* Loading */}
@@ -449,7 +508,7 @@ export default function TransactionUpdate() {
                     type="number"
                     value={tx.amount}
                     onChange={(e) =>
-                      updateField(tx.id, "amount", Number(e.target.value))
+                      updateField(tx.id, "amount", e.target.value)
                     }
                     disabled={tx.posted}
                   />
@@ -480,13 +539,16 @@ export default function TransactionUpdate() {
                 
                 <td>
                   <button
+                    className={styles.button + " " + styles.primary}
                     onClick={() => markAsPosted(tx.id)}
-                    disabled={tx.posted}
+                    disabled={tx.posted || !isEditMode}
                   >
                     Posted
                   </button>
                   
-                  <button onClick={() => deleteTransaction(tx.id)}>
+                  <button
+                    className={styles.button + " " + styles.danger}
+                    onClick={() => deleteTransaction(tx.id)}>
                     Delete
                   </button>
                 </td>
@@ -499,10 +561,16 @@ export default function TransactionUpdate() {
         {/* ACTIONS */}
         <div className={styles.actions}>
           <div className={styles.row}>
-            <button onClick={addTransaction}>+ Add</button>
-            
-            <button onClick={() => setShowCashbackInput(true)}>
-              Cashback %
+            <button
+              className={styles.button + " " + styles.secondary}
+              onClick={duplicateLastTransaction}>+ Duplicate last row</button>
+            <button
+              className={styles.button + " " + styles.secondary}
+              onClick={addBlankTransaction}>+ New Transaction</button>
+            <button
+              className={styles.button + " " + styles.secondary}
+              onClick={() => setShowCashbackInput(true)}>
+              + Cashback %
             </button>
             
             {showCashbackInput && (
@@ -514,17 +582,23 @@ export default function TransactionUpdate() {
                     setCashbackPercent(Number(e.target.value))
                   }
                 />
-                <button onClick={() => addCashbackTransaction(cashbackPercent)}>
+                <button
+                  className={styles.button + " " + styles.primary}
+                  onClick={() => addCashbackTransaction(cashbackPercent)}>
                   Add
                 </button>
-                <button onClick={() => setShowCashbackInput(false)}>
+                <button
+                  className={styles.button + " " + styles.danger}
+                  onClick={() => setShowCashbackInput(false)}>
                   Cancel
                 </button>
               </div>
             )}
             
-            <button onClick={() => setShowSplitFirstInput(true)}>
-              Split First
+            <button
+              className={styles.button + " " + styles.secondary}
+              onClick={() => setShowSplitFirstInput(true)}>
+              + Split First
             </button>
             
             {showSplitFirstInput && (
@@ -536,14 +610,25 @@ export default function TransactionUpdate() {
                     setSplitFirstCount(Number(e.target.value))
                   }
                 />
-                <button onClick={() => splitFirst(splitFirstCount)}>
+                
+                <button
+                  className={styles.button + " " + styles.primary}
+                  onClick={() => splitFirst(splitFirstCount)}>
                   Split
+                </button>
+                
+                <button
+                  className={styles.button + " " + styles.danger}
+                  onClick={() => setShowSplitFirstInput(false)}>
+                  Cancel
                 </button>
               </div>
             )}
             
-            <button onClick={() => setShowSplitAllInput(true)}>
-              Split All
+            <button
+              className={styles.button + " " + styles.secondary}
+              onClick={() => setShowSplitAllInput(true)}>
+              + Split All
             </button>
             
             {showSplitAllInput && (
@@ -555,19 +640,28 @@ export default function TransactionUpdate() {
                     setSplitAllCount(Number(e.target.value))
                   }
                 />
-                <button onClick={() => splitAll(splitAllCount)}>
+                
+                <button
+                  className={styles.button + " " + styles.primary}
+                  onClick={() => splitAll(splitAllCount)}>
                   Split
+                </button>
+                
+                <button
+                  className={styles.button + " " + styles.danger}
+                  onClick={() => setShowSplitAllInput(false)}>
+                  Cancel
                 </button>
               </div>
             )}
           </div>
           
           <div className={styles.row}>
-            <button onClick={submitAll} disabled={isInvalid}>
-              Submit
+            <button className={styles.button + " " + styles.primary} onClick={submitAll} disabled={isInvalid}>
+              {isEditMode ? "Update transactions" : "Submit transactions"}
             </button>
-            <button onClick={cancel}>Reset</button>
-            <button onClick={goBack}>Pending</button>
+            <button className={styles.button + " " + styles.danger} onClick={cancel}>Cancel / Reset this page</button>
+            <button className={styles.button + " " + styles.secondary} onClick={goBack}>Go to Pending list</button>
           </div>
         </div>
       </div>
