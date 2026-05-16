@@ -74,6 +74,17 @@
   background-color: rgba(var(--accent-rgb, 0, 0, 0), 0.05);
 }
 
+.groupRow {
+  cursor: pointer;
+  font-weight: 600;
+  background: rgba(var(--accent-rgb, 0, 0, 0), 0.03);
+  transition: background-color 0.15s ease;
+
+  &:hover {
+    background-color: rgba(var(--accent-rgb, 0, 0, 0), 0.08);
+  }
+}
+
 .posted {
   opacity: 0.6;
 }

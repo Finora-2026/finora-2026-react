@@ -1,6 +1,8 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 
+import styles from "./TransactionUpdate.module.scss";
+
 type Transaction = {
   id: string;
   date: string;
@@ -104,73 +106,107 @@ export default function TransactionListPosted() {
     navigate(`/transaction-view/${groupId}`);
   };
   
-  const renderAmount = (amount: number | null) => {
-    if (amount === null) return "—";
-    return `$${amount.toFixed(2)}`;
+  const getAmountDisplay = (amount: number | null) => {
+    if (amount === null) {
+      return { display: "—", className: "" };
+    }
+    
+    return amount < 0
+      ? {
+        display: `-$${Math.abs(amount).toFixed(2)}`,
+        className: styles.amountNegative,
+      }
+      : {
+        display: `$${amount.toFixed(2)}`,
+        className: styles.amountPositive,
+      };
   };
   
   // STATES
   if (loading) {
-    return <div>Loading posted transactions...</div>;
+    return <div className={styles.message}>Loading posted transactions...</div>;
   }
   
   if (error) {
-    return <div>{error}</div>;
+    return <div className={styles.error}>{error}</div>;
   }
   
   if (!groups.length) {
-    return <div>No posted transactions found.</div>;
+    return <div className={styles.message}>No posted transactions found.</div>;
   }
   
   return (
-    <div>
-      <h2>Posted Transactions</h2>
-      
-      <table>
-        <thead>
-        <tr>
-          <th>Date</th>
-          <th>Type</th>
-          <th>Brand</th>
-          <th>Location</th>
-          <th>Amount</th>
-          <th>Notes</th>
-          <th>Account</th>
-        </tr>
-        </thead>
+    <div className={styles.container}>
+      <div className={styles.card}>
+        <h1 className={styles.title}>Posted Transactions</h1>
         
-        <tbody>
-        {groups.map((group) => (
-          <>
-            {/* GROUP HEADER ROW */}
-            <tr
-              key={group.id}
-              onClick={() => handleGroupClick(group.id)}
-            >
-              <td colSpan={7}>
-                Group: {group.id} ({group.transactions.length} transactions)
-              </td>
+        <div className={styles.tableWrapper}>
+          <table className={styles.table}>
+            <colgroup>
+              <col style={{ width: "11%" }} />
+              <col style={{ width: "9%" }} />
+              <col style={{ width: "10%" }} />
+              <col style={{ width: "10%" }} />
+              <col style={{ width: "10%" }} />
+              <col style={{ width: "35%" }} />
+              <col style={{ width: "15%" }} />
+            </colgroup>
+            <thead>
+            <tr>
+              <th>Date</th>
+              <th>Type</th>
+              <th>Brand</th>
+              <th>Location</th>
+              <th>Amount</th>
+              <th>Notes</th>
+              <th>Account</th>
             </tr>
+            </thead>
             
-            {/* TRANSACTION ROWS */}
-            {group.transactions.map((tx) => (
-              <tr
-                key={tx.id}
-                onClick={() => handleRowClick(group.id)}
-              >
-                <td>{tx.date}</td>
-                <td>{tx.typeId}</td>
-                <td>{tx.brandName}</td>
-                <td>{tx.locationName}</td>
-                <td>{renderAmount(tx.amount)}</td>
-                <td>{tx.notes}</td>
-                <td>{tx.accountName}</td>
-              </tr>
+            <tbody>
+            {groups.map((group) => (
+              <>
+                {/* GROUP HEADER ROW */}
+                <tr
+                  key={group.id}
+                  onClick={() => handleGroupClick(group.id)}
+                  className={styles.groupRow}
+                >
+                  <td colSpan={7}>
+                    Group: {group.id} ({group.transactions.length} transactions)
+                  </td>
+                </tr>
+                
+                {/* TRANSACTION ROWS */}
+                {group.transactions.map((tx) => {
+                  const amountData = getAmountDisplay(tx.amount);
+                  
+                  return (
+                    <tr
+                      key={tx.id}
+                      onClick={() => handleRowClick(group.id)}
+                      className={styles.clickableRow}
+                    >
+                      <td>{tx.date}</td>
+                      <td>{tx.typeId}</td>
+                      <td>{tx.brandName}</td>
+                      <td>{tx.locationName}</td>
+                      
+                      <td className={amountData.className}>
+                        {amountData.display}
+                      </td>
+                      
+                      <td>{tx.notes}</td>
+                      <td>{tx.accountName}</td>
+                    </tr>
+                  );
+                })}
+              </>
             ))}
-          </>
-        ))}
-        </tbody>
-      </table>
+            </tbody>
+          </table>
+        </div>
+      </div>
     </div>
   );
 }
