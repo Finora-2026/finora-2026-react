@@ -173,7 +173,7 @@ export default function TransactionListPosted() {
                   className={styles.groupRow}
                 >
                   <td colSpan={7}>
-                    Group if: {group.id} ({group.transactions.length} transactions) - Click for details
+                    Group id: {group.id} ({group.transactions.length} transactions) - Click for details
                   </td>
                 </tr>
                 
