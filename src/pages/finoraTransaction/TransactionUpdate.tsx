@@ -391,7 +391,7 @@ export default function TransactionUpdate() {
       const updatePayload: TransactionGroupResponseDto = {
         id: groupId!,
         reportId: group?.reportId ?? null,
-        isRepeatable: group?.isRepeatable ?? false,
+        repeatable: group?.repeatable ?? false,
         transactions: validTransactions.map((tx) => ({
           id: tx.id || "", // backend can add new transactions to this group
           transactionGroupId: groupId!,

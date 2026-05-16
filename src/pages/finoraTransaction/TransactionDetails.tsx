@@ -53,7 +53,7 @@ export default function TransactionDetails() {
   const [transactionTypes, setTransactionTypes] = useState<TransactionTypeDto[]>([]);
   const [accounts, setAccounts] = useState<AccountResponseDto[]>([]);
   
-  const isRepeat = group?.isRepeatable ?? false;
+  const isRepeat = group?.repeatable ?? false;
   const reportId = group?.reportId;
   const [canEditGroup] = useState(true);
   
