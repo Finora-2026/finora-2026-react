@@ -147,7 +147,7 @@ export default function TransactionDetails() {
   };
   
   const editThisGroup = (id: string) => {
-    showToast(`Mocking editing this group ${id}`);
+    navigate(`../update/${id}`);
   }
   
   const goToReport = (reportId?: string | null) => {
