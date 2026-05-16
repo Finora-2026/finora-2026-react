@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
+import styles from "./AccountDetails.module.scss";
 
 type DailyBalanceDto = {
   date: string;
@@ -23,14 +24,18 @@ export default function AccountDetails() {
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string>("");
   
-  const [account, setAccount] = useState<AccountDetailsDto | null>(null);
+  const [account, setAccount] =
+    useState<AccountDetailsDto | null>(null);
   
-  const [dailyBalances, setDailyBalances] = useState<DailyBalanceDto[]>([]);
+  const [dailyBalances, setDailyBalances] = useState<
+    DailyBalanceDto[]
+  >([]);
   
-  const [balanceAsOfDate, setBalanceAsOfDate] = useState<string>("");
-  const [calculatedBalance, setCalculatedBalance] = useState<number | null>(
-    null
-  );
+  const [balanceAsOfDate, setBalanceAsOfDate] =
+    useState<string>("");
+  
+  const [calculatedBalance, setCalculatedBalance] =
+    useState<number | null>(null);
   
   useEffect(() => {
     const loadAccountDetails = async () => {
@@ -39,7 +44,9 @@ export default function AccountDetails() {
       
       try {
         // MOCK API DELAY
-        await new Promise((resolve) => setTimeout(resolve, 800));
+        await new Promise((resolve) =>
+          setTimeout(resolve, 800)
+        );
         
         // MOCK ACCOUNT
         setAccount({
@@ -68,7 +75,10 @@ export default function AccountDetails() {
           },
         ]);
       } catch (err) {
-        console.error("Failed to load account details", err);
+        console.error(
+          "Failed to load account details",
+          err
+        );
         
         setAccount(null);
         setDailyBalances([]);
@@ -82,20 +92,14 @@ export default function AccountDetails() {
   }, [accountId]);
   
   function handleEditAccount() {
-    console.log("Edit account");
-    
     navigate(`../edit/${account?.id}`);
   }
   
   function handleListAllAccounts() {
-    console.log("List all accounts");
-    
     navigate("../list");
   }
   
   function handleListRelatedAccounts() {
-    console.log("List related accounts");
-    
     navigate(
       `../list?bankGroupName=${encodeURIComponent(
         account?.bankGroupName ?? ""
@@ -104,15 +108,16 @@ export default function AccountDetails() {
   }
   
   function handleCalculateBalance() {
-    console.log("Calculate balance as of:", balanceAsOfDate);
+    console.log(
+      "Calculate balance as of:",
+      balanceAsOfDate
+    );
     
     // MOCK CALCULATION
     setCalculatedBalance(1988.77);
   }
   
   function handleQuickSearch(date: string) {
-    console.log("Quick search clicked");
-    
     navigate(
       `/transactions/search?accountId=${account?.id}&startDate=${date}&endDate=${date}`
     );
@@ -120,182 +125,274 @@ export default function AccountDetails() {
   
   if (loading) {
     return (
-      <div>
-        <p>Loading account details...</p>
+      <div className={styles.container}>
+        <div className={styles.card}>
+          <div className={styles.empty}>
+            Loading account details...
+          </div>
+        </div>
       </div>
     );
   }
   
   if (error) {
     return (
-      <div>
-        <p>{error}</p>
+      <div className={styles.container}>
+        <div className={styles.card}>
+          <div className={styles.empty}>
+            {error}
+          </div>
+        </div>
       </div>
     );
   }
   
   if (!account) {
     return (
-      <div>
-        <p>Account not found.</p>
+      <div className={styles.container}>
+        <div className={styles.card}>
+          <div className={styles.empty}>
+            Account not found.
+          </div>
+        </div>
       </div>
     );
   }
   
   return (
-    <div>
-      {/* PAGE TITLE */}
-      <h1>Account Details</h1>
-      
-      {/* ACCOUNT INFORMATION */}
-      <section>
-        <h2>Account Information</h2>
+    <div className={styles.container}>
+      <div className={styles.card}>
+        {/* PAGE TITLE */}
+        <h1 className={styles.title}>
+          Account Details
+        </h1>
         
-        <table>
-          <tbody>
-          <tr>
-            <td>ID</td>
-            <td>{account.id}</td>
-          </tr>
+        {/* ACCOUNT INFORMATION */}
+        <section className={styles.section}>
+          <h2 className={styles.sectionTitle}>
+            Account Information
+          </h2>
           
-          <tr>
-            <td>Name</td>
-            <td>{account.name}</td>
-          </tr>
-          
-          <tr>
-            <td>Type</td>
-            <td>{account.type}</td>
-          </tr>
-          
-          <tr>
-            <td>User Email</td>
-            <td>{account.userEmail}</td>
-          </tr>
-          
-          <tr>
-            <td>Pending Balance</td>
-            <td>
-                <span>
-                  ${account.pendingBalance.toLocaleString(undefined, {
-                  minimumFractionDigits: 2,
-                  maximumFractionDigits: 2,
-                })}
-                </span>
-            </td>
-          </tr>
-          
-          <tr>
-            <td>Posted Balance</td>
-            <td>
-                <span>
-                  ${account.postedBalance.toLocaleString(undefined, {
-                  minimumFractionDigits: 2,
-                  maximumFractionDigits: 2,
-                })}
-                </span>
-            </td>
-          </tr>
-          </tbody>
-        </table>
-      </section>
-      
-      {/* ACTION BUTTONS */}
-      <section>
-        <h2>Actions</h2>
-        
-        <div>
-          <button onClick={handleEditAccount}>
-            Edit This Account
-          </button>
-          
-          <button onClick={handleListAllAccounts}>
-            List All Accounts
-          </button>
-          
-          <button onClick={handleListRelatedAccounts}>
-            List Related Accounts
-          </button>
-        </div>
-      </section>
-      
-      {/* BALANCE AS OF DATE */}
-      <section>
-        <h2>Calculate Account Balance</h2>
-        
-        <div>
-          <label>
-            Calculate account balance as of:
-          </label>
-          
-          <input
-            type="date"
-            value={balanceAsOfDate}
-            onChange={(e) => setBalanceAsOfDate(e.target.value)}
-          />
-          
-          <button onClick={handleCalculateBalance}>
-            Calculate
-          </button>
-        </div>
-        
-        {calculatedBalance !== null && (
-          <div>
-            <p>
-              Balance as of {balanceAsOfDate}: $
-              {calculatedBalance.toLocaleString(undefined, {
-                minimumFractionDigits: 2,
-                maximumFractionDigits: 2,
-              })}
-            </p>
-          </div>
-        )}
-      </section>
-      
-      {/* DAILY BALANCES */}
-      <section>
-        <h2>Recent Daily Balances (Last 30 Days)</h2>
-        
-        {dailyBalances.length === 0 ? (
-          <p>No daily balance data available.</p>
-        ) : (
-          <table>
-            <thead>
-            <tr>
-              <th>Date</th>
-              <th>Balance</th>
-              <th>Action</th>
-            </tr>
-            </thead>
-            
+          <table className={styles.detailTable}>
             <tbody>
-            {dailyBalances.map((item) => (
-              <tr key={item.date}>
-                <td>{item.date}</td>
-                
-                <td>
-                  $
-                  {item.balance.toLocaleString(undefined, {
-                    minimumFractionDigits: 2,
-                    maximumFractionDigits: 2,
-                  })}
-                </td>
-                
-                <td>
-                  <button
-                    onClick={() =>
-                      handleQuickSearch(item.date)
+            <tr>
+              <td className={styles.label}>ID</td>
+              
+              <td className={styles.value}>
+                {account.id}
+              </td>
+            </tr>
+            
+            <tr>
+              <td className={styles.label}>
+                Name
+              </td>
+              
+              <td className={styles.value}>
+                {account.name}
+              </td>
+            </tr>
+            
+            <tr>
+              <td className={styles.label}>
+                Type
+              </td>
+              
+              <td className={styles.value}>
+                {account.type}
+              </td>
+            </tr>
+            
+            <tr>
+              <td className={styles.label}>
+                User Email
+              </td>
+              
+              <td className={styles.value}>
+                {account.userEmail}
+              </td>
+            </tr>
+            
+            <tr>
+              <td className={styles.label}>
+                Pending Balance
+              </td>
+              
+              <td className={styles.value}>
+                  <span
+                    className={
+                      styles.pendingBalance
                     }
                   >
-                    Quick Search
-                  </button>
-                </td>
-              </tr>
-            ))}
+                    $
+                    {account.pendingBalance.toLocaleString(
+                      undefined,
+                      {
+                        minimumFractionDigits: 2,
+                        maximumFractionDigits: 2,
+                      }
+                    )}
+                  </span>
+              </td>
+            </tr>
+            
+            <tr>
+              <td className={styles.label}>
+                Posted Balance
+              </td>
+              
+              <td className={styles.value}>
+                  <span
+                    className={
+                      styles.postedBalance
+                    }
+                  >
+                    $
+                    {account.postedBalance.toLocaleString(
+                      undefined,
+                      {
+                        minimumFractionDigits: 2,
+                        maximumFractionDigits: 2,
+                      }
+                    )}
+                  </span>
+              </td>
+            </tr>
             </tbody>
           </table>
-        )}
-      </section>
+        </section>
+        
+        {/* ACTION BUTTONS */}
+        <section className={styles.section}>
+          <h2 className={styles.sectionTitle}>
+            Actions
+          </h2>
+          
+          <div className={styles.actionGroup}>
+            <button
+              className={styles.actionButton}
+              onClick={handleEditAccount}
+            >
+              Edit This Account
+            </button>
+            
+            <button
+              className={styles.actionButton}
+              onClick={handleListAllAccounts}
+            >
+              List All Accounts
+            </button>
+            
+            <button
+              className={styles.actionButton}
+              onClick={handleListRelatedAccounts}
+            >
+              List Related Accounts
+            </button>
+          </div>
+        </section>
+        
+        {/* CALCULATE BALANCE */}
+        <section className={styles.section}>
+          <h2 className={styles.sectionTitle}>
+            Calculate Account Balance
+          </h2>
+          
+          <div className={styles.calculatorRow}>
+            <input
+              className={styles.input}
+              type="date"
+              value={balanceAsOfDate}
+              onChange={(e) =>
+                setBalanceAsOfDate(
+                  e.target.value
+                )
+              }
+            />
+            
+            <button
+              className={styles.actionButton}
+              onClick={handleCalculateBalance}
+            >
+              Calculate
+            </button>
+          </div>
+          
+          {calculatedBalance !== null && (
+            <div className={styles.resultBox}>
+              Balance as of{" "}
+              {balanceAsOfDate}: $
+              {calculatedBalance.toLocaleString(
+                undefined,
+                {
+                  minimumFractionDigits: 2,
+                  maximumFractionDigits: 2,
+                }
+              )}
+            </div>
+          )}
+        </section>
+        
+        {/* DAILY BALANCES */}
+        <section className={styles.section}>
+          <h2 className={styles.sectionTitle}>
+            Recent Daily Balances
+          </h2>
+          
+          {dailyBalances.length === 0 ? (
+            <div className={styles.empty}>
+              No daily balance data
+              available.
+            </div>
+          ) : (
+            <div className={styles.tableWrapper}>
+              <table className={styles.table}>
+                <thead>
+                <tr>
+                  <th>Date</th>
+                  <th>Balance</th>
+                  <th>Action</th>
+                </tr>
+                </thead>
+                
+                <tbody>
+                {dailyBalances.map((item) => (
+                  <tr key={item.date}>
+                    <td>{item.date}</td>
+                    
+                    <td>
+                      $
+                      {item.balance.toLocaleString(
+                        undefined,
+                        {
+                          minimumFractionDigits: 2,
+                          maximumFractionDigits: 2,
+                        }
+                      )}
+                    </td>
+                    
+                    <td>
+                      <button
+                        className={
+                          styles.actionButton
+                        }
+                        onClick={() =>
+                          handleQuickSearch(
+                            item.date
+                          )
+                        }
+                      >
+                        Quick Search
+                      </button>
+                    </td>
+                  </tr>
+                ))}
+                </tbody>
+              </table>
+            </div>
+          )}
+        </section>
+      </div>
     </div>
   );
 }
