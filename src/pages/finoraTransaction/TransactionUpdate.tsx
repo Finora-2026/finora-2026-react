@@ -410,8 +410,12 @@ export default function TransactionUpdate() {
         ? await transactionGroupService.updateTransactionGroup(updatePayload)
         : await transactionGroupService.createTransactionGroup(createPayload);
       showToast(res.message || "Transactions submitted", "success");
-      // redirect to account home page
-      navigate("..");
+      // redirect to transaction list or detail page
+      if (isEditMode) {
+        navigate(`../details/${groupId}`); // detail page
+      } else {
+        navigate(".."); // list/index page
+      }
     } catch (err) {
       console.error(err);
       showToast("Failed to submit transactions", "error");
