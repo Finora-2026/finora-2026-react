@@ -33,51 +33,53 @@ export default function AccountDetails() {
   );
   
   useEffect(() => {
-    loadAccountDetails();
-  }, []);
-  
-  async function loadAccountDetails() {
-    try {
+    const loadAccountDetails = async () => {
       setLoading(true);
-      
-      // MOCK API DELAY
-      await new Promise((resolve) => setTimeout(resolve, 800));
-      
-      // MOCK ACCOUNT
-      setAccount({
-        id: accountId ?? "ACC-001",
-        name: "Primary Checking",
-        type: "Checking",
-        userEmail: "demo@example.com",
-        pendingBalance: 2430.52,
-        postedBalance: 2250.17,
-        bankGroupName: "Chase",
-      });
-      
-      // MOCK DAILY BALANCES
-      setDailyBalances([
-        {
-          date: "2026-05-15",
-          balance: 2250.17,
-        },
-        {
-          date: "2026-05-14",
-          balance: 2187.42,
-        },
-        {
-          date: "2026-05-13",
-          balance: 2104.88,
-        },
-      ]);
-      
       setError("");
-    } catch (err) {
-      console.error(err);
-      setError("Unable to load account details.");
-    } finally {
-      setLoading(false);
-    }
-  }
+      
+      try {
+        // MOCK API DELAY
+        await new Promise((resolve) => setTimeout(resolve, 800));
+        
+        // MOCK ACCOUNT
+        setAccount({
+          id: accountId ?? "ACC-001",
+          name: "Primary Checking",
+          type: "Checking",
+          userEmail: "demo@example.com",
+          pendingBalance: 2430.52,
+          postedBalance: 2250.17,
+          bankGroupName: "Chase",
+        });
+        
+        // MOCK DAILY BALANCES
+        setDailyBalances([
+          {
+            date: "2026-05-15",
+            balance: 2250.17,
+          },
+          {
+            date: "2026-05-14",
+            balance: 2187.42,
+          },
+          {
+            date: "2026-05-13",
+            balance: 2104.88,
+          },
+        ]);
+      } catch (err) {
+        console.error("Failed to load account details", err);
+        
+        setAccount(null);
+        setDailyBalances([]);
+        setError("Unable to load account details.");
+      } finally {
+        setLoading(false);
+      }
+    };
+    
+    loadAccountDetails();
+  }, [accountId]);
   
   function handleEditAccount() {
     console.log("Edit account");
