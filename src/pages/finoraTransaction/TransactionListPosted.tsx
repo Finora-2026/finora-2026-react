@@ -171,21 +171,7 @@ export default function TransactionListPosted() {
   return (
     <div className={styles.container}>
       <div className={styles.card}>
-        <div className={styles.row}>
-          <button
-            className={styles.button + " " + styles.secondary}
-            onClick={showCurrentReportingTransactions}>
-            Show current reporting transactions
-          </button>
-          <button
-            className={styles.button + " " + styles.secondary}
-            onClick={showRecentReportedTransactions}>
-            Show last reported transactions
-          </button>
-        </div>
-        
         <h1 className={styles.title}>Recent Posted Transactions</h1>
-        
         <div className={styles.tableWrapper}>
           <table className={styles.table}>
             <colgroup>
@@ -263,6 +249,42 @@ export default function TransactionListPosted() {
             ))}
             </tbody>
           </table>
+        </div>
+        
+        <div className={styles.row}>
+          <button
+            className={styles.button + " " + styles.secondary}
+            onClick={showCurrentReportingTransactions}>
+            Show current reporting transactions
+          </button>
+          <button
+            className={styles.button + " " + styles.secondary}
+            onClick={showRecentReportedTransactions}>
+            Show last reported transactions
+          </button>
+        </div>
+        
+        <div className={styles.row}>
+          <button
+            className={styles.button + " " + styles.secondary}
+            onClick={showCurrentReportingTransactions}>
+            Show last 30 days
+          </button>
+          <button
+            className={styles.button + " " + styles.secondary}
+            onClick={showRecentReportedTransactions}>
+            Show last 90 days
+          </button>
+          <button
+            className={styles.button + " " + styles.secondary}
+            onClick={showRecentReportedTransactions}>
+            Show current year
+          </button>
+          <button
+            className={styles.button + " " + styles.secondary}
+            onClick={showRecentReportedTransactions}>
+            Show last year
+          </button>
         </div>
       </div>
     </div>
