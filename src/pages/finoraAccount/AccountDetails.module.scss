@@ -1,0 +1,235 @@
+.container {
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  padding: 48px 16px;
+}
+
+.card {
+  width: 100%;
+  max-width: 1100px;
+
+  padding: 32px;
+
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 18px;
+
+  box-shadow: var(--shadow);
+
+  box-sizing: border-box;
+}
+
+.title {
+  margin: 0 0 28px 0;
+
+  text-align: center;
+
+  font-size: 30px;
+  font-weight: 700;
+
+  color: var(--accent);
+}
+
+.section {
+  margin-top: 32px;
+}
+
+.sectionTitle {
+  margin-bottom: 16px;
+
+  font-size: 20px;
+  font-weight: 700;
+
+  color: var(--text-h);
+}
+
+.tableWrapper {
+  width: 100%;
+  overflow-x: auto;
+}
+
+.table {
+  width: 100%;
+  border-collapse: collapse;
+
+  font-size: 14px;
+
+  background: var(--bg);
+  color: var(--text);
+}
+
+.table th {
+  text-align: center;
+  padding: 12px 10px;
+
+  font-weight: 700;
+
+  border-bottom: 1px solid var(--border);
+
+  color: var(--text-h);
+}
+
+.table td {
+  text-align: center;
+  padding: 12px 10px;
+
+  border-bottom: 1px solid var(--border);
+}
+
+.detailTable {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.detailTable td {
+  padding: 14px 10px;
+  border-bottom: 1px solid var(--border);
+}
+
+.label {
+  width: 220px;
+
+  font-weight: 700;
+  color: var(--text-h);
+
+  text-align: left;
+}
+
+.value {
+  text-align: left;
+}
+
+.pendingBalance {
+  color: #c77700;
+  font-weight: 700;
+}
+
+.postedBalance {
+  color: #1a7f37;
+  font-weight: 700;
+}
+
+.actionGroup {
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+
+  flex-wrap: wrap;
+}
+
+.actionButton {
+  padding: 10px 14px;
+
+  border-radius: 10px;
+  border: 1px solid var(--border);
+
+  background: var(--bg);
+  color: var(--text-h);
+
+  font-size: 14px;
+  font-weight: 600;
+
+  cursor: pointer;
+
+  transition:
+          background 0.2s ease,
+          transform 0.1s ease;
+
+  &:hover {
+    background: var(--social-bg);
+  }
+
+  &:active {
+    transform: scale(0.97);
+  }
+}
+
+.calculatorRow {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.input {
+  padding: 10px 12px;
+
+  border-radius: 10px;
+  border: 1px solid var(--border);
+
+  background: var(--bg);
+  color: var(--text);
+
+  font-size: 14px;
+}
+
+.resultBox {
+  margin-top: 14px;
+
+  padding: 14px;
+
+  border-radius: 12px;
+
+  background: var(--accent-bg);
+  border: 1px solid var(--accent-border);
+}
+
+.empty {
+  text-align: center;
+  padding: 32px 0;
+
+  color: var(--text);
+  font-size: 16px;
+}
+
+@media (max-width: 600px) {
+  .container {
+    padding: 16px 10px;
+  }
+
+  .card {
+    padding: 18px;
+    border-radius: 14px;
+  }
+
+  .title {
+    font-size: 24px;
+  }
+
+  .sectionTitle {
+    font-size: 18px;
+  }
+
+  .detailTable td {
+    padding: 10px 6px;
+    font-size: 13px;
+  }
+
+  .label {
+    width: 120px;
+  }
+
+  .table {
+    font-size: 13px;
+  }
+
+  .actionGroup {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .actionButton {
+    width: 100%;
+  }
+
+  .calculatorRow {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .input {
+    width: 100%;
+    box-sizing: border-box;
+  }
+}
