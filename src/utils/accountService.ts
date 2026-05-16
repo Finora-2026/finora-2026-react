@@ -90,4 +90,20 @@ export const accountService = {
     
     return await res.json();
   },
+  
+  getAccountById: async (id: string): Promise<AccountResponseDto> => {
+    const res = await fetch(
+      `${BackendConfig.springApiUrl}/accounts/${id}`,
+      {
+        headers: getHeaders(),
+      }
+    );
+    
+    if (!res.ok) {
+      const msg = await res.text();
+      throw new Error(msg || "Failed to fetch account");
+    }
+    
+    return await res.json();
+  },
 };

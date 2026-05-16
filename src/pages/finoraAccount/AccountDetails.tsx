@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
+import { accountService } from "../../utils/accountService";
 import styles from "./AccountDetails.module.scss";
 
 type DailyBalanceDto = {
@@ -42,25 +43,24 @@ export default function AccountDetails() {
     const loadAccountDetails = async () => {
       setLoading(true);
       setError("");
-      
       try {
-        // MOCK API DELAY
-        await new Promise((resolve) =>
-          setTimeout(resolve, 800)
-        );
-        
-        // MOCK ACCOUNT
+        if (!accountId) {
+          setError("Missing account id");
+          setLoading(false);
+          return;
+        }
+        const res = await accountService.getAccountById(accountId);
         setAccount({
-          id: accountId ?? "ACC-001",
-          name: "Primary Checking",
-          type: "Checking",
-          bankName: "JPMorgan Chase",
-          userEmail: "demo@example.com",
-          pendingBalance: 2430.52,
-          postedBalance: 2250.17,
-          bankGroupName: "Chase",
+          id: res.id,
+          name: res.name,
+          type: res.type,
+          bankName: res.bankName,
+          userEmail: "", // backend does not provide this
+          pendingBalance: res.pendingBalance ?? 0,
+          postedBalance: res.postedBalance ?? 0,
+          bankGroupName: res.bankName, // placeholder until backend supports grouping
         });
-        
+        // TEMP: still mocked until backend supports it
         // MOCK DAILY BALANCES
         setDailyBalances([
           {
@@ -77,11 +77,7 @@ export default function AccountDetails() {
           },
         ]);
       } catch (err) {
-        console.error(
-          "Failed to load account details",
-          err
-        );
-        
+        console.error("Failed to load account details", err);
         setAccount(null);
         setDailyBalances([]);
         setError("Unable to load account details.");
@@ -89,7 +85,6 @@ export default function AccountDetails() {
         setLoading(false);
       }
     };
-    
     loadAccountDetails();
   }, [accountId]);
   
