@@ -138,7 +138,7 @@ export default function TransactionListPosted() {
   return (
     <div className={styles.container}>
       <div className={styles.card}>
-        <h1 className={styles.title}>Posted Transactions</h1>
+        <h1 className={styles.title}>Recent Posted Transactions</h1>
         
         <div className={styles.tableWrapper}>
           <table className={styles.table}>
