@@ -147,6 +147,14 @@ export default function TransactionListPosted() {
       };
   };
   
+  const showCurrentReportingTransactions = () => {
+    navigate("../../reports/add");
+  }
+  
+  const showRecentReportedTransactions = () => {
+    navigate("../../reports/add");
+  }
+  
   // STATES
   if (loading) {
     return <div className={styles.message}>Loading posted transactions...</div>;
@@ -163,6 +171,19 @@ export default function TransactionListPosted() {
   return (
     <div className={styles.container}>
       <div className={styles.card}>
+        <div className={styles.row}>
+          <button
+            className={styles.button + " " + styles.secondary}
+            onClick={showCurrentReportingTransactions}>
+            Show current reporting transactions
+          </button>
+          <button
+            className={styles.button + " " + styles.secondary}
+            onClick={showRecentReportedTransactions}>
+            Show last reported transactions
+          </button>
+        </div>
+        
         <h1 className={styles.title}>Recent Posted Transactions</h1>
         
         <div className={styles.tableWrapper}>
