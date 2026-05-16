@@ -55,7 +55,7 @@ export default function TransactionDetails() {
   
   const isRepeat = group?.repeatable ?? false;
   const reportId = group?.reportId;
-  const [canEditGroup] = useState(true);
+  const isLockedByReport = !!group?.reportId;
   
   // Load all data
   useEffect(() => {
@@ -147,15 +147,19 @@ export default function TransactionDetails() {
   };
   
   const editThisGroup = (id: string) => {
+    if (isLockedByReport) {
+      showToast("Cannot edit: group is part of a report", "error");
+      return;
+    }
     navigate(`../update/${id}`);
-  }
+  };
   
   const goToReport = (reportId?: string | null) => {
     if (!reportId) return;
     showToast(`Mocking report navigation to this reportId ${reportId}`);
   };
   
-  const editButtonLabel = canEditGroup ? "Edit this Group" : "View Only";
+  const editButtonLabel = isLockedByReport ? "View Only" : "Edit this Group";
   
   return (
     <div className={styles.container}>
@@ -266,8 +270,8 @@ export default function TransactionDetails() {
           <div className={styles.row}>
             <button
               className={styles.button + " " + styles.primary}
-              disabled={!canEditGroup}
-              onClick={() => editThisGroup(groupId!)}
+              disabled={isLockedByReport}
+              onClick={() => groupId && editThisGroup(groupId)}
             >
               {editButtonLabel}
             </button>
