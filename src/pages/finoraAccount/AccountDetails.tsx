@@ -11,6 +11,7 @@ type AccountDetailsDto = {
   id: string;
   name: string;
   type: string;
+  bankName: string;
   userEmail: string;
   pendingBalance: number;
   postedBalance: number;
@@ -53,6 +54,7 @@ export default function AccountDetails() {
           id: accountId ?? "ACC-001",
           name: "Primary Checking",
           type: "Checking",
+          bankName: "JPMorgan Chase",
           userEmail: "demo@example.com",
           pendingBalance: 2430.52,
           postedBalance: 2250.17,
@@ -200,6 +202,16 @@ export default function AccountDetails() {
               
               <td className={styles.value}>
                 {account.type}
+              </td>
+            </tr>
+            
+            <tr>
+              <td className={styles.label}>
+                Bank Name
+              </td>
+              
+              <td className={styles.value}>
+                {account.bankName}
               </td>
             </tr>
             
