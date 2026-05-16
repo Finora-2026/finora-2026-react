@@ -45,7 +45,9 @@ export default function AccountDetails() {
       setError("");
       try {
         if (!accountId) {
-          throw new Error("Missing account id");
+          setError("Missing account id");
+          setLoading(false);
+          return;
         }
         const res = await accountService.getAccountById(accountId);
         setAccount({
