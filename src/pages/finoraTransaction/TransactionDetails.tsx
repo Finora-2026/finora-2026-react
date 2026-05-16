@@ -1,6 +1,28 @@
-import {useEffect, useState} from "react";
+import {useEffect, useMemo, useState} from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import { transactionGroupService, type TransactionGroupResponseDto } from "../../utils/transactionGroupService.ts";
+import {
+  transactionGroupService,
+  type TransactionGroupResponseDto
+} from "../../utils/transactionGroupService.ts";
+import {
+  brandService,
+  type BrandResponseDto,
+} from "../../utils/brandService.ts";
+
+import {
+  locationService,
+  type LocationResponseDto,
+} from "../../utils/locationService.ts";
+
+import {
+  transactionTypeService,
+  type TransactionTypeDto,
+} from "../../utils/transactionTypeService.ts";
+
+import {
+  accountService,
+  type AccountResponseDto,
+} from "../../utils/accountService.ts";
 import {useToast} from "../../components/ToastProvider/toastContext.ts";
 import styles from "./TransactionUpdate.module.scss";
 
@@ -24,11 +46,17 @@ export default function TransactionDetails() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [group, setGroup] = useState<TransactionGroupResponseDto | null>(null);
+  
+  const [brands, setBrands] = useState<BrandResponseDto[]>([]);
+  const [locations, setLocations] = useState<LocationResponseDto[]>([]);
   const [transactions, setTransactions] = useState<Transaction[]>([]);
+  const [transactionTypes, setTransactionTypes] = useState<TransactionTypeDto[]>([]);
+  const [accounts, setAccounts] = useState<AccountResponseDto[]>([]);
   
   const isRepeat = group?.isRepeatable ?? false;
   const [canEditGroup] = useState(true);
   
+  // Load all data
   useEffect(() => {
     if (!groupId) return;
     
@@ -37,11 +65,23 @@ export default function TransactionDetails() {
         setLoading(true);
         setError(null);
         
-        const data = await transactionGroupService.getTransactionGroupById(groupId);
+        const [groupData, brandsData, locationsData, transactionTypesData, accountsData] =
+          await Promise.all([
+            transactionGroupService.getTransactionGroupById(groupId),
+            brandService.getAllBrands(),
+            locationService.getAllLocations(),
+            transactionTypeService.getAllTransactionTypes(),
+            accountService.getActiveAccounts(),
+          ]);
         
-        setGroup(data);
+        setGroup(groupData);
+        setBrands(brandsData);
+        setLocations(locationsData);
+        setTransactionTypes(transactionTypesData);
+        setAccounts(accountsData);
+        
         setTransactions(
-          data.transactions.map((t) => ({
+          groupData.transactions.map((t) => ({
             id: t.id,
             date: t.transactionDate.split("T")[0],
             typeId: t.transactionTypeId ?? "",
@@ -70,29 +110,28 @@ export default function TransactionDetails() {
     loadGroup();
   }, [groupId, showToast]);
   
-  const getBrandName = (id: string) => {
-    const map: Record<string, string> = {
-      BR1: "Amazon",
-      BR2: "Walmart",
-    };
-    return map[id] ?? id;
-  };
+  const brandMap = useMemo(
+    () => Object.fromEntries(brands.map(b => [b.id, b.name])),
+    [brands]
+  );
   
-  const getAccountName = (id: string) => {
-    const map: Record<string, string> = {
-      ACC1: "Chase Checking",
-      ACC2: "BOA Savings",
-    };
-    return map[id] ?? id;
-  };
+  const accountMap = useMemo(
+    () => Object.fromEntries(accounts.map(a => [a.id, a.name])),
+    [accounts]
+  );
   
-  const getLocationName = (id: string) => {
-    const map: Record<string, string> = {
-      LOC1: "Dallas, Texas",
-      LOC2: "Houston, Texas",
-    };
-    return map[id] ?? id;
-  };
+  const locationMap = useMemo(
+    () =>
+      Object.fromEntries(
+        locations.map(l => [l.id, `${l.city}, ${l.state}`])
+      ),
+    [locations]
+  );
+  
+  const transactionTypeMap = useMemo(
+    () => Object.fromEntries(transactionTypes.map(t => [t.id, t.name])),
+    [transactionTypes]
+  );
   
   const getAmountClass = (amount: number) => {
     return amount >= 0 ? "text-success" : "text-danger";
@@ -173,16 +212,31 @@ export default function TransactionDetails() {
                   key={tx.id}
                 >
                   <td>{tx.date}</td>
-                  <td>{tx.typeId}</td>
-                  <td>{getBrandName(tx.brandId)}</td>
-                  <td>{getLocationName(tx.locationId)}</td>
+                  <td>
+                    {tx.typeId
+                      ? transactionTypeMap[tx.typeId] ?? tx.typeId
+                      : "—"}
+                  </td>
+                  <td>
+                    {tx.brandId
+                      ? brandMap[tx.brandId] ?? tx.brandId
+                      : "—"}
+                  </td>
+                  <td>
+                    {tx.locationId
+                      ? locationMap[tx.locationId] ?? tx.locationId
+                      : "—"}
+                  </td>
+                  
                   <td className={getAmountClass(tx.amount)}>
                     ${tx.amount.toFixed(2)}
                   </td>
                   <td style={{ maxWidth: "400px", whiteSpace: "pre-wrap" }}>
                     {tx.notes}
                   </td>
-                  <td>{getAccountName(tx.accountId)}</td>
+                  <td>
+                    {accountMap[tx.accountId] ?? tx.accountId}
+                  </td>
                   <td>
                    <span
                      className={
