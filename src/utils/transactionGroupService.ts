@@ -3,6 +3,30 @@
 import { BackendConfig } from "../config/BackendConfig";
 import { authService } from "./authService";
 
+/* =========================
+   DTOs
+========================= */
+
+export type TransactionGroupResponseDto = {
+  id: string;
+  reportId?: string | null;
+  isRepeatable: boolean;
+  transactions: TransactionResponseDto[];
+};
+
+export type TransactionResponseDto = {
+  id: string;
+  transactionGroupId: string;
+  transactionDate: string;
+  amount: number;
+  notes?: string | null;
+  accountId: string;
+  brandId?: string | null;
+  locationId?: string | null;
+  transactionTypeId?: string | null;
+  posted: boolean;
+};
+
 export type TransactionCreateDto = {
   transactionDate: string;
   amount: number;
@@ -23,6 +47,10 @@ export type TransactionGroupCreateResponseDto = {
   message: string;
 };
 
+/* =========================
+   Helpers
+========================= */
+
 const getHeaders = () => {
   const token = authService.getToken();
   
@@ -32,7 +60,12 @@ const getHeaders = () => {
   };
 };
 
+/* =========================
+   Service
+========================= */
+
 export const transactionGroupService = {
+  // CREATE
   createTransactionGroup: async (
     payload: TransactionGroupCreateDto
   ): Promise<TransactionGroupCreateResponseDto> => {
@@ -48,6 +81,26 @@ export const transactionGroupService = {
     if (!res.ok) {
       const msg = await res.text();
       throw new Error(msg || "Failed to create transaction group");
+    }
+    
+    return await res.json();
+  },
+  
+  // GET BY ID (secure via JWT)
+  getTransactionGroupById: async (
+    id: string
+  ): Promise<TransactionGroupResponseDto> => {
+    const res = await fetch(
+      `${BackendConfig.springApiUrl}/transaction-groups/${id}`,
+      {
+        method: "GET",
+        headers: getHeaders(),
+      }
+    );
+    
+    if (!res.ok) {
+      const msg = await res.text();
+      throw new Error(msg || "Failed to fetch transaction group");
     }
     
     return await res.json();

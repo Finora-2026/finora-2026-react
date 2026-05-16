@@ -1,5 +1,28 @@
-import { useState } from "react";
+import {useEffect, useMemo, useState} from "react";
 import { useParams, useNavigate } from "react-router-dom";
+import {
+  transactionGroupService,
+  type TransactionGroupResponseDto
+} from "../../utils/transactionGroupService.ts";
+import {
+  brandService,
+  type BrandResponseDto,
+} from "../../utils/brandService.ts";
+
+import {
+  locationService,
+  type LocationResponseDto,
+} from "../../utils/locationService.ts";
+
+import {
+  transactionTypeService,
+  type TransactionTypeDto,
+} from "../../utils/transactionTypeService.ts";
+
+import {
+  accountService,
+  type AccountResponseDto,
+} from "../../utils/accountService.ts";
 import {useToast} from "../../components/ToastProvider/toastContext.ts";
 import styles from "./TransactionUpdate.module.scss";
 
@@ -20,58 +43,95 @@ export default function TransactionDetails() {
   const { showToast } = useToast();
   const navigate = useNavigate();
   
-  const [loading] = useState(false);
-  const [isRepeat] = useState(false);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const [group, setGroup] = useState<TransactionGroupResponseDto | null>(null);
+  
+  const [brands, setBrands] = useState<BrandResponseDto[]>([]);
+  const [locations, setLocations] = useState<LocationResponseDto[]>([]);
+  const [transactions, setTransactions] = useState<Transaction[]>([]);
+  const [transactionTypes, setTransactionTypes] = useState<TransactionTypeDto[]>([]);
+  const [accounts, setAccounts] = useState<AccountResponseDto[]>([]);
+  
+  const isRepeat = group?.isRepeatable ?? false;
   const [canEditGroup] = useState(true);
   
-  const transactions: Transaction[] = [
-    {
-      id: "t1",
-      date: "2026-01-01",
-      typeId: "EXPENSE",
-      brandId: "BR1",
-      locationId: "LOC1",
-      amount: 120.5,
-      notes: "Mock transaction 1",
-      accountId: "ACC1",
-      posted: true,
-    },
-    {
-      id: "t2",
-      date: "2026-01-02",
-      typeId: "INCOME",
-      brandId: "BR2",
-      locationId: "LOC2",
-      amount: 250,
-      notes: "Mock transaction 2",
-      accountId: "ACC2",
-      posted: false,
-    },
-  ];
-  
-  const getBrandName = (id: string) => {
-    const map: Record<string, string> = {
-      BR1: "Amazon",
-      BR2: "Walmart",
+  // Load all data
+  useEffect(() => {
+    if (!groupId) return;
+    
+    const loadGroup = async () => {
+      try {
+        setLoading(true);
+        setError(null);
+        
+        const [groupData, brandsData, locationsData, transactionTypesData, accountsData] =
+          await Promise.all([
+            transactionGroupService.getTransactionGroupById(groupId),
+            brandService.getAllBrands(),
+            locationService.getAllLocations(),
+            transactionTypeService.getAllTransactionTypes(),
+            accountService.getActiveAccounts(),
+          ]);
+        
+        setGroup(groupData);
+        setBrands(brandsData);
+        setLocations(locationsData);
+        setTransactionTypes(transactionTypesData);
+        setAccounts(accountsData);
+        
+        setTransactions(
+          groupData.transactions.map((t) => ({
+            id: t.id,
+            date: t.transactionDate.split("T")[0],
+            typeId: t.transactionTypeId ?? "",
+            brandId: t.brandId ?? "",
+            locationId: t.locationId ?? "",
+            amount: t.amount,
+            notes: t.notes ?? "",
+            accountId: t.accountId,
+            posted: t.posted,
+          }))
+        );
+      } catch (error: unknown) {
+        console.error(error);
+        const message =
+          error instanceof Error
+            ? error.message
+            : "Failed to load transaction group";
+        setError(message);
+        setGroup(null);
+        setTransactions([]);
+        showToast("Failed to load transaction group", "error");
+      } finally {
+        setLoading(false);
+      }
     };
-    return map[id] ?? id;
-  };
+    loadGroup();
+  }, [groupId, showToast]);
   
-  const getAccountName = (id: string) => {
-    const map: Record<string, string> = {
-      ACC1: "Chase Checking",
-      ACC2: "BOA Savings",
-    };
-    return map[id] ?? id;
-  };
+  const brandMap = useMemo(
+    () => Object.fromEntries(brands.map(b => [b.id, b.name])),
+    [brands]
+  );
   
-  const getLocationName = (id: string) => {
-    const map: Record<string, string> = {
-      LOC1: "Dallas, Texas",
-      LOC2: "Houston, Texas",
-    };
-    return map[id] ?? id;
-  };
+  const accountMap = useMemo(
+    () => Object.fromEntries(accounts.map(a => [a.id, a.name])),
+    [accounts]
+  );
+  
+  const locationMap = useMemo(
+    () =>
+      Object.fromEntries(
+        locations.map(l => [l.id, `${l.city}, ${l.state}`])
+      ),
+    [locations]
+  );
+  
+  const transactionTypeMap = useMemo(
+    () => Object.fromEntries(transactionTypes.map(t => [t.id, t.name])),
+    [transactionTypes]
+  );
   
   const getAmountClass = (amount: number) => {
     return amount >= 0 ? "text-success" : "text-danger";
@@ -105,26 +165,33 @@ export default function TransactionDetails() {
           </div>
         )}
         
+        {/* Error */}
+        {!loading && error && (
+          <div className={styles.message}>
+            Error: {error}
+          </div>
+        )}
+        
         {/* No transactions */}
-        {!loading && transactions.length === 0 && (
+        {!loading && !error && transactions.length === 0 && (
           <div className={styles.message}>
             No transactions found in this group.
           </div>
         )}
         
         {/* Table */}
-        {!loading && transactions.length > 0 && (
+        {!loading && !error && transactions.length > 0 && (
           <div className={styles.tableWrapper}>
             <table className={styles.table}>
               <colgroup>
-                <col style={{ width: "11%" }} />  {/* Date */}
-                <col style={{ width: "8%" }} />  {/* Type */}
-                <col style={{ width: "8%" }} />  {/* Brand */}
-                <col style={{ width: "8%" }} />  {/* Location */}
-                <col style={{ width: "8%" }} />  {/* Amount */}
-                <col style={{ width: "25%" }} />  {/* Notes (big) */}
-                <col style={{ width: "10%" }} />  {/* Account */}
-                <col style={{ width: "12%" }} />   {/* Status */}
+                <col style={{ width: "11%" }} />
+                <col style={{ width: "8%" }} />
+                <col style={{ width: "8%" }} />
+                <col style={{ width: "8%" }} />
+                <col style={{ width: "8%" }} />
+                <col style={{ width: "25%" }} />
+                <col style={{ width: "10%" }} />
+                <col style={{ width: "12%" }} />
               </colgroup>
               <thead>
                 <tr>
@@ -145,16 +212,31 @@ export default function TransactionDetails() {
                   key={tx.id}
                 >
                   <td>{tx.date}</td>
-                  <td>{tx.typeId}</td>
-                  <td>{getBrandName(tx.brandId)}</td>
-                  <td>{getLocationName(tx.locationId)}</td>
+                  <td>
+                    {tx.typeId
+                      ? transactionTypeMap[tx.typeId] ?? tx.typeId
+                      : "—"}
+                  </td>
+                  <td>
+                    {tx.brandId
+                      ? brandMap[tx.brandId] ?? tx.brandId
+                      : "—"}
+                  </td>
+                  <td>
+                    {tx.locationId
+                      ? locationMap[tx.locationId] ?? tx.locationId
+                      : "—"}
+                  </td>
+                  
                   <td className={getAmountClass(tx.amount)}>
                     ${tx.amount.toFixed(2)}
                   </td>
                   <td style={{ maxWidth: "400px", whiteSpace: "pre-wrap" }}>
                     {tx.notes}
                   </td>
-                  <td>{getAccountName(tx.accountId)}</td>
+                  <td>
+                    {accountMap[tx.accountId] ?? tx.accountId}
+                  </td>
                   <td>
                    <span
                      className={
