@@ -1,7 +1,15 @@
-import { useEffect, useState } from "react";
+
+import { useMemo, useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 
-import { transactionGroupService } from "../../utils/transactionGroupService";
+import {type TransactionGroupResponseDto, type TransactionResponseDto, transactionGroupService} from "../../utils/transactionGroupService";
+import {type BrandResponseDto, brandService} from "../../utils/brandService";
+import {type LocationResponseDto, locationService} from "../../utils/locationService";
+import {
+  type TransactionTypeDto,
+  transactionTypeService
+} from "../../utils/transactionTypeService";
+import {type AccountResponseDto, accountService} from "../../utils/accountService";
 
 import styles from "./TransactionUpdate.module.scss";
 
@@ -26,7 +34,12 @@ export default function TransactionListPosted() {
   
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string>("");
+  
   const [groups, setGroups] = useState<TransactionGroup[]>([]);
+  const [brands, setBrands] = useState<BrandResponseDto[]>([]);
+  const [locations, setLocations] = useState<LocationResponseDto[]>([]);
+  const [transactionTypes, setTransactionTypes] = useState<TransactionTypeDto[]>([]);
+  const [accounts, setAccounts] = useState<AccountResponseDto[]>([]);
   
   useEffect(() => {
     const loadPostedTransactions = async () => {
@@ -34,14 +47,25 @@ export default function TransactionListPosted() {
         setLoading(true);
         setError("");
         
-        const data =
-          await transactionGroupService.getAvailableReportGroups();
+        const [
+          data,
+          brandsData,
+          locationsData,
+          typesData,
+          accountsData
+        ] = await Promise.all([
+          transactionGroupService.getAvailableReportGroups(),
+          brandService.getAllBrands(),
+          locationService.getAllLocations(),
+          transactionTypeService.getAllTransactionTypes(),
+          accountService.getActiveAccounts(),
+        ]);
         
-        const mapped: TransactionGroup[] = data.map((group) => ({
+        const mapped: TransactionGroup[] = data.map((group: TransactionGroupResponseDto) => ({
           id: group.id,
-          transactions: group.transactions.map((tx) => ({
+          transactions: group.transactions.map((tx: TransactionResponseDto) => ({
             id: tx.id,
-            date: tx.transactionDate.split("T")[0], // LocalDateTime -> YYYY-MM-DD
+            date: tx.transactionDate.split("T")[0],
             typeId: tx.transactionTypeId ?? "",
             brandName: tx.brandId ?? "",
             locationName: tx.locationId ?? "",
@@ -52,6 +76,12 @@ export default function TransactionListPosted() {
         }));
         
         setGroups(mapped);
+        
+        setBrands(brandsData);
+        setLocations(locationsData);
+        setTransactionTypes(typesData);
+        setAccounts(accountsData);
+        
       } catch (error: unknown) {
         console.error(error);
         
@@ -69,6 +99,29 @@ export default function TransactionListPosted() {
     
     loadPostedTransactions();
   }, []);
+  
+  const brandMap = useMemo(
+    () => Object.fromEntries(brands.map(b => [b.id, b.name])),
+    [brands]
+  );
+  
+  const locationMap = useMemo(
+    () =>
+      Object.fromEntries(
+        locations.map(l => [l.id, `${l.city}, ${l.state}`])
+      ),
+    [locations]
+  );
+  
+  const transactionTypeMap = useMemo(
+    () => Object.fromEntries(transactionTypes.map(t => [t.id, t.name])),
+    [transactionTypes]
+  );
+  
+  const accountMap = useMemo(
+    () => Object.fromEntries(accounts.map(a => [a.id, a.name])),
+    [accounts]
+  );
   
   const handleGroupClick = (groupId: string) => {
     navigate(`../details/${groupId}`);
@@ -160,16 +213,28 @@ export default function TransactionListPosted() {
                       className={styles.clickableRow}
                     >
                       <td>{tx.date}</td>
-                      <td>{tx.typeId}</td>
-                      <td>{tx.brandName}</td>
-                      <td>{tx.locationName}</td>
-                      
+                      <td>
+                        {tx.typeId
+                          ? transactionTypeMap[tx.typeId] || tx.typeId
+                          : "—"}
+                      </td>
+                      <td>
+                        {tx.brandName
+                          ? brandMap[tx.brandName] || tx.brandName
+                          : "—"}
+                      </td>
+                      <td>
+                        {tx.locationName
+                          ? locationMap[tx.locationName] || tx.locationName
+                          : "—"}
+                      </td>
                       <td className={amountData.className}>
                         {amountData.display}
                       </td>
                       
-                      <td>{tx.notes}</td>
-                      <td>{tx.accountName}</td>
+                      <td>{tx.notes}</td><td>
+                        {accountMap[tx.accountName] || tx.accountName}
+                      </td>
                     </tr>
                   );
                 })}
