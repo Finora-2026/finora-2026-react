@@ -10,7 +10,7 @@ import { authService } from "./authService";
 export type TransactionGroupResponseDto = {
   id: string;
   reportId?: string | null;
-  isRepeatable: boolean;
+  repeatable: boolean;
   transactions: TransactionResponseDto[];
 };
 
