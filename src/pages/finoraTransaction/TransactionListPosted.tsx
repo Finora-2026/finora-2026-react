@@ -155,6 +155,10 @@ export default function TransactionListPosted() {
     navigate("../../reports/add");
   }
   
+  const routeToSearchWithCommand = (command: string) => {
+    navigate(`../../search/${command}`);
+  };
+  
   // STATES
   if (loading) {
     return <div className={styles.message}>Loading posted transactions...</div>;
@@ -267,22 +271,26 @@ export default function TransactionListPosted() {
         <div className={styles.row}>
           <button
             className={styles.button + " " + styles.secondary}
-            onClick={showCurrentReportingTransactions}>
+            onClick={() => routeToSearchWithCommand("search30")}
+          >
             Show last 30 days
           </button>
           <button
             className={styles.button + " " + styles.secondary}
-            onClick={showRecentReportedTransactions}>
+            onClick={() => routeToSearchWithCommand("search90")}
+          >
             Show last 90 days
           </button>
           <button
             className={styles.button + " " + styles.secondary}
-            onClick={showRecentReportedTransactions}>
+            onClick={() => routeToSearchWithCommand("searchCurrentYear")}
+          >
             Show current year
           </button>
           <button
             className={styles.button + " " + styles.secondary}
-            onClick={showRecentReportedTransactions}>
+            onClick={() => routeToSearchWithCommand("searchLastYear")}
+          >
             Show last year
           </button>
         </div>
