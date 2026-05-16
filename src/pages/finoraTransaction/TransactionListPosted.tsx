@@ -12,6 +12,7 @@ import {
 import {type AccountResponseDto, accountService} from "../../utils/accountService";
 
 import styles from "./TransactionUpdate.module.scss";
+import {useToast} from "../../components/ToastProvider/toastContext.ts";
 
 type Transaction = {
   id: string;
@@ -31,6 +32,7 @@ type TransactionGroup = {
 
 export default function TransactionListPosted() {
   const navigate = useNavigate();
+  const { showToast } = useToast();
   
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string>("");
@@ -84,7 +86,6 @@ export default function TransactionListPosted() {
         
       } catch (error: unknown) {
         console.error(error);
-        
         const message =
           error instanceof Error
             ? error.message
@@ -92,13 +93,14 @@ export default function TransactionListPosted() {
         
         setError(message);
         setGroups([]);
+        showToast(message, "error");
       } finally {
         setLoading(false);
       }
     };
     
     loadPostedTransactions();
-  }, []);
+  }, [showToast]);
   
   const brandMap = useMemo(
     () => Object.fromEntries(brands.map(b => [b.id, b.name])),
@@ -156,6 +158,7 @@ export default function TransactionListPosted() {
   }
   
   const routeToSearchWithCommand = (command: string) => {
+    showToast(`Running Search command: ${command}`, "success");
     navigate(`../../search/${command}`);
   };
   
