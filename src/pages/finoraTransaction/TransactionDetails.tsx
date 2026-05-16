@@ -54,6 +54,7 @@ export default function TransactionDetails() {
   const [accounts, setAccounts] = useState<AccountResponseDto[]>([]);
   
   const isRepeat = group?.isRepeatable ?? false;
+  const reportId = group?.reportId;
   const [canEditGroup] = useState(true);
   
   // Load all data
@@ -149,7 +150,12 @@ export default function TransactionDetails() {
     showToast(`Mocking editing this group ${id}`);
   }
   
-  const editButtonLabel = canEditGroup ? "Edit Group [mocking]" : "View Only [mocking]";
+  const goToReport = (reportId?: string | null) => {
+    if (!reportId) return;
+    showToast(`Mocking report navigation to this reportId ${reportId}`);
+  };
+  
+  const editButtonLabel = canEditGroup ? "Edit this Group" : "View Only";
   
   return (
     <div className={styles.container}>
@@ -271,7 +277,7 @@ export default function TransactionDetails() {
               disabled={isRepeat}
               onClick={() => markAsRepeat(groupId!)}
             >
-              {isRepeat ? "Already Marked as Repeat" : "Mark as Repeat"}
+              {isRepeat ? "Already Marked as Repeatable" : "Mark as Repeatable"}
             </button>
             
             <button
@@ -297,6 +303,13 @@ export default function TransactionDetails() {
               onClick={() => navigate("../list-pending")}
             >
               List all pending transactions
+            </button>
+            <button
+              className={styles.button + " " + styles.secondary}
+              disabled={!reportId}
+              onClick={() => goToReport(reportId)}
+            >
+              {reportId ? `Go to Report ${reportId}` : "Not Added to Report Yet"}
             </button>
           </div>
         </div>
