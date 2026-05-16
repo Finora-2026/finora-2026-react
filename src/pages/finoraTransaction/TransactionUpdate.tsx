@@ -375,6 +375,7 @@ export default function TransactionUpdate() {
       const validTransactions = transactions.filter(
         (tx) => tx.date && tx.accountId && Number(tx.amount) !== 0
       );
+      const isEmptyAfterUpdate = validTransactions.length === 0;
       
       const createPayload = {
         transactions: validTransactions.map((tx) => ({
@@ -412,9 +413,13 @@ export default function TransactionUpdate() {
       showToast(res.message || "Transactions submitted", "success");
       // redirect to transaction list or detail page
       if (isEditMode) {
-        navigate(`../details/${groupId}`); // detail page
+        if (isEmptyAfterUpdate) {
+          navigate(".."); // fallback to list/index
+        } else {
+          navigate(`../details/${groupId}`);
+        }
       } else {
-        navigate(".."); // list/index page
+        navigate("..");
       }
     } catch (err) {
       console.error(err);
