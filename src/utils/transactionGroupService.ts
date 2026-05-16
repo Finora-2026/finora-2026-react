@@ -47,6 +47,11 @@ export type TransactionGroupCreateResponseDto = {
   message: string;
 };
 
+export type AvailableReportGroupsResponse = {
+  success: boolean;
+  data: TransactionGroupResponseDto[];
+};
+
 /* =========================
    Helpers
 ========================= */
@@ -125,5 +130,29 @@ export const transactionGroupService = {
     }
     
     return await res.json();
+  },
+  
+  // GET AVAILABLE REPORT GROUPS
+  getAvailableReportGroups: async (): Promise<TransactionGroupResponseDto[]> => {
+    const res = await fetch(
+      `${BackendConfig.springApiUrl}/transaction-groups/available-report-groups`,
+      {
+        method: "GET",
+        headers: getHeaders(),
+      }
+    );
+    
+    if (!res.ok) {
+      const msg = await res.text();
+      throw new Error(msg || "Failed to fetch available report groups");
+    }
+    
+    const json: AvailableReportGroupsResponse = await res.json();
+    
+    if (!json.success) {
+      throw new Error("Request failed (success=false)");
+    }
+    
+    return json.data;
   },
 };

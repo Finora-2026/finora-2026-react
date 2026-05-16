@@ -1,6 +1,8 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 
+import { transactionGroupService } from "../../utils/transactionGroupService";
+
 import styles from "./TransactionUpdate.module.scss";
 
 type Transaction = {
@@ -32,54 +34,24 @@ export default function TransactionListPosted() {
         setLoading(true);
         setError("");
         
-        // MOCK API DELAY
-        await new Promise((resolve) => setTimeout(resolve, 800));
+        const data =
+          await transactionGroupService.getAvailableReportGroups();
         
-        // MOCK DATA
-        const mockData: TransactionGroup[] = [
-          {
-            id: "grp_1001",
-            transactions: [
-              {
-                id: "t1",
-                date: "2026-05-01",
-                typeId: "DEBIT",
-                brandName: "Amazon",
-                locationName: "Dallas, TX",
-                amount: -45.2,
-                notes: "Office supplies",
-                accountName: "Chase Checking",
-              },
-              {
-                id: "t2",
-                date: "2026-05-01",
-                typeId: "DEBIT",
-                brandName: "Starbucks",
-                locationName: "Rowlett, TX",
-                amount: -6.5,
-                notes: "Coffee",
-                accountName: "Chase Checking",
-              },
-            ],
-          },
-          {
-            id: "grp_1002",
-            transactions: [
-              {
-                id: "t3",
-                date: "2026-05-03",
-                typeId: "CREDIT",
-                brandName: "Payroll",
-                locationName: "Company",
-                amount: 2500,
-                notes: "Salary",
-                accountName: "Wells Fargo",
-              },
-            ],
-          },
-        ];
+        const mapped: TransactionGroup[] = data.map((group) => ({
+          id: group.id,
+          transactions: group.transactions.map((tx) => ({
+            id: tx.id,
+            date: tx.transactionDate.split("T")[0], // LocalDateTime -> YYYY-MM-DD
+            typeId: tx.transactionTypeId ?? "",
+            brandName: tx.brandId ?? "",
+            locationName: tx.locationId ?? "",
+            amount: tx.amount,
+            notes: tx.notes ?? "",
+            accountName: tx.accountId,
+          })),
+        }));
         
-        setGroups(mockData);
+        setGroups(mapped);
       } catch (error: unknown) {
         console.error(error);
         
@@ -99,11 +71,11 @@ export default function TransactionListPosted() {
   }, []);
   
   const handleGroupClick = (groupId: string) => {
-    navigate(`/transaction-view/${groupId}`);
+    navigate(`../details/${groupId}`);
   };
   
   const handleRowClick = (groupId: string) => {
-    navigate(`/transaction-view/${groupId}`);
+    navigate(`../details/${groupId}`);
   };
   
   const getAmountDisplay = (amount: number | null) => {
