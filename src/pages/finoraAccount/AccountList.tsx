@@ -1,14 +1,18 @@
 import { useEffect, useState } from "react";
-import styles from "./AccountList.module.scss";
+import {useNavigate} from "react-router-dom";
+
 import {
   accountService,
   type AccountResponseDto,
 } from "../../utils/accountService.ts";
 import {useToast} from "../../components/ToastProvider/toastContext.ts";
 
+import styles from "./AccountList.module.scss";
+
 type Mode = "all" | "active" | "inactive";
 
 export default function AccountList() {
+  const navigate = useNavigate();
   const { showToast } = useToast();
   const [mode, setMode] = useState<Mode>("active");
   
@@ -46,6 +50,14 @@ export default function AccountList() {
     
     loadAccounts();
   }, [mode, showToast]);
+  
+  function handleViewAccount(accountId: string) {
+    navigate(`../details/${accountId}`);
+  }
+  
+  function handleEditAccount(accountId: string) {
+    navigate(`../edit/${accountId}`);
+  }
   
   return (
     <div className={styles.container}>
@@ -142,13 +154,17 @@ export default function AccountList() {
                     
                     <td>
                       <div className={styles.actionGroup}>
-                        <button className={styles.actionButton}
-                                onClick={() => showToast("Mock view account", "success")}>
+                        <button
+                          className={styles.actionButton}
+                          onClick={() => handleViewAccount(account.id)}
+                        >
                           View
                         </button>
                         
-                        <button className={styles.actionButton}
-                                onClick={() => showToast("Mock edit account", "success")}>
+                        <button
+                          className={styles.actionButton}
+                          onClick={() => handleEditAccount(account.id)}
+                        >
                           Edit
                         </button>
                       </div>
