@@ -100,7 +100,7 @@ export default function TransactionListPosted() {
     };
     
     loadPostedTransactions();
-  }, []);
+  }, [showToast]);
   
   const brandMap = useMemo(
     () => Object.fromEntries(brands.map(b => [b.id, b.name])),
