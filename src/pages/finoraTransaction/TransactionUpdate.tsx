@@ -19,6 +19,7 @@ import {
   type TransactionTypeDto,
 } from "../../utils/transactionTypeService.ts";
 import {
+  type TransactionGroupResponseDto,
   transactionGroupService,
 } from "../../utils/transactionGroupService.ts";
 import {useNavigate} from "react-router-dom";
@@ -42,8 +43,10 @@ export default function TransactionUpdate() {
   const { groupId } = useParams();
   const isEditMode = !!groupId;
   
-  const [loading] = useState(false);
-  const [errorMessage] = useState<string | null>(null);
+  const [loading, setLoading] = useState(false);
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
+  
+  const [group, setGroup] = useState<TransactionGroupResponseDto | null>(null);
   
   const [accounts, setAccounts] = useState<AccountResponseDto[]>([]);
   const [accountsLoading, setAccountsLoading] = useState(true);
@@ -183,6 +186,40 @@ export default function TransactionUpdate() {
     };
     loadTransactionTypes();
   }, [showToast]);
+  
+  // Load transaction group for edit mode
+  useEffect(() => {
+    if (!groupId) return;
+    const loadGroup = async () => {
+      try {
+        setLoading(true);
+        setErrorMessage(null);
+        const groupData =
+          await transactionGroupService.getTransactionGroupById(groupId);
+        setGroup(groupData);
+        setTransactions(
+          groupData.transactions.map((t) => ({
+            id: t.id,
+            date: t.transactionDate.split("T")[0],
+            transactionTypeId: t.transactionTypeId ?? "",
+            brandId: t.brandId ?? "",
+            locationId: t.locationId ?? "",
+            amount: String(t.amount),
+            notes: t.notes ?? "",
+            accountId: t.accountId,
+            posted: t.posted,
+          }))
+        );
+      } catch (err) {
+        console.error(err);
+        setErrorMessage("Failed to load transaction group");
+        showToast("Failed to load transaction group", "error");
+      } finally {
+        setLoading(false);
+      }
+    };
+    loadGroup();
+  }, [groupId, showToast]);
   
   const renderAccountOptions = () => {
     if (accountsLoading) {
@@ -339,7 +376,7 @@ export default function TransactionUpdate() {
         (tx) => tx.date && tx.accountId && Number(tx.amount) !== 0
       );
       
-      const payload = {
+      const createPayload = {
         transactions: validTransactions.map((tx) => ({
           transactionDate: new Date(tx.date).toISOString(),
           amount: Number(tx.amount),
@@ -351,9 +388,28 @@ export default function TransactionUpdate() {
         })),
       };
       
-      const res = await transactionGroupService.createTransactionGroup(payload);
+      const updatePayload: TransactionGroupResponseDto = {
+        id: groupId!,
+        reportId: group?.reportId ?? null,
+        isRepeatable: group?.isRepeatable ?? false,
+        transactions: validTransactions.map((tx) => ({
+          id: tx.id || "", // backend can add new transactions to this group
+          transactionGroupId: groupId!,
+          transactionDate: new Date(tx.date).toISOString(),
+          amount: Number(tx.amount),
+          notes: tx.notes,
+          accountId: tx.accountId,
+          brandId: tx.brandId || null,
+          locationId: tx.locationId || null,
+          transactionTypeId: tx.transactionTypeId || null,
+          posted: tx.posted ?? false,
+        })),
+      };
+      
+      const res = isEditMode
+        ? await transactionGroupService.updateTransactionGroup(updatePayload)
+        : await transactionGroupService.createTransactionGroup(createPayload);
       showToast(res.message || "Transactions submitted", "success");
-      console.log("Group created:", res.groupId);
       // redirect to account home page
       navigate("..");
     } catch (err) {
