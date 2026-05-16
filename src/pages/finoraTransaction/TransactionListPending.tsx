@@ -30,6 +30,7 @@ export default function TransactionListPending() {
   const navigate = useNavigate();
   
   const [loading, setLoading] = useState<boolean>(true);
+  const [error, setError] = useState<string | null>(null);
   const [results, setResults] = useState<TransactionResponseDto[]>([]);
   const [brands, setBrands] = useState<BrandResponseDto[]>([]);
   const [locations, setLocations] = useState<LocationResponseDto[]>([]);
@@ -46,6 +47,7 @@ export default function TransactionListPending() {
     const loadData = async () => {
       try {
         setLoading(true);
+        setError(null);
         const [
           transactions,
           brandsData,
@@ -64,9 +66,15 @@ export default function TransactionListPending() {
         setLocations(locationsData);
         setTransactionTypes(transactionTypesData);
         setAccounts(accountsData);
-      } catch (error) {
+      } catch (error: unknown) {
         console.error(error);
-        showToast("Failed to load pending transactions", "error");
+        const message =
+          error instanceof Error
+            ? error.message
+            : "Failed to load pending transactions";
+        setError(message);
+        setResults([]);
+        showToast(message, "error");
       } finally {
         setLoading(false);
       }
@@ -118,25 +126,38 @@ export default function TransactionListPending() {
         <h1 className={styles.title}>Pending Transactions</h1>
         
         {/* Loading state */}
-        {loading && <div className={styles.message}>Loading pending transactions...</div>}
+        {loading && (
+          <div className={styles.message}>
+            Loading pending transactions...
+          </div>
+        )}
+        
+        {/* Error */}
+        {!loading && error && (
+          <div className={styles.message}>
+            Error: {error}
+          </div>
+        )}
         
         {/* Empty state */}
-        {!loading && results.length === 0 && (
-          <div className={styles.message}>No pending transactions found.</div>
+        {!loading && !error && results.length === 0 && (
+          <div className={styles.message}>
+            No pending transactions found.
+          </div>
         )}
         
         {/* Table */}
-        {!loading && results.length > 0 && (
+        {!loading && !error && results.length > 0 && (
           <div className={styles.tableWrapper}>
             <table className={styles.table}>
               <colgroup>
-                <col style={{ width: "11%" }} /> {/* Date */}
-                <col style={{ width: "9%" }} />  {/* Type */}
-                <col style={{ width: "10%" }} /> {/* Brand */}
-                <col style={{ width: "10%" }} /> {/* Location */}
-                <col style={{ width: "10%" }} /> {/* Amount */}
-                <col style={{ width: "35%" }} /> {/* Notes (Given maximum real estate) */}
-                <col style={{ width: "15%" }} /> {/* Account */}
+                <col style={{ width: "11%" }} />
+                <col style={{ width: "9%" }} />
+                <col style={{ width: "10%" }} />
+                <col style={{ width: "10%" }} />
+                <col style={{ width: "10%" }} />
+                <col style={{ width: "35%" }} />
+                <col style={{ width: "15%" }} />
               </colgroup>
               <thead>
               <tr>
