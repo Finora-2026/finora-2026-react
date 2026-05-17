@@ -141,6 +141,22 @@ export const accountService = {
     return await res.json();
   },
   
+  getEditAccountDtoById: async (id: string): Promise<AccountEditDto> => {
+    const res = await fetch(
+      `${BackendConfig.springApiUrl}/accounts/edit/${id}`,
+      {
+        headers: getHeaders(),
+      }
+    );
+    
+    if (!res.ok) {
+      const msg = await res.text();
+      throw new Error(msg || "Failed to fetch edit account dto by id");
+    }
+    
+    return await res.json();
+  },
+  
   getAccountBalanceAsOfDate: async (
     payload: AccountBalanceRequestDto
   ): Promise<AccountBalanceResponseDto> => {
