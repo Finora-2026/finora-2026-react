@@ -163,6 +163,7 @@ export default function AccountList() {
                         
                         <button
                           className={styles.actionButton}
+                          disabled={!isActive}
                           onClick={() => handleEditAccount(account.id)}
                         >
                           Edit

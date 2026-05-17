@@ -160,6 +160,11 @@
   }
 }
 
+.actionButton:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
 /* Empty state */
 .empty {
   text-align: center;
