@@ -64,6 +64,10 @@ export default function TransactionUpdate() {
   const [transactionTypesLoading, setTransactionTypesLoading] = useState(true);
   const [transactionTypesError, setTransactionTypesError] = useState("");
   
+  const [dateValidationMap, setDateValidationMap] = useState<
+    Record<string, boolean | null>
+  >({});
+  
   const getToday = () => new Date().toISOString().split("T")[0];
   
   const [transactions, setTransactions] = useState<Transaction[]>([
@@ -89,17 +93,24 @@ export default function TransactionUpdate() {
   const [showSplitAllInput, setShowSplitAllInput] = useState(false);
   const [splitAllCount, setSplitAllCount] = useState<number>(2);
   
-  const isInvalid = transactions.some((t) => {
-    const amount = Number(t.amount);
-    
-    return (
-      !t.date ||
-      !t.accountId ||
-      t.amount === "" ||
-      Number.isNaN(amount) ||
-      amount === 0
-    );
+  const hasInvalidDate = transactions.some((t) => {
+    const valid = dateValidationMap[t.id];
+    return valid === false;
   });
+  
+  const isInvalid =
+    hasInvalidDate ||
+    transactions.some((t) => {
+      const amount = Number(t.amount);
+      
+      return (
+        !t.date ||
+        !t.accountId ||
+        t.amount === "" ||
+        Number.isNaN(amount) ||
+        amount === 0
+      );
+    });
   
   const pageTitle = isEditMode
     ? "Update transaction group"
@@ -220,6 +231,48 @@ export default function TransactionUpdate() {
     };
     loadGroup();
   }, [groupId, showToast]);
+  
+  // Soft check transaction.date with the selected account (between account.open and account.close dates)
+  useEffect(() => {
+    const timeouts: Record<string, ReturnType<typeof setTimeout>> = {};
+    
+    transactions.forEach((tx) => {
+      const hasDate = !!tx.date;
+      const hasAccount = !!tx.accountId;
+      
+      if (!hasDate || !hasAccount) return;
+      
+      const key = tx.id;
+      
+      // debounce per row
+      if (timeouts[key]) clearTimeout(timeouts[key]);
+      
+      timeouts[key] = setTimeout(async () => {
+        try {
+          const res = await accountService.validateAccountDate(
+            tx.accountId,
+            tx.date.split("T")[0]
+          );
+          
+          setDateValidationMap((prev) => ({
+            ...prev,
+            [key]: res.valid,
+          }));
+        } catch (err) {
+          console.error("Date validation failed", err);
+          
+          setDateValidationMap((prev) => ({
+            ...prev,
+            [key]: false,
+          }));
+        }
+      }, 500);
+    });
+    
+    return () => {
+      Object.values(timeouts).forEach(clearTimeout);
+    };
+  }, [transactions]);
   
   const renderAccountOptions = () => {
     if (accountsLoading) {
@@ -600,6 +653,11 @@ export default function TransactionUpdate() {
                   >
                     {renderAccountOptions()}
                   </select>
+                  {dateValidationMap[tx.id] === false && (
+                    <small className={styles.errorText}>
+                      Date is outside account active period
+                    </small>
+                  )}
                 </td>
                 
                 <td>

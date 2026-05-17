@@ -105,6 +105,25 @@ export const accountService = {
     return await res.json();
   },
   
+  validateAccountDate: async (
+    accountId: string,
+    dateTime: string
+  ): Promise<AccountDateValidationResponseDto> => {
+    const res = await fetch(
+      `${BackendConfig.springApiUrl}/accounts/${accountId}/validate-date?dateTime=${encodeURIComponent(dateTime)}`,
+      {
+        headers: getHeaders(),
+      }
+    );
+    
+    if (!res.ok) {
+      const msg = await res.text();
+      throw new Error(msg || "Failed to validate account date");
+    }
+    
+    return await res.json();
+  },
+  
   getAllAccounts: async (): Promise<AccountResponseDto[]> => {
     const res = await fetch(`${BackendConfig.springApiUrl}/accounts`, {
       headers: getHeaders(),
