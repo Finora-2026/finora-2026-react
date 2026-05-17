@@ -88,6 +88,32 @@
   }
 }
 
+.inputError {
+  border: 1px solid #dc2626;
+}
+
+.inputSuccess {
+  border: 1px solid #16a34a;
+}
+
+.errorText {
+  color: #dc2626;
+  font-size: 0.85rem;
+  margin-top: 0.25rem;
+}
+
+.successText {
+  color: #16a34a;
+  font-size: 0.85rem;
+  margin-top: 0.25rem;
+}
+
+.checkingText {
+  color: #888;
+  font-size: 0.85rem;
+  margin-top: 0.25rem;
+}
+
 .button {
   margin-top: 8px;
 
