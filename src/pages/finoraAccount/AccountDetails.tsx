@@ -19,6 +19,16 @@ type AccountDetailsDto = {
   bankGroupName: string;
 };
 
+function getLocalDateString() {
+  const now = new Date();
+  
+  const year = now.getFullYear();
+  const month = String(now.getMonth() + 1).padStart(2, "0");
+  const day = String(now.getDate()).padStart(2, "0");
+  
+  return `${year}-${month}-${day}`;
+}
+
 export default function AccountDetails() {
   const navigate = useNavigate();
   const { accountId } = useParams();
@@ -106,11 +116,20 @@ export default function AccountDetails() {
   
   async function handleCalculateBalance() {
     try {
-      if (!account?.id || !balanceAsOfDate) return;
+      if (!account?.id) return;
+      
+      const dateToUse =
+        balanceAsOfDate?.trim()
+          ? balanceAsOfDate
+          : getLocalDateString(); // LOCAL DATE
+      
+      if (!balanceAsOfDate?.trim()) {
+        setBalanceAsOfDate(dateToUse);
+      }
       
       const res = await accountService.getAccountBalanceAsOfDate({
         accountId: account.id,
-        asOfDate: new Date(balanceAsOfDate).toISOString(),
+        asOfDate: new Date(dateToUse).toISOString(),
       });
       
       setCalculatedBalance(res);
