@@ -28,6 +28,10 @@ export default function AccountCreate() {
   const [loadingAccountTypes, setLoadingAccountTypes] = useState(true);
   const [accountTypeError, setAccountTypeError] = useState<string | null>(null);
   
+  const [checkingName, setCheckingName] = useState(false);
+  const [nameAvailable, setNameAvailable] = useState<boolean | null>(null);
+  const [nameError, setNameError] = useState<string | null>(null);
+  
   const [form, setForm] = useState<AccountForm>({
     bankId: "",
     accountName: "",
@@ -36,6 +40,7 @@ export default function AccountCreate() {
     accountType: "",
   });
   
+  // Loading bank info
   useEffect(() => {
     const loadBanks = async () => {
       setLoadingBanks(true);
@@ -58,6 +63,7 @@ export default function AccountCreate() {
     loadBanks();
   }, [showToast]);
   
+  // Load account type info
   useEffect(() => {
     const loadAccountTypes = async () => {
       setLoadingAccountTypes(true);
@@ -79,6 +85,47 @@ export default function AccountCreate() {
     
     loadAccountTypes();
   }, [showToast]);
+  
+  // Check if account name is valid
+  useEffect(() => {
+    const trimmedName = form.accountName.trim();
+    
+    // reset state if empty
+    if (!trimmedName) {
+      setNameAvailable(null);
+      setNameError(null);
+      return;
+    }
+    
+    const timeoutId = setTimeout(async () => {
+      setCheckingName(true);
+      
+      try {
+        const available =
+          await accountService.checkAccountNameAvailability(trimmedName);
+        
+        setNameAvailable(available);
+        
+        if (!available) {
+          setNameError("Account name already exists");
+        } else {
+          setNameError(null);
+        }
+        
+      } catch (err) {
+        console.error(err);
+        
+        setNameAvailable(null);
+        setNameError("Unable to validate account name");
+        
+      } finally {
+        setCheckingName(false);
+      }
+    }, 500); // debounce
+    
+    return () => clearTimeout(timeoutId);
+    
+  }, [form.accountName]);
   
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
@@ -103,6 +150,11 @@ export default function AccountCreate() {
       !form.accountType
     ) {
       showToast("Please fill in all required fields", "error");
+      return;
+    }
+    
+    if (nameAvailable === false) {
+      showToast("Account name already exists", "error");
       return;
     }
     
@@ -198,11 +250,35 @@ export default function AccountCreate() {
               id="accountName"
               type="text"
               placeholder="Enter account name"
-              className={styles.input}
+              className={`${styles.input} ${
+                nameAvailable === false
+                  ? styles.inputError
+                  : nameAvailable === true
+                    ? styles.inputSuccess
+                    : ""
+              }`}
               value={form.accountName}
               onChange={handleChange}
               disabled={submitting}
             />
+            
+            {checkingName && (
+              <small className={styles.checkingText}>
+                Checking availability...
+              </small>
+            )}
+            
+            {!checkingName && nameAvailable === true && (
+              <small className={styles.successText}>
+                Account name is available
+              </small>
+            )}
+            
+            {!checkingName && nameError && (
+              <small className={styles.errorText}>
+                {nameError}
+              </small>
+            )}
           </div>
           
           {/* Opening Date */}

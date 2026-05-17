@@ -67,6 +67,22 @@ export const accountService = {
     return await res.json();
   },
   
+  checkAccountNameAvailability: async (
+    name: string
+  ): Promise<boolean> => {
+    const res = await fetch(
+      `${BackendConfig.springApiUrl}/accounts/check-name?name=${encodeURIComponent(name)}`,
+      {
+        headers: getHeaders(),
+      }
+    );
+    if (!res.ok) {
+      const msg = await res.text();
+      throw new Error(msg || "Failed to check account name availability");
+    }
+    return await res.json();
+  },
+  
   getAllAccounts: async (): Promise<AccountResponseDto[]> => {
     const res = await fetch(`${BackendConfig.springApiUrl}/accounts`, {
       headers: getHeaders(),
