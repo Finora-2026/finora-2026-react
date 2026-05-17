@@ -16,6 +16,8 @@ type AccountDetailsDto = {
   type: string;
   bankName: string;
   userEmail: string;
+  openingDate: string;
+  closingDate?: string | null;
   pendingBalance: number;
   postedBalance: number;
   bankGroupName: string;
@@ -59,6 +61,7 @@ export default function AccountDetails() {
   const [calculatedBalance, setCalculatedBalance] =
     useState<AccountBalanceResponseDto | null>(null);
   
+  // Load the account details
   useEffect(() => {
     const loadAccountDetails = async () => {
       setLoading(true);
@@ -75,7 +78,9 @@ export default function AccountDetails() {
           name: res.name,
           type: res.type,
           bankName: res.bankName,
-          userEmail: "", // backend does not provide this
+          openingDate: res.openingDate,
+          closingDate: res.closingDate ?? null,
+          userEmail: res.email,
           pendingBalance: res.pendingBalance ?? 0,
           postedBalance: res.postedBalance ?? 0,
           bankGroupName: res.bankName, // placeholder until backend supports grouping
@@ -248,6 +253,24 @@ export default function AccountDetails() {
               
               <td className={styles.value}>
                 {account.userEmail}
+              </td>
+            </tr>
+            
+            <tr>
+              <td className={styles.label}>Opening Date</td>
+              <td className={styles.value}>
+                {account.openingDate
+                  ? formatDateOnly(account.openingDate)
+                  : "-"}
+              </td>
+            </tr>
+            
+            <tr>
+              <td className={styles.label}>Closing Date</td>
+              <td className={styles.value}>
+                {account.closingDate
+                  ? formatDateOnly(account.closingDate)
+                  : "-"}
               </td>
             </tr>
             
