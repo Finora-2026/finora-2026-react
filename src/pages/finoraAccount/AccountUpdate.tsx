@@ -237,9 +237,9 @@ export default function AccountUpdate() {
         typeId: form.accountType,
       };
       
-      // Mock the update account API for now
       if (isEditMode) {
-        showToast("Mocking account update API, wait for BE", "success");
+        await accountService.updateAccount(payload);
+        showToast("Account updated successfully", "success");
       } else {
         await accountService.createAccount(payload);
         showToast("New account created successfully", "success");
