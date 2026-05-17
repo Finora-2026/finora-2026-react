@@ -18,6 +18,7 @@ export type AccountResponseDto = {
   bankId: string;
   bankName: string;
   type: string;
+  email: string;
   pendingBalance?: number;
   postedBalance?: number;
 };
@@ -38,6 +39,10 @@ export type AccountDailyBalanceDto = {
   date: string; // ISO date (LocalDate from Java)
   pendingBalance: number;
   postedBalance: number;
+};
+
+export type AccountDateValidationResponseDto = {
+  valid: boolean;
 };
 
 const getHeaders = () => {
