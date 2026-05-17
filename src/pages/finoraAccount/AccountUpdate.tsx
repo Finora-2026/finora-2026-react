@@ -245,8 +245,12 @@ export default function AccountUpdate() {
         showToast("New account created successfully", "success");
       }
       
-      // redirect to account home page
-      navigate("..");
+      // Route to account list page or details page
+      if (isEditMode) {
+        navigate(`../details/${accountId}`);
+      } else {
+        navigate("../list");
+      }
     } catch (err) {
       console.error(err);
       showToast(
@@ -365,7 +369,7 @@ export default function AccountUpdate() {
               className={styles.input}
               value={form.openingDate}
               onChange={handleChange}
-              disabled={submitting}
+              disabled={submitting || isEditMode}
             />
           </div>
           
