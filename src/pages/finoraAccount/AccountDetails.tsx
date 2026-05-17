@@ -29,6 +29,10 @@ function getLocalDateString() {
   return `${year}-${month}-${day}`;
 }
 
+function formatDateOnly(dateTime: string) {
+  return new Date(dateTime).toLocaleDateString();
+}
+
 export default function AccountDetails() {
   const navigate = useNavigate();
   const { accountId } = useParams();
@@ -353,7 +357,7 @@ export default function AccountDetails() {
           {calculatedBalance && (
             <div className={styles.resultBox}>
               <div>
-                Balance as of {calculatedBalance.asOfDate}:
+                Balance as of {formatDateOnly(calculatedBalance.asOfDate)}:
               </div>
               
               <div>
