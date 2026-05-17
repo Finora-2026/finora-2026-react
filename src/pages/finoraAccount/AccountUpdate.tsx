@@ -71,6 +71,9 @@ export default function AccountUpdate() {
           closingDate: accountDto.closingDate ? accountDto.closingDate.split("T")[0] : "",
           accountType: accountDto.typeId,
         });
+        setNameAvailable(true);
+        setNameError(null);
+        setCheckingName(false);
       } catch (err) {
         console.error("Failed to load account details", err);
         showToast("Failed to load account details", "error");
@@ -333,14 +336,16 @@ export default function AccountUpdate() {
               </small>
             )}
             
-            {!checkingName && nameAvailable === true && (
+            {!checkingName && isOriginalName && (
               <small className={styles.successText}>
-                {isEditMode && form.accountName.trim() === originalName.trim()
-                  ? "Current name"
-                  : "Account name is available"}
+                Current name
               </small>
             )}
-            
+            {!checkingName && !isOriginalName && nameAvailable === true && (
+              <small className={styles.successText}>
+                Account name is available
+              </small>
+            )}
             {!checkingName && nameError && (
               <small className={styles.errorText}>
                 {nameError}
