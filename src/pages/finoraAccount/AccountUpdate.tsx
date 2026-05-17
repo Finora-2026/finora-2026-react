@@ -1,10 +1,10 @@
 import { useEffect, useState } from "react";
-import {useNavigate, useParams} from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import { useToast } from "../../components/ToastProvider/toastContext.ts";
 
 import { type BankResponseDto, bankService } from "../../utils/bankService.ts";
-import {type AccountTypeResponseDto, accountTypeService} from "../../utils/accountTypeService.ts";
-import {accountService} from "../../utils/accountService.ts";
+import { type AccountTypeResponseDto, accountTypeService } from "../../utils/accountTypeService.ts";
+import { accountService } from "../../utils/accountService.ts";
 
 import styles from "./AccountCreate.module.scss";
 
@@ -23,6 +23,10 @@ export default function AccountUpdate() {
   const isEditMode = !!accountId;
   
   const [submitting, setSubmitting] = useState(false);
+  
+  // Track loading existing account and original account name
+  const [originalName, setOriginalName] = useState<string>("");
+  const [loadingAccount, setLoadingAccount] = useState(isEditMode);
   
   const [banks, setBanks] = useState<BankResponseDto[]>([]);
   const [loadingBanks, setLoadingBanks] = useState(true);
@@ -44,7 +48,40 @@ export default function AccountUpdate() {
     accountType: "",
   });
   
-  // Loading bank info
+  // Fetch Existing Account Data if in Edit Mode
+  useEffect(() => {
+    if (!isEditMode || !accountId) return;
+    
+    const loadAccountData = async () => {
+      setLoadingAccount(true);
+      try {
+        const accountDto = await accountService.getEditAccountDtoById(accountId);
+        
+        // Save the original name to bypass name check if unchanged
+        setOriginalName(accountDto.name);
+        
+        // Map the backend DTO directly to your component's internal form state
+        setForm({
+          bankId: accountDto.bankId,
+          accountName: accountDto.name,
+          // Safely extract just the 'YYYY-MM-DD' segment from ISO string
+          openingDate: accountDto.openingDate ? accountDto.openingDate.split("T")[0] : "",
+          closingDate: accountDto.closingDate ? accountDto.closingDate.split("T")[0] : "",
+          accountType: accountDto.typeId,
+        });
+      } catch (err) {
+        console.error("Failed to load account details", err);
+        showToast("Failed to load account details", "error");
+        navigate(".."); // Go back if we can't find the account data
+      } finally {
+        setLoadingAccount(false);
+      }
+    };
+    
+    loadAccountData();
+  }, [accountId, isEditMode, navigate, showToast]);
+  
+  // Load bank info
   useEffect(() => {
     const loadBanks = async () => {
       setLoadingBanks(true);
@@ -55,7 +92,6 @@ export default function AccountUpdate() {
         setBanks(data);
       } catch (err) {
         console.error("Failed to load banks", err);
-        
         setBanks([]); // clear stale data
         setBankError("Failed to load banks");
         showToast("Failed to load banks", "error");
@@ -78,7 +114,6 @@ export default function AccountUpdate() {
         setAccountTypes(data);
       } catch (err) {
         console.error("Failed to load account types", err);
-        
         setAccountTypes([]);
         setAccountTypeError("Failed to load account types");
         showToast("Failed to load account types", "error");
@@ -93,9 +128,15 @@ export default function AccountUpdate() {
   // Check if account name is valid
   useEffect(() => {
     const trimmedName = form.accountName.trim();
-    
     // no name, skip API call
     if (!trimmedName) {
+      return;
+    }
+    
+    // Optimization: Skip API check if name matches the original record name in Edit mode
+    if (isEditMode && trimmedName.toLowerCase() === originalName.trim().toLowerCase()) {
+      setNameAvailable(true);
+      setNameError(null);
       return;
     }
     
@@ -103,9 +144,7 @@ export default function AccountUpdate() {
       setCheckingName(true);
       
       try {
-        const available =
-          await accountService.checkAccountNameAvailability(trimmedName);
-        
+        const available = await accountService.checkAccountNameAvailability(trimmedName);
         setNameAvailable(available);
         
         if (!available) {
@@ -113,21 +152,17 @@ export default function AccountUpdate() {
         } else {
           setNameError(null);
         }
-        
       } catch (err) {
         console.error(err);
-        
         setNameAvailable(null);
         setNameError("Unable to validate account name");
-        
       } finally {
         setCheckingName(false);
       }
     }, 500); // debounce
     
     return () => clearTimeout(timeoutId);
-    
-  }, [form.accountName]);
+  }, [form.accountName, isEditMode, originalName]);
   
   const renderTitle = () => {
     return isEditMode ? `Update account: ${accountId}` : "Add Account";
@@ -157,6 +192,7 @@ export default function AccountUpdate() {
     }));
   };
   
+  // Handle Create vs Update Logic on Submit
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
@@ -180,40 +216,48 @@ export default function AccountUpdate() {
     setSubmitting(true);
     
     try {
-      await accountService.createAccount({
+      const payload = {
+        id: isEditMode ? accountId : null, // Include id to target existing account
         name: form.accountName,
         bankId: form.bankId,
         openingDate: new Date(form.openingDate).toISOString(),
         closingDate: form.closingDate ? new Date(form.closingDate).toISOString() : null,
         typeId: form.accountType,
-      });
+      };
       
-      showToast("Account created successfully", "success");
+      // Mock the update account API for now
+      if (isEditMode) {
+        showToast("Mocking account update API, wait for BE", "success");
+      } else {
+        await accountService.createAccount(payload);
+        showToast("New account created successfully", "success");
+      }
       
       // redirect to account home page
       navigate("..");
-      
-      // optional reset, we will leave the page too, so this code is not important.
-      setForm({
-        bankId: "",
-        accountName: "",
-        openingDate: new Date().toISOString().split("T")[0],
-        closingDate: "",
-        accountType: "",
-      });
-      
     } catch (err) {
       console.error(err);
       showToast(
         err instanceof Error
           ? err.message
-          : "Failed to create account",
+          : `Failed to ${isEditMode ? "update" : "create"} account`,
         "error"
       );
     } finally {
       setSubmitting(false);
     }
   };
+  
+  // Render a simple loading screen while fetching initial account info
+  if (loadingAccount) {
+    return (
+      <div className={styles.container}>
+        <div className={styles.card}>
+          <p>Loading account configurations...</p>
+        </div>
+      </div>
+    );
+  }
   
   return (
     <div className={styles.container}>
@@ -232,11 +276,7 @@ export default function AccountUpdate() {
               value={form.bankId}
               onChange={handleChange}
               className={styles.input}
-              disabled={
-                submitting ||
-                loadingBanks ||
-                !!bankError
-              }
+              disabled={submitting || loadingBanks || !!bankError}
             >
               <option value="">
                 {loadingBanks
@@ -249,10 +289,7 @@ export default function AccountUpdate() {
               {!loadingBanks &&
                 !bankError &&
                 banks.map((bank) => (
-                  <option
-                    key={bank.id}
-                    value={bank.id}
-                  >
+                  <option key={bank.id} value={bank.id}>
                     {bank.name}
                   </option>
                 ))}
@@ -289,7 +326,9 @@ export default function AccountUpdate() {
             
             {!checkingName && nameAvailable === true && (
               <small className={styles.successText}>
-                Account name is available
+                {isEditMode && form.accountName.trim() === originalName.trim()
+                  ? "Current name"
+                  : "Account name is available"}
               </small>
             )}
             
@@ -325,7 +364,8 @@ export default function AccountUpdate() {
             <input
               id="closingDate"
               type="date"
-              disabled
+              // Enabled closing date selection during edit mode
+              disabled={submitting || !isEditMode}
               className={styles.input}
               value={form.closingDate}
               onChange={handleChange}
@@ -343,11 +383,7 @@ export default function AccountUpdate() {
               value={form.accountType}
               onChange={handleChange}
               className={styles.input}
-              disabled={
-                submitting ||
-                loadingAccountTypes ||
-                !!accountTypeError
-              }
+              disabled={submitting || loadingAccountTypes || !!accountTypeError}
             >
               <option value="">
                 {loadingAccountTypes
