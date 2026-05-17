@@ -90,10 +90,8 @@ export default function AccountCreate() {
   useEffect(() => {
     const trimmedName = form.accountName.trim();
     
-    // reset state if empty
+    // no name, skip API call
     if (!trimmedName) {
-      setNameAvailable(null);
-      setNameError(null);
       return;
     }
     
