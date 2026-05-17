@@ -67,6 +67,23 @@ export const accountService = {
     return await res.json();
   },
   
+  updateAccount: async (
+    payload: AccountEditDto
+  ): Promise<AccountEditDto> => {
+    const res = await fetch(`${BackendConfig.springApiUrl}/accounts`, {
+      method: "PUT",
+      headers: getHeaders(),
+      body: JSON.stringify(payload),
+    });
+    
+    if (!res.ok) {
+      const msg = await res.text();
+      throw new Error(msg || "Failed to update account");
+    }
+    
+    return await res.json();
+  },
+  
   checkAccountNameAvailability: async (
     name: string
   ): Promise<boolean> => {
