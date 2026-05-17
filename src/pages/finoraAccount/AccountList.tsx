@@ -56,7 +56,7 @@ export default function AccountList() {
   }
   
   function handleEditAccount(accountId: string) {
-    navigate(`../edit/${accountId}`);
+    navigate(`../update/${accountId}`);
   }
   
   return (
