@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import { accountService } from "../../utils/accountService";
+import { accountService, type AccountBalanceResponseDto } from "../../utils/accountService";
 import styles from "./AccountDetails.module.scss";
 
 type DailyBalanceDto = {
@@ -37,7 +37,7 @@ export default function AccountDetails() {
     useState<string>("");
   
   const [calculatedBalance, setCalculatedBalance] =
-    useState<number | null>(null);
+    useState<AccountBalanceResponseDto | null>(null);
   
   useEffect(() => {
     const loadAccountDetails = async () => {
@@ -104,14 +104,20 @@ export default function AccountDetails() {
     );
   }
   
-  function handleCalculateBalance() {
-    console.log(
-      "Calculate balance as of:",
-      balanceAsOfDate
-    );
-    
-    // MOCK CALCULATION
-    setCalculatedBalance(1988.77);
+  async function handleCalculateBalance() {
+    try {
+      if (!account?.id || !balanceAsOfDate) return;
+      
+      const res = await accountService.getAccountBalanceAsOfDate({
+        accountId: account.id,
+        asOfDate: new Date(balanceAsOfDate).toISOString(),
+      });
+      
+      setCalculatedBalance(res);
+    } catch (err) {
+      console.error("Failed to calculate balance", err);
+      setCalculatedBalance(null);
+    }
   }
   
   function handleQuickSearch(date: string) {
@@ -325,17 +331,33 @@ export default function AccountDetails() {
             </button>
           </div>
           
-          {calculatedBalance !== null && (
+          {calculatedBalance && (
             <div className={styles.resultBox}>
-              Balance as of{" "}
-              {balanceAsOfDate}: $
-              {calculatedBalance.toLocaleString(
-                undefined,
-                {
-                  minimumFractionDigits: 2,
-                  maximumFractionDigits: 2,
-                }
-              )}
+              <div>
+                Balance as of {calculatedBalance.asOfDate}:
+              </div>
+              
+              <div>
+                Pending: $
+                {calculatedBalance.pendingBalance.toLocaleString(
+                  undefined,
+                  {
+                    minimumFractionDigits: 2,
+                    maximumFractionDigits: 2,
+                  }
+                )}
+              </div>
+              
+              <div>
+                Posted: $
+                {calculatedBalance.postedBalance.toLocaleString(
+                  undefined,
+                  {
+                    minimumFractionDigits: 2,
+                    maximumFractionDigits: 2,
+                  }
+                )}
+              </div>
             </div>
           )}
         </section>
