@@ -27,6 +27,7 @@ export default function AccountUpdate() {
   // Track loading existing account and original account name
   const [originalName, setOriginalName] = useState<string>("");
   const [loadingAccount, setLoadingAccount] = useState(isEditMode);
+  const [isClosedAccount, setIsClosedAccount] = useState(false);
   
   const [banks, setBanks] = useState<BankResponseDto[]>([]);
   const [loadingBanks, setLoadingBanks] = useState(true);
@@ -59,6 +60,7 @@ export default function AccountUpdate() {
         
         // Save the original name to bypass name check if unchanged
         setOriginalName(accountDto.name);
+        setIsClosedAccount(!!accountDto.closingDate);
         
         // Map the backend DTO directly to your component's internal form state
         setForm({
@@ -212,6 +214,11 @@ export default function AccountUpdate() {
     
     if (nameAvailable === false) {
       showToast("Account name already exists", "error");
+      return;
+    }
+    
+    if (isClosedAccount) {
+      showToast("Finalized accounts cannot be updated", "error");
       return;
     }
     
@@ -408,9 +415,11 @@ export default function AccountUpdate() {
           <button
             type="submit"
             className={styles.button}
-            disabled={submitting}
+            disabled={submitting || isClosedAccount}
           >
-            {renderButtonText()}
+            {isClosedAccount
+              ? "Account Closed"
+              : renderButtonText()}
           </button>
         </form>
       </div>
