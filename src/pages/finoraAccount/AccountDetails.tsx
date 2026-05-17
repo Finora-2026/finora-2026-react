@@ -97,7 +97,7 @@ export default function AccountDetails() {
   }, [accountId, showToast]);
   
   function handleEditAccount() {
-    navigate(`../edit/${account?.id}`);
+    navigate(`../update/${account?.id}`);
   }
   
   function handleListAllAccounts() {
