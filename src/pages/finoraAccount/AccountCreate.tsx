@@ -130,6 +130,12 @@ export default function AccountCreate() {
   ) => {
     const { id, value } = e.target;
     
+    // reset validation immediately while typing
+    if (id === "accountName") {
+      setNameAvailable(null);
+      setNameError(null);
+    }
+    
     setForm((prev) => ({
       ...prev,
       [id]: value,
