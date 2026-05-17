@@ -1,7 +1,8 @@
 import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import { accountService } from "../../utils/accountService";
+import { accountService, type AccountBalanceResponseDto } from "../../utils/accountService";
 import styles from "./AccountDetails.module.scss";
+import {useToast} from "../../components/ToastProvider/toastContext.ts";
 
 type DailyBalanceDto = {
   date: string;
@@ -19,12 +20,30 @@ type AccountDetailsDto = {
   bankGroupName: string;
 };
 
+function getLocalDateString() {
+  const now = new Date();
+  
+  const year = now.getFullYear();
+  const month = String(now.getMonth() + 1).padStart(2, "0");
+  const day = String(now.getDate()).padStart(2, "0");
+  
+  return `${year}-${month}-${day}`;
+}
+
+function formatDateOnly(dateTime: string) {
+  return new Date(dateTime).toLocaleDateString();
+}
+
 export default function AccountDetails() {
   const navigate = useNavigate();
+  const { showToast } = useToast();
   const { accountId } = useParams();
   
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string>("");
+  
+  const [balanceLoading, setBalanceLoading] = useState(false);
+  const [balanceError, setBalanceError] = useState<string>("");
   
   const [account, setAccount] =
     useState<AccountDetailsDto | null>(null);
@@ -37,7 +56,7 @@ export default function AccountDetails() {
     useState<string>("");
   
   const [calculatedBalance, setCalculatedBalance] =
-    useState<number | null>(null);
+    useState<AccountBalanceResponseDto | null>(null);
   
   useEffect(() => {
     const loadAccountDetails = async () => {
@@ -81,12 +100,13 @@ export default function AccountDetails() {
         setAccount(null);
         setDailyBalances([]);
         setError("Unable to load account details.");
+        showToast("Failed to load account details", "error");
       } finally {
         setLoading(false);
       }
     };
     loadAccountDetails();
-  }, [accountId]);
+  }, [accountId, showToast]);
   
   function handleEditAccount() {
     navigate(`../edit/${account?.id}`);
@@ -104,14 +124,37 @@ export default function AccountDetails() {
     );
   }
   
-  function handleCalculateBalance() {
-    console.log(
-      "Calculate balance as of:",
-      balanceAsOfDate
-    );
-    
-    // MOCK CALCULATION
-    setCalculatedBalance(1988.77);
+  async function handleCalculateBalance() {
+    try {
+      if (!account?.id) return;
+      
+      setBalanceLoading(true);
+      setBalanceError("");
+      setCalculatedBalance(null);
+      
+      const dateToUse =
+        balanceAsOfDate?.trim()
+          ? balanceAsOfDate
+          : getLocalDateString(); // LOCAL DATE
+      
+      if (!balanceAsOfDate?.trim()) {
+        setBalanceAsOfDate(dateToUse);
+      }
+      
+      const res = await accountService.getAccountBalanceAsOfDate({
+        accountId: account.id,
+        asOfDate: new Date(dateToUse).toISOString(),
+      });
+      
+      setCalculatedBalance(res);
+    } catch (err) {
+      console.error("Failed to calculate balance", err);
+      setBalanceError("Failed to calculate balance");
+      setCalculatedBalance(null);
+      showToast("Failed to calculate balance", "error");
+    } finally {
+      setBalanceLoading(false);
+    }
   }
   
   function handleQuickSearch(date: string) {
@@ -310,32 +353,46 @@ export default function AccountDetails() {
               className={styles.input}
               type="date"
               value={balanceAsOfDate}
-              onChange={(e) =>
-                setBalanceAsOfDate(
-                  e.target.value
-                )
-              }
+              onChange={(e) => setBalanceAsOfDate(e.target.value)}
+              disabled={balanceLoading}
             />
             
             <button
               className={styles.actionButton}
               onClick={handleCalculateBalance}
+              disabled={balanceLoading}
             >
-              Calculate
+              {balanceLoading ? "Calculating..." : "Calculate"}
             </button>
           </div>
           
-          {calculatedBalance !== null && (
+          {balanceError && (
+            <div className={styles.empty}>
+              {balanceError}
+            </div>
+          )}
+          
+          {calculatedBalance && !balanceLoading && (
             <div className={styles.resultBox}>
-              Balance as of{" "}
-              {balanceAsOfDate}: $
-              {calculatedBalance.toLocaleString(
-                undefined,
-                {
+              <div>
+                Balance as of {formatDateOnly(calculatedBalance.asOfDate)}:
+              </div>
+              
+              <div>
+                Pending: $
+                {calculatedBalance.pendingBalance.toLocaleString(undefined, {
                   minimumFractionDigits: 2,
                   maximumFractionDigits: 2,
-                }
-              )}
+                })}
+              </div>
+              
+              <div>
+                Posted: $
+                {calculatedBalance.postedBalance.toLocaleString(undefined, {
+                  minimumFractionDigits: 2,
+                  maximumFractionDigits: 2,
+                })}
+              </div>
             </div>
           )}
         </section>

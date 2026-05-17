@@ -22,6 +22,18 @@ export type AccountResponseDto = {
   postedBalance?: number;
 };
 
+export type AccountBalanceRequestDto = {
+  accountId: string;
+  asOfDate: string; // ISO string (important for Java LocalDateTime)
+};
+
+export type AccountBalanceResponseDto = {
+  accountId: string;
+  asOfDate: string;
+  pendingBalance: number;
+  postedBalance: number;
+};
+
 const getHeaders = () => {
   const token = authService.getToken();
   
@@ -43,7 +55,7 @@ export const accountService = {
     
     if (!res.ok) {
       const msg = await res.text();
-      throw new Error(msg || "Failed to create account");
+      throw new Error(msg || "Failed to create a new account");
     }
     
     return await res.json();
@@ -55,7 +67,7 @@ export const accountService = {
     });
     
     if (!res.ok) {
-      throw new Error("Failed to fetch accounts");
+      throw new Error("Failed to fetch all accounts");
     }
     
     return await res.json();
@@ -101,7 +113,27 @@ export const accountService = {
     
     if (!res.ok) {
       const msg = await res.text();
-      throw new Error(msg || "Failed to fetch account");
+      throw new Error(msg || "Failed to fetch account by id");
+    }
+    
+    return await res.json();
+  },
+  
+  getAccountBalanceAsOfDate: async (
+    payload: AccountBalanceRequestDto
+  ): Promise<AccountBalanceResponseDto> => {
+    const res = await fetch(
+      `${BackendConfig.springApiUrl}/accounts/balance-as-of-date`,
+      {
+        method: "POST",
+        headers: getHeaders(),
+        body: JSON.stringify(payload),
+      }
+    );
+    
+    if (!res.ok) {
+      const msg = await res.text();
+      throw new Error(msg || "Failed to fetch account balance");
     }
     
     return await res.json();
