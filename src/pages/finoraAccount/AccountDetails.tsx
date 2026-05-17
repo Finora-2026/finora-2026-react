@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { accountService, type AccountBalanceResponseDto } from "../../utils/accountService";
 import styles from "./AccountDetails.module.scss";
+import {useToast} from "../../components/ToastProvider/toastContext.ts";
 
 type DailyBalanceDto = {
   date: string;
@@ -35,6 +36,7 @@ function formatDateOnly(dateTime: string) {
 
 export default function AccountDetails() {
   const navigate = useNavigate();
+  const { showToast } = useToast();
   const { accountId } = useParams();
   
   const [loading, setLoading] = useState<boolean>(true);
@@ -98,12 +100,13 @@ export default function AccountDetails() {
         setAccount(null);
         setDailyBalances([]);
         setError("Unable to load account details.");
+        showToast("Failed to load account details", "error");
       } finally {
         setLoading(false);
       }
     };
     loadAccountDetails();
-  }, [accountId]);
+  }, [accountId, showToast]);
   
   function handleEditAccount() {
     navigate(`../edit/${account?.id}`);
@@ -148,6 +151,7 @@ export default function AccountDetails() {
       console.error("Failed to calculate balance", err);
       setBalanceError("Failed to calculate balance");
       setCalculatedBalance(null);
+      showToast("Failed to calculate balance", "error");
     } finally {
       setBalanceLoading(false);
     }
