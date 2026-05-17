@@ -34,6 +34,12 @@ export type AccountBalanceResponseDto = {
   postedBalance: number;
 };
 
+export type AccountDailyBalanceDto = {
+  date: string; // ISO date (LocalDate from Java)
+  pendingBalance: number;
+  postedBalance: number;
+};
+
 const getHeaders = () => {
   const token = authService.getToken();
   
@@ -134,6 +140,25 @@ export const accountService = {
     if (!res.ok) {
       const msg = await res.text();
       throw new Error(msg || "Failed to fetch account balance");
+    }
+    
+    return await res.json();
+  },
+  
+  getAccountDailyBalances: async (
+    accountId: string,
+    days: number = 30
+  ): Promise<AccountDailyBalanceDto[]> => {
+    const res = await fetch(
+      `${BackendConfig.springApiUrl}/accounts/${accountId}/daily-balance?days=${days}`,
+      {
+        headers: getHeaders(),
+      }
+    );
+    
+    if (!res.ok) {
+      const msg = await res.text();
+      throw new Error(msg || "Failed to fetch daily balances");
     }
     
     return await res.json();

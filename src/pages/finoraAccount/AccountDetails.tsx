@@ -6,7 +6,8 @@ import {useToast} from "../../components/ToastProvider/toastContext.ts";
 
 type DailyBalanceDto = {
   date: string;
-  balance: number;
+  pendingBalance: number;
+  postedBalance: number;
 };
 
 type AccountDetailsDto = {
@@ -79,22 +80,9 @@ export default function AccountDetails() {
           postedBalance: res.postedBalance ?? 0,
           bankGroupName: res.bankName, // placeholder until backend supports grouping
         });
-        // TEMP: still mocked until backend supports it
-        // MOCK DAILY BALANCES
-        setDailyBalances([
-          {
-            date: "2026-05-15",
-            balance: 2250.17,
-          },
-          {
-            date: "2026-05-14",
-            balance: 2187.42,
-          },
-          {
-            date: "2026-05-13",
-            balance: 2104.88,
-          },
-        ]);
+        
+        const balances = await accountService.getAccountDailyBalances(accountId, 30);
+        setDailyBalances(balances);
       } catch (err) {
         console.error("Failed to load account details", err);
         setAccount(null);
@@ -414,7 +402,8 @@ export default function AccountDetails() {
                 <thead>
                 <tr>
                   <th>Date</th>
-                  <th>Balance</th>
+                  <th>Pending</th>
+                  <th>Posted</th>
                   <th>Action</th>
                 </tr>
                 </thead>
@@ -426,13 +415,18 @@ export default function AccountDetails() {
                     
                     <td>
                       $
-                      {item.balance.toLocaleString(
-                        undefined,
-                        {
-                          minimumFractionDigits: 2,
-                          maximumFractionDigits: 2,
-                        }
-                      )}
+                      {item.pendingBalance.toLocaleString(undefined, {
+                        minimumFractionDigits: 2,
+                        maximumFractionDigits: 2,
+                      })}
+                    </td>
+                    
+                    <td>
+                      $
+                      {item.postedBalance.toLocaleString(undefined, {
+                        minimumFractionDigits: 2,
+                        maximumFractionDigits: 2,
+                      })}
                     </td>
                     
                     <td>
