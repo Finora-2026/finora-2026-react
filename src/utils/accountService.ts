@@ -1,8 +1,8 @@
 import { BackendConfig } from "../config/BackendConfig";
 import { authService } from "./authService";
 
-export type AccountCreateRequestDto = {
-  id?: string | null;
+export type AccountEditDto = {
+  id?: string | null; // update or create new account
   name: string;
   openingDate: string;
   closingDate?: string | null;
@@ -51,7 +51,7 @@ const getHeaders = () => {
 
 export const accountService = {
   createAccount: async (
-    payload: AccountCreateRequestDto
+    payload: AccountEditDto
   ): Promise<AccountResponseDto> => {
     const res = await fetch(`${BackendConfig.springApiUrl}/accounts`, {
       method: "POST",
