@@ -133,6 +133,13 @@ export default function AccountUpdate() {
     return isEditMode ? `Update account: ${accountId}` : "Add Account";
   };
   
+  const renderButtonText = () => {
+    if (submitting) {
+      return isEditMode ? "Updating..." : "Creating...";
+    }
+    return isEditMode ? "Update Account" : "Create Account";
+  };
+  
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
   ) => {
@@ -365,7 +372,7 @@ export default function AccountUpdate() {
             className={styles.button}
             disabled={submitting}
           >
-            {submitting ? "Creating..." : "Create Account"}
+            {renderButtonText()}
           </button>
         </form>
       </div>
