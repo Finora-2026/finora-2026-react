@@ -144,6 +144,10 @@
     transform: scale(0.98);
   }
 }
+.button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
 
 /* Mobile */
 @media (max-width: 600px) {
