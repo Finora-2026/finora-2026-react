@@ -125,18 +125,20 @@ export default function AccountUpdate() {
     loadAccountTypes();
   }, [showToast]);
   
+  // Derived state: unchanged name in edit mode
+  const trimmedName = form.accountName.trim();
+  const isOriginalName =
+    isEditMode &&
+    trimmedName.toLowerCase() === originalName.trim().toLowerCase();
   // Check if account name is valid
   useEffect(() => {
-    const trimmedName = form.accountName.trim();
     // no name, skip API call
     if (!trimmedName) {
       return;
     }
     
-    // Optimization: Skip API check if name matches the original record name in Edit mode
-    if (isEditMode && trimmedName.toLowerCase() === originalName.trim().toLowerCase()) {
-      setNameAvailable(true);
-      setNameError(null);
+    // unchanged original name, skip validation API
+    if (isOriginalName) {
       return;
     }
     
@@ -162,7 +164,7 @@ export default function AccountUpdate() {
     }, 500); // debounce
     
     return () => clearTimeout(timeoutId);
-  }, [form.accountName, isEditMode, originalName]);
+  }, [trimmedName, isOriginalName]);
   
   const renderTitle = () => {
     return isEditMode ? `Update account: ${accountId}` : "Add Account";
