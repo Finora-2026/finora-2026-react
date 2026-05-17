@@ -1,10 +1,12 @@
 import { useEffect, useState } from "react";
-import styles from "./AccountCreate.module.scss";
-import { type BankResponseDto, bankService } from "../../utils/bankService.ts";
+import {useNavigate, useParams} from "react-router-dom";
 import { useToast } from "../../components/ToastProvider/toastContext.ts";
+
+import { type BankResponseDto, bankService } from "../../utils/bankService.ts";
 import {type AccountTypeResponseDto, accountTypeService} from "../../utils/accountTypeService.ts";
 import {accountService} from "../../utils/accountService.ts";
-import {useNavigate} from "react-router-dom";
+
+import styles from "./AccountCreate.module.scss";
 
 type AccountForm = {
   bankId: string;
@@ -14,9 +16,11 @@ type AccountForm = {
   accountType: string;
 };
 
-export default function AccountCreate() {
+export default function AccountUpdate() {
   const { showToast } = useToast();
   const navigate = useNavigate();
+  const { accountId } = useParams<{ accountId: string }>();
+  const isEditMode = !!accountId;
   
   const [submitting, setSubmitting] = useState(false);
   
@@ -125,6 +129,17 @@ export default function AccountCreate() {
     
   }, [form.accountName]);
   
+  const renderTitle = () => {
+    return isEditMode ? `Update account: ${accountId}` : "Add Account";
+  };
+  
+  const renderButtonText = () => {
+    if (submitting) {
+      return isEditMode ? "Updating..." : "Creating...";
+    }
+    return isEditMode ? "Update Account" : "Create Account";
+  };
+  
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
   ) => {
@@ -203,7 +218,7 @@ export default function AccountCreate() {
   return (
     <div className={styles.container}>
       <div className={styles.card}>
-        <h1 className={styles.title}>Add Account</h1>
+        <h1 className={styles.title}>{renderTitle()}</h1>
         
         <form className={styles.form} onSubmit={handleSubmit}>
           {/* Bank */}
@@ -357,7 +372,7 @@ export default function AccountCreate() {
             className={styles.button}
             disabled={submitting}
           >
-            {submitting ? "Creating..." : "Create Account"}
+            {renderButtonText()}
           </button>
         </form>
       </div>
