@@ -40,6 +40,9 @@ export default function AccountDetails() {
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string>("");
   
+  const [balanceLoading, setBalanceLoading] = useState(false);
+  const [balanceError, setBalanceError] = useState<string>("");
+  
   const [account, setAccount] =
     useState<AccountDetailsDto | null>(null);
   
@@ -122,6 +125,10 @@ export default function AccountDetails() {
     try {
       if (!account?.id) return;
       
+      setBalanceLoading(true);
+      setBalanceError("");
+      setCalculatedBalance(null);
+      
       const dateToUse =
         balanceAsOfDate?.trim()
           ? balanceAsOfDate
@@ -139,7 +146,10 @@ export default function AccountDetails() {
       setCalculatedBalance(res);
     } catch (err) {
       console.error("Failed to calculate balance", err);
+      setBalanceError("Failed to calculate balance");
       setCalculatedBalance(null);
+    } finally {
+      setBalanceLoading(false);
     }
   }
   
@@ -339,22 +349,26 @@ export default function AccountDetails() {
               className={styles.input}
               type="date"
               value={balanceAsOfDate}
-              onChange={(e) =>
-                setBalanceAsOfDate(
-                  e.target.value
-                )
-              }
+              onChange={(e) => setBalanceAsOfDate(e.target.value)}
+              disabled={balanceLoading}
             />
             
             <button
               className={styles.actionButton}
               onClick={handleCalculateBalance}
+              disabled={balanceLoading}
             >
-              Calculate
+              {balanceLoading ? "Calculating..." : "Calculate"}
             </button>
           </div>
           
-          {calculatedBalance && (
+          {balanceError && (
+            <div className={styles.empty}>
+              {balanceError}
+            </div>
+          )}
+          
+          {calculatedBalance && !balanceLoading && (
             <div className={styles.resultBox}>
               <div>
                 Balance as of {formatDateOnly(calculatedBalance.asOfDate)}:
@@ -362,24 +376,18 @@ export default function AccountDetails() {
               
               <div>
                 Pending: $
-                {calculatedBalance.pendingBalance.toLocaleString(
-                  undefined,
-                  {
-                    minimumFractionDigits: 2,
-                    maximumFractionDigits: 2,
-                  }
-                )}
+                {calculatedBalance.pendingBalance.toLocaleString(undefined, {
+                  minimumFractionDigits: 2,
+                  maximumFractionDigits: 2,
+                })}
               </div>
               
               <div>
                 Posted: $
-                {calculatedBalance.postedBalance.toLocaleString(
-                  undefined,
-                  {
-                    minimumFractionDigits: 2,
-                    maximumFractionDigits: 2,
-                  }
-                )}
+                {calculatedBalance.postedBalance.toLocaleString(undefined, {
+                  minimumFractionDigits: 2,
+                  maximumFractionDigits: 2,
+                })}
               </div>
             </div>
           )}
