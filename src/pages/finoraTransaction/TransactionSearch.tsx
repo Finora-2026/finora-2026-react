@@ -1,4 +1,5 @@
-import {useEffect, useState} from "react";
+import {useEffect, useMemo, useState} from "react";
+import {useNavigate} from "react-router-dom";
 
 import { useToast } from "../../components/ToastProvider/toastContext.ts";
 import { bankService, type BankResponseDto } from "../../utils/bankService.ts";
@@ -6,26 +7,14 @@ import { accountService, type AccountResponseDto,} from "../../utils/accountServ
 import {locationService, type LocationResponseDto,} from "../../utils/locationService.ts";
 import {brandService, type BrandResponseDto,} from "../../utils/brandService.ts";
 import {transactionTypeService, type TransactionTypeDto,} from "../../utils/transactionTypeService.ts";
+import transactionService, {type TransactionResponseDto, type TransactionSearchRequestDto}
+  from "../../utils/transactionService.ts";
 
 import styles from "./TransactionUpdate.module.scss";
 
-type TransactionResult = {
-  id: string;
-  groupId: string;
-  date: string;
-  typeName: string;
-  brandName: string;
-  locationName: string;
-  amount: number;
-  notes: string;
-  bankName: string;
-};
-
 export default function TransactionSearch() {
   const { showToast } = useToast();
-  
-  const [loading] = useState(false);
-  const [searched] = useState(true);
+  const navigate = useNavigate();
   
   const getToday = () => new Date().toISOString().split("T")[0];
   const get30DaysAgo = () => {
@@ -67,6 +56,10 @@ export default function TransactionSearch() {
   const [selectedTypeId, setSelectedTypeId] = useState("");
   
   const [notes, setNotes] = useState("");
+  
+  const [results, setResults] = useState<TransactionResponseDto[]>([]);
+  const [loading, setLoading] = useState(false);
+  const [searched, setSearched] = useState(false);
   
   // Fetch banks from BE
   useEffect(() => {
@@ -171,36 +164,65 @@ export default function TransactionSearch() {
     loadTransactionTypes();
   }, [showToast]);
   
-  // Mock results
-  const results: TransactionResult[] = [
-    {
-      id: "TXN-001",
-      groupId: "GRP-001",
-      date: "2026-05-18",
-      typeName: "Food",
-      brandName: "McDonald's",
-      locationName: "Dallas, TX",
-      amount: -12.45,
-      notes: "Lunch",
-      bankName: "Chase",
-    },
-    {
-      id: "TXN-002",
-      groupId: "GRP-002",
-      date: "2026-05-17",
-      typeName: "Shopping",
-      brandName: "Amazon",
-      locationName: "Plano, TX",
-      amount: -89.99,
-      notes: "Keyboard purchase",
-      bankName: "Bank of America",
-    },
-  ];
+  const accountMap = useMemo(
+    () => Object.fromEntries(accounts.map(a => [a.id, a.name])),
+    [accounts]
+  );
   
-  // Mock handlers
-  const onSearch = (e: React.FormEvent) => {
+  const brandMap = useMemo(
+    () => Object.fromEntries(brands.map(b => [b.id, b.name])),
+    [brands]
+  );
+  
+  const locationMap = useMemo(
+    () =>
+      Object.fromEntries(
+        locations.map(l => [l.id, `${l.city}, ${l.state}`])
+      ),
+    [locations]
+  );
+  
+  const typeMap = useMemo(
+    () => Object.fromEntries(transactionTypes.map(t => [t.id, t.name])),
+    [transactionTypes]
+  );
+  
+  const onSearch = async (e: React.FormEvent) => {
     e.preventDefault();
-    console.log("Search clicked");
+    
+    setLoading(true);
+    setSearched(true);
+    
+    try {
+      const request: TransactionSearchRequestDto = {
+        startDate: startDate || undefined,
+        endDate: endDate || undefined,
+        
+        minAmount: minAmount ? Number(minAmount) : undefined,
+        maxAmount: maxAmount ? Number(maxAmount) : undefined,
+        
+        bankId: selectedBankId || undefined,
+        accountId: selectedAccountId || undefined,
+        brandId: selectedBrandId || undefined,
+        locationId: selectedLocationId || undefined,
+        typeId: selectedTypeId || undefined,
+        
+        notes: notes || undefined,
+      };
+      
+      const data = await transactionService.searchTransactions(request);
+      setResults(data);
+    } catch (err) {
+      console.error(err);
+      const message =
+        err instanceof Error
+          ? err.message
+          : "Failed to search transactions";
+      showToast(message, "error");
+      setResults([]);
+    } finally {
+      setLoading(false);
+    }
   };
   
   const onReset = () => {
@@ -222,7 +244,7 @@ export default function TransactionSearch() {
   };
   
   const openTransactionGroup = (groupId: string) => {
-    console.log("Open transaction group:", groupId);
+    navigate(`../details/${groupId}`);
   };
   
   return (
@@ -479,9 +501,16 @@ export default function TransactionSearch() {
           )}
           
           {/* No Results */}
-          {!loading && searched && results.length === 0 && (
+          {searched && !loading && results.length === 0 && (
             <div className={styles.message}>
               No transactions found.
+            </div>
+          )}
+          
+          {/* Not search yet */}
+          {!searched && !loading && (
+            <div className={styles.message}>
+              Use filters and click Search to begin.
             </div>
           )}
           
@@ -525,9 +554,7 @@ export default function TransactionSearch() {
                   return (
                     <tr
                       key={transaction.id}
-                      onClick={() =>
-                        openTransactionGroup(transaction.groupId)
-                      }
+                      onClick={() => openTransactionGroup(transaction.transactionGroupId)}
                       className={styles.clickableRow}
                     >
                       
@@ -536,25 +563,28 @@ export default function TransactionSearch() {
                       </td>
                       
                       <td data-label="Date">
-                        {new Date(transaction.date).toLocaleDateString()}
+                        {new Date(transaction.transactionDate).toLocaleDateString()}
                       </td>
                       
                       <td data-label="Type">
-                        {transaction.typeName || "—"}
+                        {transaction.transactionTypeId
+                          ? typeMap[transaction.transactionTypeId] || "—"
+                          : "—"}
                       </td>
                       
                       <td data-label="Brand">
-                        {transaction.brandName || "—"}
+                        {transaction.brandId
+                          ? brandMap[transaction.brandId] || "—"
+                          : "—"}
                       </td>
                       
                       <td data-label="Location">
-                        {transaction.locationName || "—"}
+                        {transaction.locationId
+                          ? locationMap[transaction.locationId] || "—"
+                          : "—"}
                       </td>
                       
-                      <td
-                        data-label="Amount"
-                        className={amountClass}
-                      >
+                      <td data-label="Amount" className={amountClass}>
                         {transaction.amount < 0
                           ? `-$${Math.abs(transaction.amount).toFixed(2)}`
                           : `$${transaction.amount.toFixed(2)}`}
@@ -565,7 +595,9 @@ export default function TransactionSearch() {
                       </td>
                       
                       <td data-label="Bank">
-                        {transaction.bankName || "—"}
+                        {transaction.accountId
+                          ? accountMap[transaction.accountId] || "—"
+                          : "—"}
                       </td>
                     </tr>
                   );
