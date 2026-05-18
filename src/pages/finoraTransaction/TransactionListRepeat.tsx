@@ -1,6 +1,13 @@
 import { useEffect, useState } from "react";
-
+import { useMemo } from "react";
 import {useToast} from "../../components/ToastProvider/toastContext.ts";
+
+import { brandService, type BrandResponseDto } from "../../utils/brandService";
+import { locationService, type LocationResponseDto } from "../../utils/locationService";
+import {transactionTypeService, type TransactionTypeDto } from "../../utils/transactionTypeService";
+import { accountService, type AccountResponseDto } from "../../utils/accountService";
+import { transactionGroupService } from "../../utils/transactionGroupService";
+import {type TransactionGroupResponseDto, type TransactionResponseDto,} from "../../utils/transactionGroupService";
 
 import styles from "./TransactionUpdate.module.scss";
 
@@ -20,64 +27,96 @@ type TransactionGroupDto = {
   transactions: TransactionDto[];
 };
 
-// MOCK DATA
-const mockGroups: TransactionGroupDto[] = [
-  {
-    id: "GRP-1001",
-    transactions: [
-      {
-        id: "T1",
-        date: "2026-05-01",
-        typeId: "EXPENSE",
-        brandName: "Netflix",
-        locationName: "Online",
-        amount: -15.99,
-        notes: "Monthly subscription",
-        accountName: "CHASE_001",
-      },
-      {
-        id: "T2",
-        date: "2026-06-01",
-        typeId: "EXPENSE",
-        brandName: "Netflix",
-        locationName: "Online",
-        amount: -15.99,
-        notes: "Monthly subscription",
-        accountName: "CHASE_001",
-      },
-    ],
-  },
-  {
-    id: "GRP-1002",
-    transactions: [
-      {
-        id: "T3",
-        date: "2026-05-10",
-        typeId: "EXPENSE",
-        brandName: "Spotify",
-        locationName: "Online",
-        amount: -9.99,
-        notes: "Family plan",
-        accountName: "BOA_002",
-      },
-    ],
-  },
-];
-
 export default function TransactionListRepeat() {
   const { showToast } = useToast();
   
   const [loading, setLoading] = useState(true);
-  const [transactionGroups, setTransactionGroups] = useState<TransactionGroupDto[]>([]);
+  const [error, setError] = useState<string>("");
   
+  const [transactionGroups, setTransactionGroups] = useState<TransactionGroupDto[]>([]);
+  const [brands, setBrands] = useState<BrandResponseDto[]>([]);
+  const [locations, setLocations] = useState<LocationResponseDto[]>([]);
+  const [transactionTypes, setTransactionTypes] = useState<TransactionTypeDto[]>([]);
+  const [accounts, setAccounts] = useState<AccountResponseDto[]>([]);
+  
+  // Fetch all data from BE
   useEffect(() => {
-    const timer = setTimeout(() => {
-      setTransactionGroups(mockGroups);
-      setLoading(false);
-    }, 2000);
-    
-    return () => clearTimeout(timer);
-  }, []);
+    const loadGroupsAndData = async () => {
+      try {
+        setLoading(true);
+        setError("");
+        const [
+          data,
+          brandsData,
+          locationsData,
+          typesData,
+          accountsData,
+        ] = await Promise.all([
+          transactionGroupService.getRepeatableGroups(),
+          brandService.getAllBrands(),
+          locationService.getAllLocations(),
+          transactionTypeService.getAllTransactionTypes(),
+          accountService.getAllAccounts(),
+        ]);
+        const mapped: TransactionGroupDto[] = data.map(
+          (group: TransactionGroupResponseDto) => ({
+            id: group.id,
+            transactions: group.transactions.map(
+              (tx: TransactionResponseDto) => ({
+                id: tx.id,
+                date: tx.transactionDate.split("T")[0],
+                typeId: tx.transactionTypeId ?? "",
+                brandName: tx.brandId ?? "",
+                locationName: tx.locationId ?? "",
+                amount: tx.amount,
+                notes: tx.notes ?? "",
+                accountName: tx.accountId,
+              })
+            ),
+          })
+        );
+        setTransactionGroups(mapped);
+        setBrands(brandsData);
+        setLocations(locationsData);
+        setTransactionTypes(typesData);
+        setAccounts(accountsData);
+      } catch (err: unknown) {
+        const message =
+          err instanceof Error
+            ? err.message
+            : "Failed to load repeatable groups and data from BE";
+        setError(message);
+        setTransactionGroups([]);
+        showToast(message, "error");
+      } finally {
+        setLoading(false);
+      }
+    };
+    loadGroupsAndData();
+  }, [showToast]);
+  
+  const brandMap = useMemo(
+    () => Object.fromEntries(brands.map(b => [b.id, b.name])),
+    [brands]
+  );
+  
+  const locationMap = useMemo(
+    () =>
+      Object.fromEntries(
+        locations.map(l => [l.id, `${l.city}, ${l.state}`])
+      ),
+    [locations]
+  );
+  
+  const transactionTypeMap = useMemo(
+    () => Object.fromEntries(transactionTypes.map(t => [t.id, t.name])),
+    [transactionTypes]
+  );
+  
+  const accountMap = useMemo(
+    () => Object.fromEntries(accounts.map(a => [a.id, a.name])),
+    [accounts]
+  );
   
   const getAmountClass = (amount: number) =>
     amount < 0 ? styles.amountNegative : styles.amountPositive;
@@ -102,8 +141,9 @@ export default function TransactionListRepeat() {
       <div className={styles.card}>
         <h2 className={styles.title}>Repeat Transactions</h2>
         
+        {/*Pending states*/}
         {loading && <div className={styles.message}>Loading repeat transactions...</div>}
-        
+        {error && <div className={styles.error}>{error}</div>}
         {!loading && transactionGroups.length === 0 && (
           <div className={styles.message}>No repeat transactions found.</div>
         )}
@@ -172,14 +212,22 @@ export default function TransactionListRepeat() {
                   {group.transactions.map((tx) => (
                     <tr key={tx.id}>
                       <td>{tx.date}</td>
-                      <td>{tx.typeId}</td>
-                      <td>{tx.brandName}</td>
-                      <td>{tx.locationName}</td>
+                      <td>
+                        {tx.typeId ? transactionTypeMap[tx.typeId] || tx.typeId : "—"}
+                      </td>
+                      <td>
+                        {tx.brandName ? brandMap[tx.brandName] || tx.brandName : "—"}
+                      </td>
+                      <td>
+                        {tx.locationName ? locationMap[tx.locationName] || tx.locationName : "—"}
+                      </td>
                       <td className={getAmountClass(tx.amount)}>
                         {getAmountDisplay(tx.amount)}
                       </td>
                       <td>{tx.notes}</td>
-                      <td>{tx.accountName}</td>
+                      <td>
+                        {accountMap[tx.accountName] || tx.accountName}
+                      </td>
                     </tr>
                   ))}
                 </>
