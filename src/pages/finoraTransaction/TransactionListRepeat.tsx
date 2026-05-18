@@ -142,7 +142,12 @@ export default function TransactionListRepeat() {
                           >
                             Repeat
                           </button>
-                          
+                          <button
+                            className={`${styles.button} ${styles.secondary}`}
+                            onClick={() => console.log("details", group.id)}
+                          >
+                            Details
+                          </button>
                           <button
                             className={`${styles.button} ${styles.danger}`}
                             onClick={() => removeRepeatTag(group.id)}
