@@ -143,7 +143,7 @@ export default function TransactionDetails() {
   };
   
   const repeatThisGroup = (id: string | undefined) => {
-    showToast(`Mocking repeat group ${id}`);
+    navigate(`../repeat/${id}`);
   };
   
   const editThisGroup = (id: string) => {

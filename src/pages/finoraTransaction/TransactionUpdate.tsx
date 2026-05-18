@@ -1,5 +1,5 @@
 import {useEffect, useState} from "react";
-import { useParams } from "react-router-dom";
+import {useLocation, useParams} from "react-router-dom";
 import {useToast} from "../../components/ToastProvider/toastContext.ts";
 import styles from "./TransactionUpdate.module.scss";
 import {
@@ -36,12 +36,20 @@ type Transaction = {
   posted: boolean;
 };
 
+type PageMode = "create" | "edit" | "repeat";
+
 export default function TransactionUpdate() {
   const { showToast } = useToast();
   const navigate = useNavigate();
+  const location = useLocation();
   
   const { groupId } = useParams();
-  const isEditMode = !!groupId;
+  const mode: PageMode =
+    location.pathname.includes("/update/")
+      ? "edit"
+      : location.pathname.includes("/repeat/")
+        ? "repeat"
+        : "create";
   
   const [loading, setLoading] = useState(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
@@ -102,7 +110,6 @@ export default function TransactionUpdate() {
     hasInvalidDate ||
     transactions.some((t) => {
       const amount = Number(t.amount);
-      
       return (
         !t.date ||
         !t.accountId ||
@@ -112,16 +119,18 @@ export default function TransactionUpdate() {
       );
     });
   
-  const pageTitle = isEditMode
-    ? "Update transaction group"
-    : "Add new transactions";
+  const pageTitleMap: Record<PageMode, string> = {
+    create: "Add new transactions",
+    edit: "Update transaction group",
+    repeat: "Repeat transaction group",
+  };
+  const pageTitle = pageTitleMap[mode];
   
   // Load accounts
   useEffect(() => {
     const loadAccounts = async () => {
       setAccountsLoading(true);
       setAccountsError("");
-      
       try {
         const data = await accountService.getActiveAccounts();
         setAccounts(data);
@@ -142,7 +151,6 @@ export default function TransactionUpdate() {
     const loadBrands = async () => {
       setBrandsLoading(true);
       setBrandsError("");
-      
       try {
         const data = await brandService.getAllBrands();
         setBrands(data);
@@ -198,8 +206,9 @@ export default function TransactionUpdate() {
     loadTransactionTypes();
   }, [showToast]);
   
-  // Load transaction group for edit mode
+  // Load transaction group for edit/repeat mode
   useEffect(() => {
+    if (mode === "create") return;
     if (!groupId) return;
     const loadGroup = async () => {
       try {
@@ -210,15 +219,15 @@ export default function TransactionUpdate() {
         setGroup(groupData);
         setTransactions(
           groupData.transactions.map((t) => ({
-            id: t.id,
-            date: t.transactionDate.split("T")[0],
+            id: mode === "repeat" ? crypto.randomUUID() : t.id,
+            date: mode === "repeat" ? getToday() : t.transactionDate.split("T")[0],
             transactionTypeId: t.transactionTypeId ?? "",
             brandId: t.brandId ?? "",
             locationId: t.locationId ?? "",
             amount: String(t.amount),
             notes: t.notes ?? "",
             accountId: t.accountId,
-            posted: t.posted,
+            posted: mode === "repeat" ? false : t.posted,
           }))
         );
       } catch (err) {
@@ -230,7 +239,7 @@ export default function TransactionUpdate() {
       }
     };
     loadGroup();
-  }, [groupId, showToast]);
+  }, [groupId, mode, showToast]);
   
   // Soft check transaction.date with the selected account (between account.open and account.close dates)
   useEffect(() => {
@@ -378,6 +387,8 @@ export default function TransactionUpdate() {
       const lastType = last?.transactionTypeId || "";
       const lastBrand = last?.brandId || "";
       const lastLocation = last?.locationId || "";
+      const lastAmount = last?.amount || "";
+      const lastAccount = last?.accountId || "";
       const lastNotes = last?.notes || "";
       
       return [
@@ -388,9 +399,9 @@ export default function TransactionUpdate() {
           transactionTypeId: lastType,
           brandId: lastBrand,
           locationId: lastLocation,
-          amount: "",
+          amount: lastAmount,
           notes: lastNotes,
-          accountId: "",
+          accountId: lastAccount,
           posted: false,
         },
       ];
@@ -460,12 +471,12 @@ export default function TransactionUpdate() {
         })),
       };
       
-      const res = isEditMode
+      const res = mode === "edit"
         ? await transactionGroupService.updateTransactionGroup(updatePayload)
-        : await transactionGroupService.createTransactionGroup(createPayload);
+        : await transactionGroupService.createTransactionGroup(createPayload); // Create or Repeat
       showToast(res.message || "Transactions submitted", "success");
       // redirect to transaction list or detail page
-      if (isEditMode) {
+      if (mode === "edit") {
         if (isEmptyAfterUpdate) {
           navigate(".."); // fallback to list/index
         } else {
@@ -664,7 +675,7 @@ export default function TransactionUpdate() {
                   <button
                     className={styles.button + " " + styles.primary}
                     onClick={() => markAsPosted(tx.id)}
-                    disabled={tx.posted || !isEditMode}
+                    disabled={tx.posted || !(mode === "edit")}
                   >
                     Posted
                   </button>
@@ -781,7 +792,7 @@ export default function TransactionUpdate() {
           
           <div className={styles.stackRow}>
             <button className={styles.button + " " + styles.primary} onClick={submitAll} disabled={isInvalid}>
-              {isEditMode ? "Update transactions" : "Submit transactions"}
+              {(mode === "edit") ? "Update transactions" : "Submit transactions"}
             </button>
             <button className={styles.button + " " + styles.danger} onClick={cancel}>Cancel / Reset this page</button>
             <button className={styles.button + " " + styles.secondary} onClick={goBack}>Go to Pending list</button>
