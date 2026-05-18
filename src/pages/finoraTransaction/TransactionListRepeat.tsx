@@ -1,4 +1,7 @@
 import { useEffect, useState } from "react";
+
+import {useToast} from "../../components/ToastProvider/toastContext.ts";
+
 import styles from "./TransactionUpdate.module.scss";
 
 type TransactionDto = {
@@ -62,6 +65,8 @@ const mockGroups: TransactionGroupDto[] = [
 ];
 
 export default function TransactionListRepeat() {
+  const { showToast } = useToast();
+  
   const [loading, setLoading] = useState(true);
   const [transactionGroups, setTransactionGroups] = useState<TransactionGroupDto[]>([]);
   
@@ -69,7 +74,7 @@ export default function TransactionListRepeat() {
     const timer = setTimeout(() => {
       setTransactionGroups(mockGroups);
       setLoading(false);
-    }, 500);
+    }, 2000);
     
     return () => clearTimeout(timer);
   }, []);
@@ -81,12 +86,16 @@ export default function TransactionListRepeat() {
     amount < 0 ? `-$${Math.abs(amount).toFixed(2)}` : `$${amount.toFixed(2)}`;
   
   const repeatGroup = (groupId: string) => {
-    console.log("repeat", groupId);
+    showToast(`Mock repeating this group: ${groupId}`);
   };
   
   const removeRepeatTag = (groupId: string) => {
-    console.log("remove repeat", groupId);
+    showToast(`Mock remove repeating tag for this group: ${groupId}`);
   };
+  
+  const showDetails = (groupId: string) => {
+    showToast(`Mock show details for this group: ${groupId}`);
+  }
   
   return (
     <div className={styles.container}>
@@ -128,28 +137,28 @@ export default function TransactionListRepeat() {
               {transactionGroups.map((group) => (
                 <>
                   {/* GROUP HEADER */}
-                  <tr key={group.id} className={styles.groupRow}>
+                  <tr key={group.id} className={styles.groupRowNoPointer}>
                     <td colSpan={7}>
                       <div className={styles.inline} style={{ justifyContent: "space-between", width: "100%" }}>
                         <div>
                           Group id: {group.id} ({group.transactions.length} transactions)
                         </div>
                         
-                        <div className={styles.inline}>
+                        <div className={styles.repeatButtonGroup}>
                           <button
-                            className={`${styles.button} ${styles.primary}`}
+                            className={`${styles.button} ${styles.repeatButton} ${styles.repeatPrimary}`}
                             onClick={() => repeatGroup(group.id)}
                           >
                             Repeat
                           </button>
                           <button
-                            className={`${styles.button} ${styles.secondary}`}
-                            onClick={() => console.log("details", group.id)}
+                            className={`${styles.button} ${styles.repeatButton} ${styles.repeatSecondary}`}
+                            onClick={() => showDetails(group.id)}
                           >
                             Details
                           </button>
                           <button
-                            className={`${styles.button} ${styles.danger}`}
+                            className={`${styles.button} ${styles.repeatButton} ${styles.repeatDanger}`}
                             onClick={() => removeRepeatTag(group.id)}
                           >
                             Remove
