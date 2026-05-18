@@ -72,7 +72,7 @@ export default function TransactionDetails() {
             brandService.getAllBrands(),
             locationService.getAllLocations(),
             transactionTypeService.getAllTransactionTypes(),
-            accountService.getActiveAccounts(),
+            accountService.getAllAccounts(),
           ]);
         
         setGroup(groupData);

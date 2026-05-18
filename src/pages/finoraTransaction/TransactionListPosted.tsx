@@ -60,7 +60,7 @@ export default function TransactionListPosted() {
           brandService.getAllBrands(),
           locationService.getAllLocations(),
           transactionTypeService.getAllTransactionTypes(),
-          accountService.getActiveAccounts(),
+          accountService.getAllAccounts(),
         ]);
         
         const mapped: TransactionGroup[] = data.map((group: TransactionGroupResponseDto) => ({

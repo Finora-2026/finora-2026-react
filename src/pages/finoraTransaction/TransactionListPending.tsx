@@ -59,7 +59,7 @@ export default function TransactionListPending() {
           brandService.getAllBrands(),
           locationService.getAllLocations(),
           transactionTypeService.getAllTransactionTypes(),
-          accountService.getActiveAccounts(),
+          accountService.getAllAccounts(),
         ]);
         setResults(transactions);
         setBrands(brandsData);
