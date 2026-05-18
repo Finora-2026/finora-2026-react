@@ -41,7 +41,7 @@ export type AccountDailyBalanceDto = {
   postedBalance: number;
 };
 
-export type AccountDateValidationResponseDto = {
+export type AccountSoftCheckValidationResponseDto = {
   valid: boolean;
 };
 
@@ -108,7 +108,7 @@ export const accountService = {
   validateAccountDate: async (
     accountId: string,
     dateTime: string
-  ): Promise<AccountDateValidationResponseDto> => {
+  ): Promise<AccountSoftCheckValidationResponseDto> => {
     const res = await fetch(
       `${BackendConfig.springApiUrl}/accounts/${accountId}/validate-date?dateTime=${encodeURIComponent(dateTime)}`,
       {
@@ -119,6 +119,25 @@ export const accountService = {
     if (!res.ok) {
       const msg = await res.text();
       throw new Error(msg || "Failed to validate account date");
+    }
+    
+    return await res.json();
+  },
+  
+  validateAccountCanBeClosed: async (
+    accountId: string,
+    closeDate: string
+  ): Promise<AccountSoftCheckValidationResponseDto> => {
+    const res = await fetch(
+      `${BackendConfig.springApiUrl}/accounts/${accountId}/validate-can-close?closeDate=${encodeURIComponent(closeDate)}`,
+      {
+        headers: getHeaders(),
+      }
+    );
+    
+    if (!res.ok) {
+      const msg = await res.text();
+      throw new Error(msg || "Failed to validate account closing");
     }
     
     return await res.json();
