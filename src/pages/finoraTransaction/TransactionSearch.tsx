@@ -3,6 +3,7 @@ import {useEffect, useState} from "react";
 import { useToast } from "../../components/ToastProvider/toastContext.ts";
 import { bankService, type BankResponseDto } from "../../utils/bankService.ts";
 import { accountService, type AccountResponseDto,} from "../../utils/accountService.ts";
+import {locationService, type LocationResponseDto,} from "../../utils/locationService.ts";
 
 import styles from "./TransactionUpdate.module.scss";
 
@@ -46,6 +47,10 @@ export default function TransactionSearch() {
   const [loadingAccounts, setLoadingAccounts] = useState(true);
   const [accountError, setAccountError] = useState<string | null>(null);
   
+  const [locations, setLocations] = useState<LocationResponseDto[]>([]);
+  const [loadingLocations, setLoadingLocations] = useState(true);
+  const [locationError, setLocationError] = useState<string | null>(null);
+  
   // Fetch banks from BE
   useEffect(() => {
     const loadBanks = async () => {
@@ -87,15 +92,30 @@ export default function TransactionSearch() {
     loadAccounts();
   }, [showToast]);
   
+  // Fetch location from BE
+  useEffect(() => {
+    const loadLocations = async () => {
+      setLoadingLocations(true);
+      setLocationError(null);
+      try {
+        const data = await locationService.getAllLocations();
+        setLocations(data);
+      } catch (err) {
+        console.error("Failed to load locations", err);
+        setLocations([]);
+        setLocationError("Failed to load locations");
+        showToast("Failed to load locations", "error");
+      } finally {
+        setLoadingLocations(false);
+      }
+    };
+    loadLocations();
+  }, [showToast]);
+  
   // Mock dropdown data
   const brands = [
     { id: "1", name: "Amazon" },
     { id: "2", name: "Walmart" },
-  ];
-  
-  const locations = [
-    { id: "1", city: "Dallas", state: "TX" },
-    { id: "2", city: "Plano", state: "TX" },
   ];
   
   const transactionTypes = [
@@ -278,14 +298,25 @@ export default function TransactionSearch() {
             <div className={styles.searchField}>
               <label className={styles.label}>Location</label>
               
-              <select className={styles.select}>
-                <option value="">-- Select Location --</option>
+              <select
+                className={styles.select}
+                disabled={loadingLocations || !!locationError}
+              >
+                <option value="">
+                  {loadingLocations
+                    ? "Loading locations..."
+                    : locationError
+                      ? "Unable to load locations"
+                      : "-- Select Location --"}
+                </option>
                 
-                {locations.map((location) => (
-                  <option key={location.id} value={location.id}>
-                    {location.city}, {location.state}
-                  </option>
-                ))}
+                {!loadingLocations &&
+                  !locationError &&
+                  locations.map((location) => (
+                    <option key={location.id} value={location.id}>
+                      {location.city}, {location.state}
+                    </option>
+                  ))}
               </select>
             </div>
             
