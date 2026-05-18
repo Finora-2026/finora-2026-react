@@ -26,6 +26,11 @@ export default function TransactionSearch() {
   const [startDate, setStartDate] = useState<string>(get30DaysAgo());
   const [endDate, setEndDate] = useState<string>(getToday());
   
+  const [minAmount, setMinAmount] = useState<string>("");
+  const [maxAmount, setMaxAmount] = useState<string>("");
+  // controls auto-fill behavior
+  const [amountAutoFillEnabled, setAmountAutoFillEnabled] = useState(true);
+  
   // Mock dropdown data
   const banks = [
     { id: "1", name: "Chase" },
@@ -80,7 +85,12 @@ export default function TransactionSearch() {
   };
   
   const onReset = () => {
-    console.log("Reset clicked");
+    setStartDate(get30DaysAgo());
+    setEndDate(getToday());
+    
+    setMinAmount("");
+    setMaxAmount("");
+    setAmountAutoFillEnabled(true);
   };
   
   const openTransactionGroup = (groupId: string) => {
@@ -125,6 +135,14 @@ export default function TransactionSearch() {
                 type="number"
                 step="0.01"
                 placeholder="-50.00"
+                value={minAmount}
+                onChange={(e) => {
+                  const val = e.target.value;
+                  setMinAmount(val);
+                  if (!amountAutoFillEnabled) return;
+                  if (!val) return;
+                  setMaxAmount(val);
+                }}
               />
               
               <small className={styles.helpText}>
@@ -140,6 +158,11 @@ export default function TransactionSearch() {
                 type="number"
                 step="0.01"
                 placeholder="500.00"
+                value={maxAmount}
+                onChange={(e) => {
+                  setMaxAmount(e.target.value);
+                  setAmountAutoFillEnabled(false);
+                }}
               />
             </div>
             
