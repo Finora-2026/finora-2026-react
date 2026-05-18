@@ -433,3 +433,67 @@
 
   color: var(--text);
 }
+
+/* =========================
+   REPEAT PAGE BUTTON OVERRIDES
+   (TransactionListRepeat only)
+========================= */
+
+.groupRowNoPointer {
+  font-weight: 600;
+  background: rgba(var(--accent-rgb, 0, 0, 0), 0.03);
+  transition: background-color 0.15s ease;
+
+  &:hover {
+    background-color: rgba(var(--accent-rgb, 0, 0, 0), 0.08);
+  }
+}
+
+.repeatButtonGroup {
+  display: flex;
+  gap: 6px;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+/* smaller base button only for this page */
+.repeatButton {
+  padding: 6px 8px;
+  font-size: 12px;
+  border-radius: 8px;
+  line-height: 1;
+}
+
+/* optional tighter variants */
+.repeatPrimary {
+  background: var(--btn-primary);
+  color: var(--btn-primary-text);
+}
+
+.repeatSecondary {
+  background: var(--btn-secondary);
+  color: var(--btn-secondary-text);
+}
+
+.repeatDanger {
+  background: var(--btn-danger);
+  color: var(--btn-danger-text);
+}
+
+.repeatPrimary:hover {
+  filter: brightness(1.05);
+}
+
+.repeatSecondary:hover {
+  background: var(--btn-secondary-hover);
+}
+
+.repeatDanger:hover {
+  background: var(--btn-danger-hover);
+}
+
+@media (max-width: 600px) {
+  .repeatButton {
+    padding: 12px 6px;
+  }
+}
