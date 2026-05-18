@@ -51,6 +51,11 @@ export type AvailableReportGroupsResponse = {
   data: TransactionGroupResponseDto[];
 };
 
+export type RepeatableGroupsResponse = {
+  success: boolean;
+  data: TransactionGroupResponseDto[];
+};
+
 /* =========================
    Helpers
 ========================= */
@@ -155,6 +160,26 @@ export const transactionGroupService = {
       throw new Error(msg || "Failed to fetch available report groups");
     }
     const json: AvailableReportGroupsResponse = await res.json();
+    if (!json.success) {
+      throw new Error("Request failed (success=false)");
+    }
+    return json.data;
+  },
+  
+  // GET REPEATABLE GROUPS
+  getRepeatableGroups: async (): Promise<TransactionGroupResponseDto[]> => {
+    const res = await fetch(
+      `${BackendConfig.springApiUrl}/transaction-groups/repeatable`,
+      {
+        method: "GET",
+        headers: getHeaders(),
+      }
+    );
+    if (!res.ok) {
+      const msg = await res.text();
+      throw new Error(msg || "Failed to fetch repeatable groups");
+    }
+    const json: RepeatableGroupsResponse = await res.json();
     if (!json.success) {
       throw new Error("Request failed (success=false)");
     }
