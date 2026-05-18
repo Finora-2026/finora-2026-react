@@ -9,7 +9,7 @@ type TransactionDto = {
   locationName: string;
   amount: number;
   notes?: string;
-  bankName: string;
+  accountName: string;
 };
 
 type TransactionGroupDto = {
@@ -17,9 +17,7 @@ type TransactionGroupDto = {
   transactions: TransactionDto[];
 };
 
-// ----------------------------
 // MOCK DATA
-// ----------------------------
 const mockGroups: TransactionGroupDto[] = [
   {
     id: "GRP-1001",
@@ -32,7 +30,7 @@ const mockGroups: TransactionGroupDto[] = [
         locationName: "Online",
         amount: -15.99,
         notes: "Monthly subscription",
-        bankName: "Chase",
+        accountName: "CHASE_001",
       },
       {
         id: "T2",
@@ -42,7 +40,7 @@ const mockGroups: TransactionGroupDto[] = [
         locationName: "Online",
         amount: -15.99,
         notes: "Monthly subscription",
-        bankName: "Chase",
+        accountName: "CHASE_001",
       },
     ],
   },
@@ -57,7 +55,7 @@ const mockGroups: TransactionGroupDto[] = [
         locationName: "Online",
         amount: -9.99,
         notes: "Family plan",
-        bankName: "Bank of America",
+        accountName: "BOA_002",
       },
     ],
   },
@@ -80,9 +78,7 @@ export default function TransactionListRepeat() {
     amount < 0 ? styles.amountNegative : styles.amountPositive;
   
   const getAmountDisplay = (amount: number) =>
-    amount < 0
-      ? `-$${Math.abs(amount).toFixed(2)}`
-      : `+$${amount.toFixed(2)}`;
+    amount < 0 ? `-$${Math.abs(amount).toFixed(2)}` : `$${amount.toFixed(2)}`;
   
   const repeatGroup = (groupId: string) => {
     console.log("repeat", groupId);
@@ -97,21 +93,25 @@ export default function TransactionListRepeat() {
       <div className={styles.card}>
         <h2 className={styles.title}>Repeat Transactions</h2>
         
-        {loading && (
-          <div className={styles.message}>
-            Loading repeat transactions...
-          </div>
-        )}
+        {loading && <div className={styles.message}>Loading repeat transactions...</div>}
         
         {!loading && transactionGroups.length === 0 && (
-          <div className={styles.message}>
-            No repeat transactions found.
-          </div>
+          <div className={styles.message}>No repeat transactions found.</div>
         )}
         
         {!loading && transactionGroups.length > 0 && (
           <div className={styles.tableWrapper}>
             <table className={styles.table}>
+              <colgroup>
+                <col style={{ width: "11%" }} />
+                <col style={{ width: "9%" }} />
+                <col style={{ width: "10%" }} />
+                <col style={{ width: "10%" }} />
+                <col style={{ width: "10%" }} />
+                <col style={{ width: "35%" }} />
+                <col style={{ width: "15%" }} />
+              </colgroup>
+              
               <thead>
               <tr>
                 <th>Date</th>
@@ -120,7 +120,7 @@ export default function TransactionListRepeat() {
                 <th>Location</th>
                 <th>Amount</th>
                 <th>Notes</th>
-                <th>Bank</th>
+                <th>Account</th>
               </tr>
               </thead>
               
@@ -132,10 +132,7 @@ export default function TransactionListRepeat() {
                     <td colSpan={7}>
                       <div className={styles.inline} style={{ justifyContent: "space-between", width: "100%" }}>
                         <div>
-                          Group: {group.id}{" "}
-                          <span className={styles.badge}>
-                              {group.transactions.length} tx
-                            </span>
+                          Group id: {group.id} ({group.transactions.length} transactions)
                         </div>
                         
                         <div className={styles.inline}>
@@ -168,7 +165,7 @@ export default function TransactionListRepeat() {
                         {getAmountDisplay(tx.amount)}
                       </td>
                       <td>{tx.notes}</td>
-                      <td>{tx.bankName}</td>
+                      <td>{tx.accountName}</td>
                     </tr>
                   ))}
                 </>
