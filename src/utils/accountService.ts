@@ -185,6 +185,22 @@ export const accountService = {
     return await res.json();
   },
   
+  getAccountsByBank: async (bankId: string): Promise<AccountResponseDto[]> => {
+    const res = await fetch(
+      `${BackendConfig.springApiUrl}/accounts/by-bank?bankId=${encodeURIComponent(bankId)}`,
+      {
+        headers: getHeaders(),
+      }
+    );
+    
+    if (!res.ok) {
+      const msg = await res.text();
+      throw new Error(msg || "Failed to fetch accounts by bank");
+    }
+    
+    return await res.json();
+  },
+  
   getAccountById: async (id: string): Promise<AccountResponseDto> => {
     const res = await fetch(
       `${BackendConfig.springApiUrl}/accounts/${id}`,

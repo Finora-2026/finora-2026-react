@@ -1,4 +1,12 @@
-import { useState } from "react";
+import {useEffect, useState} from "react";
+
+import { useToast } from "../../components/ToastProvider/toastContext.ts";
+import { bankService, type BankResponseDto } from "../../utils/bankService.ts";
+import { accountService, type AccountResponseDto,} from "../../utils/accountService.ts";
+import {locationService, type LocationResponseDto,} from "../../utils/locationService.ts";
+import {brandService, type BrandResponseDto,} from "../../utils/brandService.ts";
+import {transactionTypeService, type TransactionTypeDto,} from "../../utils/transactionTypeService.ts";
+
 import styles from "./TransactionUpdate.module.scss";
 
 type TransactionResult = {
@@ -14,6 +22,8 @@ type TransactionResult = {
 };
 
 export default function TransactionSearch() {
+  const { showToast } = useToast();
+  
   const [loading] = useState(false);
   const [searched] = useState(true);
   
@@ -31,26 +41,135 @@ export default function TransactionSearch() {
   // controls auto-fill behavior
   const [amountAutoFillEnabled, setAmountAutoFillEnabled] = useState(true);
   
-  // Mock dropdown data
-  const banks = [
-    { id: "1", name: "Chase" },
-    { id: "2", name: "Bank of America" },
-  ];
+  const [banks, setBanks] = useState<BankResponseDto[]>([]);
+  const [loadingBanks, setLoadingBanks] = useState(false);
+  const [bankError, setBankError] = useState<string | null>(null);
+  const [selectedBankId, setSelectedBankId] = useState<string>("");
   
-  const brands = [
-    { id: "1", name: "Amazon" },
-    { id: "2", name: "Walmart" },
-  ];
+  const [accounts, setAccounts] = useState<AccountResponseDto[]>([]);
+  const [loadingAccounts, setLoadingAccounts] = useState(false);
+  const [accountError, setAccountError] = useState<string | null>(null);
+  const [selectedAccountId, setSelectedAccountId] = useState("");
   
-  const locations = [
-    { id: "1", city: "Dallas", state: "TX" },
-    { id: "2", city: "Plano", state: "TX" },
-  ];
+  const [locations, setLocations] = useState<LocationResponseDto[]>([]);
+  const [loadingLocations, setLoadingLocations] = useState(false);
+  const [locationError, setLocationError] = useState<string | null>(null);
+  const [selectedLocationId, setSelectedLocationId] = useState("");
   
-  const transactionTypes = [
-    { id: "1", name: "Food" },
-    { id: "2", name: "Shopping" },
-  ];
+  const [brands, setBrands] = useState<BrandResponseDto[]>([]);
+  const [loadingBrands, setLoadingBrands] = useState(false);
+  const [brandError, setBrandError] = useState<string | null>(null);
+  const [selectedBrandId, setSelectedBrandId] = useState("");
+  
+  const [transactionTypes, setTransactionTypes] = useState<TransactionTypeDto[]>([]);
+  const [loadingTransactionTypes, setLoadingTransactionTypes] = useState(false);
+  const [transactionTypeError, setTransactionTypeError] = useState<string | null>(null);
+  const [selectedTypeId, setSelectedTypeId] = useState("");
+  
+  const [notes, setNotes] = useState("");
+  
+  // Fetch banks from BE
+  useEffect(() => {
+    const loadBanks = async () => {
+      setLoadingBanks(true);
+      setBankError(null);
+      
+      try {
+        const data = await bankService.getAllBanks();
+        setBanks(data);
+      } catch (err) {
+        console.error("Failed to load banks", err);
+        setBanks([]);
+        setBankError("Failed to load banks");
+        showToast("Failed to load banks", "error");
+      } finally {
+        setLoadingBanks(false);
+      }
+    };
+    loadBanks();
+  }, [showToast]);
+  
+  // Fetch accounts from BE
+  useEffect(() => {
+    const loadAccounts = async () => {
+      setLoadingAccounts(true);
+      setAccountError(null);
+      try {
+        const data = selectedBankId
+          ? await accountService.getAccountsByBank(selectedBankId)
+          : await accountService.getAllAccounts();
+        setAccounts(data);
+      } catch (err) {
+        console.error("Failed to load accounts", err);
+        setAccounts([]);
+        setAccountError("Failed to load accounts");
+        showToast("Failed to load accounts", "error");
+      } finally {
+        setLoadingAccounts(false);
+      }
+    };
+    loadAccounts();
+  }, [selectedBankId, showToast]);
+  
+  // Fetch location from BE
+  useEffect(() => {
+    const loadLocations = async () => {
+      setLoadingLocations(true);
+      setLocationError(null);
+      try {
+        const data = await locationService.getAllLocations();
+        setLocations(data);
+      } catch (err) {
+        console.error("Failed to load locations", err);
+        setLocations([]);
+        setLocationError("Failed to load locations");
+        showToast("Failed to load locations", "error");
+      } finally {
+        setLoadingLocations(false);
+      }
+    };
+    loadLocations();
+  }, [showToast]);
+  
+  // Load brands from BE
+  useEffect(() => {
+    const loadBrands = async () => {
+      setLoadingBrands(true);
+      setBrandError(null);
+      try {
+        const data = await brandService.getAllBrands();
+        setBrands(data);
+      } catch (err) {
+        console.error("Failed to load brands", err);
+        setBrands([]);
+        setBrandError("Failed to load brands");
+        showToast("Failed to load brands", "error");
+      } finally {
+        setLoadingBrands(false);
+      }
+    };
+    loadBrands();
+  }, [showToast]);
+  
+  // Load transaction types from BE
+  useEffect(() => {
+    const loadTransactionTypes = async () => {
+      setLoadingTransactionTypes(true);
+      setTransactionTypeError(null);
+      try {
+        const data = await transactionTypeService.getAllTransactionTypes();
+        setTransactionTypes(data);
+      } catch (err) {
+        console.error("Failed to load transaction types", err);
+        setTransactionTypes([]);
+        setTransactionTypeError("Failed to load transaction types");
+        showToast("Failed to load transaction types", "error");
+      } finally {
+        setLoadingTransactionTypes(false);
+      }
+    };
+    loadTransactionTypes();
+  }, [showToast]);
   
   // Mock results
   const results: TransactionResult[] = [
@@ -91,6 +210,15 @@ export default function TransactionSearch() {
     setMinAmount("");
     setMaxAmount("");
     setAmountAutoFillEnabled(true);
+    
+    setSelectedBankId("");
+    setSelectedAccountId("");
+    
+    setSelectedBrandId("");
+    setSelectedLocationId("");
+    setSelectedTypeId("");
+    
+    setNotes("");
   };
   
   const openTransactionGroup = (groupId: string) => {
@@ -169,70 +297,137 @@ export default function TransactionSearch() {
             <div className={styles.searchField}>
               <label className={styles.label}>Bank</label>
               
-              <select className={styles.select}>
-                <option value="">-- Select Bank --</option>
+              <select
+                className={styles.select}
+                value={selectedBankId}
+                onChange={(e) => {
+                  setSelectedBankId(e.target.value);
+                  setSelectedAccountId("");
+                }}
+                disabled={loadingBanks || !!bankError}
+              >
+                <option value="">
+                  {loadingBanks
+                    ? "Loading banks..."
+                    : bankError
+                      ? "Unable to load banks"
+                      : "-- Select Bank --"}
+                </option>
                 
-                {banks.map((bank) => (
-                  <option key={bank.id} value={bank.id}>
-                    {bank.name}
-                  </option>
-                ))}
+                {!loadingBanks &&
+                  !bankError &&
+                  banks.map((bank) => (
+                    <option key={bank.id} value={bank.id}>
+                      {bank.name}
+                    </option>
+                  ))}
               </select>
             </div>
             
             <div className={styles.searchField}>
               <label className={styles.label}>Account</label>
               
-              <select className={styles.select}>
-                <option value="">-- Select Account --</option>
+              <select
+                className={styles.select}
+                value={selectedAccountId}
+                onChange={(e) => setSelectedAccountId(e.target.value)}
+                disabled={loadingAccounts || !!accountError}
+              >
+                <option value="">
+                  {loadingAccounts
+                    ? "Loading accounts..."
+                    : accountError
+                      ? "Unable to load accounts"
+                      : "-- Select Account --"}
+                </option>
                 
-                {banks.map((bank) => (
-                  <option key={bank.id} value={bank.id}>
-                    {bank.name}
-                  </option>
-                ))}
+                {!loadingAccounts &&
+                  !accountError &&
+                  accounts.map((acc) => (
+                    <option key={acc.id} value={acc.id}>
+                      {acc.name}
+                    </option>
+                  ))}
               </select>
             </div>
             
             <div className={styles.searchField}>
               <label className={styles.label}>Brand</label>
-              
-              <select className={styles.select}>
-                <option value="">-- Select Brand --</option>
+              <select
+                className={styles.select}
+                value={selectedBrandId}
+                onChange={(e) => setSelectedBrandId(e.target.value)}
+                disabled={loadingBrands || !!brandError}
+              >
+                <option value="">
+                  {loadingBrands
+                    ? "Loading brands..."
+                    : brandError
+                      ? "Unable to load brands"
+                      : "-- Select Brand --"}
+                </option>
                 
-                {brands.map((brand) => (
-                  <option key={brand.id} value={brand.id}>
-                    {brand.name}
-                  </option>
-                ))}
+                {!loadingBrands &&
+                  !brandError &&
+                  brands.map((brand) => (
+                    <option key={brand.id} value={brand.id}>
+                      {brand.name}
+                    </option>
+                  ))}
               </select>
             </div>
             
             <div className={styles.searchField}>
               <label className={styles.label}>Location</label>
               
-              <select className={styles.select}>
-                <option value="">-- Select Location --</option>
+              <select
+                className={styles.select}
+                value={selectedLocationId}
+                onChange={(e) => setSelectedLocationId(e.target.value)}
+                disabled={loadingLocations || !!locationError}
+              >
+                <option value="">
+                  {loadingLocations
+                    ? "Loading locations..."
+                    : locationError
+                      ? "Unable to load locations"
+                      : "-- Select Location --"}
+                </option>
                 
-                {locations.map((location) => (
-                  <option key={location.id} value={location.id}>
-                    {location.city}, {location.state}
-                  </option>
-                ))}
+                {!loadingLocations &&
+                  !locationError &&
+                  locations.map((location) => (
+                    <option key={location.id} value={location.id}>
+                      {location.city}, {location.state}
+                    </option>
+                  ))}
               </select>
             </div>
             
             <div className={styles.searchField}>
               <label className={styles.label}>Type</label>
               
-              <select className={styles.select}>
-                <option value="">-- Select Type --</option>
+              <select
+                className={styles.select}
+                value={selectedTypeId}
+                onChange={(e) => setSelectedTypeId(e.target.value)}
+                disabled={loadingTransactionTypes || !!transactionTypeError}
+              >
+                <option value="">
+                  {loadingTransactionTypes
+                    ? "Loading types..."
+                    : transactionTypeError
+                      ? "Unable to load types"
+                      : "-- Select Type --"}
+                </option>
                 
-                {transactionTypes.map((type) => (
-                  <option key={type.id} value={type.id}>
-                    {type.name}
-                  </option>
-                ))}
+                {!loadingTransactionTypes &&
+                  !transactionTypeError &&
+                  transactionTypes.map((type) => (
+                    <option key={type.id} value={type.id}>
+                      {type.name}
+                    </option>
+                  ))}
               </select>
             </div>
             
@@ -242,6 +437,8 @@ export default function TransactionSearch() {
               <input
                 className={styles.input}
                 type="text"
+                value={notes}
+                onChange={(e) => setNotes(e.target.value)}
                 placeholder="Search notes..."
               />
             </div>
