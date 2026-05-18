@@ -16,6 +16,7 @@ export default function TransactionRoutes() {
       <Route path="search" element={<TransactionSearch />} />
       <Route path="add" element={<TransactionUpdate />} />
       <Route path="update/:groupId" element={<TransactionUpdate />} />
+      <Route path="repeat/:groupId" element={<TransactionUpdate />} />
       <Route path="details/:groupId" element={<TransactionDetails />} />
       <Route path="*" element={<NotFound />} />
     </Routes>
