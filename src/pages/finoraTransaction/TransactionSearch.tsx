@@ -4,6 +4,7 @@ import { useToast } from "../../components/ToastProvider/toastContext.ts";
 import { bankService, type BankResponseDto } from "../../utils/bankService.ts";
 import { accountService, type AccountResponseDto,} from "../../utils/accountService.ts";
 import {locationService, type LocationResponseDto,} from "../../utils/locationService.ts";
+import {brandService, type BrandResponseDto,} from "../../utils/brandService.ts";
 
 import styles from "./TransactionUpdate.module.scss";
 
@@ -50,6 +51,10 @@ export default function TransactionSearch() {
   const [locations, setLocations] = useState<LocationResponseDto[]>([]);
   const [loadingLocations, setLoadingLocations] = useState(true);
   const [locationError, setLocationError] = useState<string | null>(null);
+  
+  const [brands, setBrands] = useState<BrandResponseDto[]>([]);
+  const [loadingBrands, setLoadingBrands] = useState(true);
+  const [brandError, setBrandError] = useState<string | null>(null);
   
   // Fetch banks from BE
   useEffect(() => {
@@ -112,12 +117,27 @@ export default function TransactionSearch() {
     loadLocations();
   }, [showToast]);
   
-  // Mock dropdown data
-  const brands = [
-    { id: "1", name: "Amazon" },
-    { id: "2", name: "Walmart" },
-  ];
+  // Load brands from BE
+  useEffect(() => {
+    const loadBrands = async () => {
+      setLoadingBrands(true);
+      setBrandError(null);
+      try {
+        const data = await brandService.getAllBrands();
+        setBrands(data);
+      } catch (err) {
+        console.error("Failed to load brands", err);
+        setBrands([]);
+        setBrandError("Failed to load brands");
+        showToast("Failed to load brands", "error");
+      } finally {
+        setLoadingBrands(false);
+      }
+    };
+    loadBrands();
+  }, [showToast]);
   
+  // Mock dropdown data
   const transactionTypes = [
     { id: "1", name: "Food" },
     { id: "2", name: "Shopping" },
@@ -283,15 +303,22 @@ export default function TransactionSearch() {
             
             <div className={styles.searchField}>
               <label className={styles.label}>Brand</label>
-              
-              <select className={styles.select}>
-                <option value="">-- Select Brand --</option>
+              <select className={styles.select} disabled={loadingBrands || !!brandError}>
+                <option value="">
+                  {loadingBrands
+                    ? "Loading brands..."
+                    : brandError
+                      ? "Unable to load brands"
+                      : "-- Select Brand --"}
+                </option>
                 
-                {brands.map((brand) => (
-                  <option key={brand.id} value={brand.id}>
-                    {brand.name}
-                  </option>
-                ))}
+                {!loadingBrands &&
+                  !brandError &&
+                  brands.map((brand) => (
+                    <option key={brand.id} value={brand.id}>
+                      {brand.name}
+                    </option>
+                  ))}
               </select>
             </div>
             
