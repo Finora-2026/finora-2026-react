@@ -2,6 +2,7 @@ import {useEffect, useState} from "react";
 
 import { useToast } from "../../components/ToastProvider/toastContext.ts";
 import { bankService, type BankResponseDto } from "../../utils/bankService.ts";
+import { accountService, type AccountResponseDto,} from "../../utils/accountService.ts";
 
 import styles from "./TransactionUpdate.module.scss";
 
@@ -41,6 +42,10 @@ export default function TransactionSearch() {
   const [loadingBanks, setLoadingBanks] = useState(true);
   const [bankError, setBankError] = useState<string | null>(null);
   
+  const [accounts, setAccounts] = useState<AccountResponseDto[]>([]);
+  const [loadingAccounts, setLoadingAccounts] = useState(true);
+  const [accountError, setAccountError] = useState<string | null>(null);
+  
   // Fetch banks from BE
   useEffect(() => {
     const loadBanks = async () => {
@@ -60,6 +65,26 @@ export default function TransactionSearch() {
       }
     };
     loadBanks();
+  }, [showToast]);
+  
+  // Fetch accounts from BE
+  useEffect(() => {
+    const loadAccounts = async () => {
+      setLoadingAccounts(true);
+      setAccountError(null);
+      try {
+        const data = await accountService.getActiveAccounts();
+        setAccounts(data);
+      } catch (err) {
+        console.error("Failed to load accounts", err);
+        setAccounts([]);
+        setAccountError("Failed to load accounts");
+        showToast("Failed to load accounts", "error");
+      } finally {
+        setLoadingAccounts(false);
+      }
+    };
+    loadAccounts();
   }, [showToast]);
   
   // Mock dropdown data
@@ -217,14 +242,22 @@ export default function TransactionSearch() {
             <div className={styles.searchField}>
               <label className={styles.label}>Account</label>
               
-              <select className={styles.select}>
-                <option value="">-- Select Account --</option>
+              <select className={styles.select} disabled={loadingAccounts || !!accountError}>
+                <option value="">
+                  {loadingAccounts
+                    ? "Loading accounts..."
+                    : accountError
+                      ? "Unable to load accounts"
+                      : "-- Select Account --"}
+                </option>
                 
-                {banks.map((bank) => (
-                  <option key={bank.id} value={bank.id}>
-                    {bank.name}
-                  </option>
-                ))}
+                {!loadingAccounts &&
+                  !accountError &&
+                  accounts.map((acc) => (
+                    <option key={acc.id} value={acc.id}>
+                      {acc.name}
+                    </option>
+                  ))}
               </select>
             </div>
             
