@@ -1,4 +1,4 @@
-import {useEffect, useMemo, useState} from "react";
+import {useCallback, useEffect, useMemo, useState} from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import {
   transactionGroupService,
@@ -57,59 +57,66 @@ export default function TransactionDetails() {
   const reportId = group?.reportId;
   const isLockedByReport = !!group?.reportId;
   
+  // Function to load the current group from BE
+  const loadGroup = useCallback(async (groupId: string) => {
+    try {
+      setLoading(true);
+      setError(null);
+      
+      const [groupData, brandsData, locationsData, transactionTypesData, accountsData] =
+        await Promise.all([
+          transactionGroupService.getTransactionGroupById(groupId),
+          brandService.getAllBrands(),
+          locationService.getAllLocations(),
+          transactionTypeService.getAllTransactionTypes(),
+          accountService.getAllAccounts(),
+        ]);
+      
+      setGroup(groupData);
+      setBrands(brandsData);
+      setLocations(locationsData);
+      setTransactionTypes(transactionTypesData);
+      setAccounts(accountsData);
+      
+      setTransactions(
+        groupData.transactions.map((t) => ({
+          id: t.id,
+          date: t.transactionDate.split("T")[0],
+          typeId: t.transactionTypeId ?? "",
+          brandId: t.brandId ?? "",
+          locationId: t.locationId ?? "",
+          amount: t.amount,
+          notes: t.notes ?? "",
+          accountId: t.accountId,
+          posted: t.posted,
+        }))
+      );
+    } catch (error: unknown) {
+      console.error(error);
+      
+      const message =
+        error instanceof Error
+          ? error.message
+          : "Failed to load transaction group";
+      
+      setError(message);
+      setGroup(null);
+      setTransactions([]);
+      
+      showToast("Failed to load transaction group", "error");
+    } finally {
+      setLoading(false);
+    }
+  }, [showToast]);
+  
   // Load all data
   useEffect(() => {
     if (!groupId) return;
-    
-    const loadGroup = async () => {
-      try {
-        setLoading(true);
-        setError(null);
-        
-        const [groupData, brandsData, locationsData, transactionTypesData, accountsData] =
-          await Promise.all([
-            transactionGroupService.getTransactionGroupById(groupId),
-            brandService.getAllBrands(),
-            locationService.getAllLocations(),
-            transactionTypeService.getAllTransactionTypes(),
-            accountService.getAllAccounts(),
-          ]);
-        
-        setGroup(groupData);
-        setBrands(brandsData);
-        setLocations(locationsData);
-        setTransactionTypes(transactionTypesData);
-        setAccounts(accountsData);
-        
-        setTransactions(
-          groupData.transactions.map((t) => ({
-            id: t.id,
-            date: t.transactionDate.split("T")[0],
-            typeId: t.transactionTypeId ?? "",
-            brandId: t.brandId ?? "",
-            locationId: t.locationId ?? "",
-            amount: t.amount,
-            notes: t.notes ?? "",
-            accountId: t.accountId,
-            posted: t.posted,
-          }))
-        );
-      } catch (error: unknown) {
-        console.error(error);
-        const message =
-          error instanceof Error
-            ? error.message
-            : "Failed to load transaction group";
-        setError(message);
-        setGroup(null);
-        setTransactions([]);
-        showToast("Failed to load transaction group", "error");
-      } finally {
-        setLoading(false);
-      }
+    const run = async () => {
+      await loadGroup(groupId);
     };
-    loadGroup();
-  }, [groupId, showToast]);
+    run();
+  }, [groupId, loadGroup]);
   
   const brandMap = useMemo(
     () => Object.fromEntries(brands.map(b => [b.id, b.name])),
@@ -138,8 +145,19 @@ export default function TransactionDetails() {
     return amount >= 0 ? "text-success" : "text-danger";
   };
   
-  const markAsRepeat = (id: string) => {
-    showToast(`Mocking mark as repeat this group ${id}`);
+  const markAsRepeat = async (id: string) => {
+    try {
+      await transactionGroupService.setTransactionGroupRepeatable(id, true);
+      showToast("Marked as repeatable. Refreshing...", "success");
+      await loadGroup(id);
+    } catch (error: unknown) {
+      console.error(error);
+      const message =
+        error instanceof Error
+          ? error.message
+          : "Failed to mark transaction group as repeatable";
+      showToast(message, "error");
+    }
   };
   
   const repeatThisGroup = (id: string | undefined) => {
