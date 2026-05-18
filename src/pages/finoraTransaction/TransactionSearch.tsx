@@ -42,23 +42,25 @@ export default function TransactionSearch() {
   const [amountAutoFillEnabled, setAmountAutoFillEnabled] = useState(true);
   
   const [banks, setBanks] = useState<BankResponseDto[]>([]);
-  const [loadingBanks, setLoadingBanks] = useState(true);
+  const [loadingBanks, setLoadingBanks] = useState(false);
   const [bankError, setBankError] = useState<string | null>(null);
+  const [selectedBankId, setSelectedBankId] = useState<string>("");
   
   const [accounts, setAccounts] = useState<AccountResponseDto[]>([]);
-  const [loadingAccounts, setLoadingAccounts] = useState(true);
+  const [loadingAccounts, setLoadingAccounts] = useState(false);
   const [accountError, setAccountError] = useState<string | null>(null);
+  const [selectedAccountId, setSelectedAccountId] = useState("");
   
   const [locations, setLocations] = useState<LocationResponseDto[]>([]);
-  const [loadingLocations, setLoadingLocations] = useState(true);
+  const [loadingLocations, setLoadingLocations] = useState(false);
   const [locationError, setLocationError] = useState<string | null>(null);
   
   const [brands, setBrands] = useState<BrandResponseDto[]>([]);
-  const [loadingBrands, setLoadingBrands] = useState(true);
+  const [loadingBrands, setLoadingBrands] = useState(false);
   const [brandError, setBrandError] = useState<string | null>(null);
   
   const [transactionTypes, setTransactionTypes] = useState<TransactionTypeDto[]>([]);
-  const [loadingTransactionTypes, setLoadingTransactionTypes] = useState(true);
+  const [loadingTransactionTypes, setLoadingTransactionTypes] = useState(false);
   const [transactionTypeError, setTransactionTypeError] = useState<string | null>(null);
   
   // Fetch banks from BE
@@ -88,7 +90,9 @@ export default function TransactionSearch() {
       setLoadingAccounts(true);
       setAccountError(null);
       try {
-        const data = await accountService.getActiveAccounts();
+        const data = selectedBankId
+          ? await accountService.getAccountsByBank(selectedBankId)
+          : await accountService.getAllAccounts();
         setAccounts(data);
       } catch (err) {
         console.error("Failed to load accounts", err);
@@ -100,7 +104,7 @@ export default function TransactionSearch() {
       }
     };
     loadAccounts();
-  }, [showToast]);
+  }, [selectedBankId, showToast]);
   
   // Fetch location from BE
   useEffect(() => {
@@ -279,7 +283,15 @@ export default function TransactionSearch() {
             <div className={styles.searchField}>
               <label className={styles.label}>Bank</label>
               
-              <select className={styles.select} disabled={loadingBanks || !!bankError}>
+              <select
+                className={styles.select}
+                value={selectedBankId}
+                onChange={(e) => {
+                  setSelectedBankId(e.target.value);
+                  setSelectedAccountId("");
+                }}
+                disabled={loadingBanks || !!bankError}
+              >
                 <option value="">
                   {loadingBanks
                     ? "Loading banks..."
@@ -301,7 +313,12 @@ export default function TransactionSearch() {
             <div className={styles.searchField}>
               <label className={styles.label}>Account</label>
               
-              <select className={styles.select} disabled={loadingAccounts || !!accountError}>
+              <select
+                className={styles.select}
+                value={selectedAccountId}
+                onChange={(e) => setSelectedAccountId(e.target.value)}
+                disabled={loadingAccounts || !!accountError}
+              >
                 <option value="">
                   {loadingAccounts
                     ? "Loading accounts..."
