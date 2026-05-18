@@ -29,6 +29,10 @@ export default function AccountUpdate() {
   const [loadingAccount, setLoadingAccount] = useState(isEditMode);
   const [isClosedAccount, setIsClosedAccount] = useState(false);
   
+  const [checkingCloseDate, setCheckingCloseDate] = useState(false);
+  const [closeDateValid, setCloseDateValid] = useState<boolean | null>(null);
+  const [closeDateError, setCloseDateError] = useState<string | null>(null);
+  
   const [banks, setBanks] = useState<BankResponseDto[]>([]);
   const [loadingBanks, setLoadingBanks] = useState(true);
   const [bankError, setBankError] = useState<string | null>(null);
@@ -171,6 +175,44 @@ export default function AccountUpdate() {
     return () => clearTimeout(timeoutId);
   }, [trimmedName, isOriginalName]);
   
+  // Soft check if user can close account
+  const trimmedCloseDate = form.closingDate?.trim();
+  useEffect(() => {
+    if (!isEditMode) return;
+    if (!accountId) return;
+    
+    if (!trimmedCloseDate) {
+      return;
+    }
+    
+    const timeoutId = setTimeout(async () => {
+      setCheckingCloseDate(true);
+      
+      try {
+        const res = await accountService.validateAccountCanBeClosed(
+          accountId,
+          trimmedCloseDate
+        );
+        
+        setCloseDateValid(res.valid);
+        
+        if (!res.valid) {
+          setCloseDateError("Account cannot be closed, invalid date input");
+        } else {
+          setCloseDateError(null);
+        }
+      } catch (err) {
+        console.error(err);
+        setCloseDateValid(null);
+        setCloseDateError("Unable to validate closing date");
+      } finally {
+        setCheckingCloseDate(false);
+      }
+    }, 500);
+    
+    return () => clearTimeout(timeoutId);
+  }, [trimmedCloseDate, isEditMode, accountId]);
+  
   const renderTitle = () => {
     return isEditMode ? `Update account: ${accountId}` : "Add Account";
   };
@@ -191,6 +233,11 @@ export default function AccountUpdate() {
     if (id === "accountName") {
       setNameAvailable(null);
       setNameError(null);
+    }
+    
+    if (id === "closingDate") {
+      setCloseDateValid(null);
+      setCloseDateError(null);
     }
     
     setForm((prev) => ({
@@ -222,6 +269,11 @@ export default function AccountUpdate() {
     
     if (isClosedAccount) {
       showToast("Finalized accounts cannot be updated", "error");
+      return;
+    }
+    
+    if (closeDateValid === false) {
+      showToast("Account cannot be closed due to validation rules", "error");
       return;
     }
     
@@ -384,10 +436,34 @@ export default function AccountUpdate() {
               type="date"
               // Enabled closing date selection during edit mode
               disabled={submitting || !isEditMode}
-              className={styles.input}
+              className={`${styles.input} ${
+                closeDateValid === false
+                  ? styles.inputError
+                  : closeDateValid === true
+                    ? styles.inputSuccess
+                    : ""
+              }`}
               value={form.closingDate}
               onChange={handleChange}
             />
+            
+            {checkingCloseDate && (
+              <small className={styles.checkingText}>
+                Checking closing validation...
+              </small>
+            )}
+            
+            {!checkingCloseDate && closeDateValid === true && (
+              <small className={styles.successText}>
+                Account can be safely closed
+              </small>
+            )}
+            
+            {!checkingCloseDate && closeDateError && (
+              <small className={styles.errorText}>
+                {closeDateError}
+              </small>
+            )}
           </div>
           
           {/* Account Type */}
