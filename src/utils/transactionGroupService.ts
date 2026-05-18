@@ -6,7 +6,6 @@ import { authService } from "./authService";
 /* =========================
    DTOs
 ========================= */
-
 export type TransactionGroupResponseDto = {
   id: string;
   reportId?: string | null;
@@ -55,10 +54,8 @@ export type AvailableReportGroupsResponse = {
 /* =========================
    Helpers
 ========================= */
-
 const getHeaders = () => {
   const token = authService.getToken();
-  
   return {
     "Content-Type": "application/json",
     Authorization: `Bearer ${token}`,
@@ -68,7 +65,6 @@ const getHeaders = () => {
 /* =========================
    Service
 ========================= */
-
 export const transactionGroupService = {
   // CREATE
   createTransactionGroup: async (
@@ -82,12 +78,10 @@ export const transactionGroupService = {
         body: JSON.stringify(payload),
       }
     );
-    
     if (!res.ok) {
       const msg = await res.text();
       throw new Error(msg || "Failed to create transaction group");
     }
-    
     return await res.json();
   },
   
@@ -103,12 +97,29 @@ export const transactionGroupService = {
         body: JSON.stringify(payload),
       }
     );
-    
     if (!res.ok) {
       const msg = await res.text();
       throw new Error(msg || "Failed to update transaction group");
     }
-    
+    return await res.json();
+  },
+  
+  // UPDATE: Repeatable
+  setTransactionGroupRepeatable: async (
+    groupId: string,
+    repeatable: boolean
+  ): Promise<{ success: boolean; message: string }> => {
+    const res = await fetch(
+      `${BackendConfig.springApiUrl}/transaction-groups/${groupId}/repeatable?repeatable=${repeatable}`,
+      {
+        method: "PUT",
+        headers: getHeaders(),
+      }
+    );
+    if (!res.ok) {
+      const msg = await res.text();
+      throw new Error(msg || "Failed to update repeatable flag");
+    }
     return await res.json();
   },
   
@@ -123,12 +134,10 @@ export const transactionGroupService = {
         headers: getHeaders(),
       }
     );
-    
     if (!res.ok) {
       const msg = await res.text();
       throw new Error(msg || "Failed to fetch transaction group");
     }
-    
     return await res.json();
   },
   
@@ -141,18 +150,14 @@ export const transactionGroupService = {
         headers: getHeaders(),
       }
     );
-    
     if (!res.ok) {
       const msg = await res.text();
       throw new Error(msg || "Failed to fetch available report groups");
     }
-    
     const json: AvailableReportGroupsResponse = await res.json();
-    
     if (!json.success) {
       throw new Error("Request failed (success=false)");
     }
-    
     return json.data;
   },
 };
