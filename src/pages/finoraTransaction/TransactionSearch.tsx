@@ -5,6 +5,7 @@ import { bankService, type BankResponseDto } from "../../utils/bankService.ts";
 import { accountService, type AccountResponseDto,} from "../../utils/accountService.ts";
 import {locationService, type LocationResponseDto,} from "../../utils/locationService.ts";
 import {brandService, type BrandResponseDto,} from "../../utils/brandService.ts";
+import {transactionTypeService, type TransactionTypeDto,} from "../../utils/transactionTypeService.ts";
 
 import styles from "./TransactionUpdate.module.scss";
 
@@ -55,6 +56,10 @@ export default function TransactionSearch() {
   const [brands, setBrands] = useState<BrandResponseDto[]>([]);
   const [loadingBrands, setLoadingBrands] = useState(true);
   const [brandError, setBrandError] = useState<string | null>(null);
+  
+  const [transactionTypes, setTransactionTypes] = useState<TransactionTypeDto[]>([]);
+  const [loadingTransactionTypes, setLoadingTransactionTypes] = useState(true);
+  const [transactionTypeError, setTransactionTypeError] = useState<string | null>(null);
   
   // Fetch banks from BE
   useEffect(() => {
@@ -137,11 +142,25 @@ export default function TransactionSearch() {
     loadBrands();
   }, [showToast]);
   
-  // Mock dropdown data
-  const transactionTypes = [
-    { id: "1", name: "Food" },
-    { id: "2", name: "Shopping" },
-  ];
+  // Load transaction types from BE
+  useEffect(() => {
+    const loadTransactionTypes = async () => {
+      setLoadingTransactionTypes(true);
+      setTransactionTypeError(null);
+      try {
+        const data = await transactionTypeService.getAllTransactionTypes();
+        setTransactionTypes(data);
+      } catch (err) {
+        console.error("Failed to load transaction types", err);
+        setTransactionTypes([]);
+        setTransactionTypeError("Failed to load transaction types");
+        showToast("Failed to load transaction types", "error");
+      } finally {
+        setLoadingTransactionTypes(false);
+      }
+    };
+    loadTransactionTypes();
+  }, [showToast]);
   
   // Mock results
   const results: TransactionResult[] = [
@@ -350,14 +369,25 @@ export default function TransactionSearch() {
             <div className={styles.searchField}>
               <label className={styles.label}>Type</label>
               
-              <select className={styles.select}>
-                <option value="">-- Select Type --</option>
+              <select
+                className={styles.select}
+                disabled={loadingTransactionTypes || !!transactionTypeError}
+              >
+                <option value="">
+                  {loadingTransactionTypes
+                    ? "Loading types..."
+                    : transactionTypeError
+                      ? "Unable to load types"
+                      : "-- Select Type --"}
+                </option>
                 
-                {transactionTypes.map((type) => (
-                  <option key={type.id} value={type.id}>
-                    {type.name}
-                  </option>
-                ))}
+                {!loadingTransactionTypes &&
+                  !transactionTypeError &&
+                  transactionTypes.map((type) => (
+                    <option key={type.id} value={type.id}>
+                      {type.name}
+                    </option>
+                  ))}
               </select>
             </div>
             
