@@ -54,14 +54,19 @@ export default function TransactionSearch() {
   const [locations, setLocations] = useState<LocationResponseDto[]>([]);
   const [loadingLocations, setLoadingLocations] = useState(false);
   const [locationError, setLocationError] = useState<string | null>(null);
+  const [selectedLocationId, setSelectedLocationId] = useState("");
   
   const [brands, setBrands] = useState<BrandResponseDto[]>([]);
   const [loadingBrands, setLoadingBrands] = useState(false);
   const [brandError, setBrandError] = useState<string | null>(null);
+  const [selectedBrandId, setSelectedBrandId] = useState("");
   
   const [transactionTypes, setTransactionTypes] = useState<TransactionTypeDto[]>([]);
   const [loadingTransactionTypes, setLoadingTransactionTypes] = useState(false);
   const [transactionTypeError, setTransactionTypeError] = useState<string | null>(null);
+  const [selectedTypeId, setSelectedTypeId] = useState("");
+  
+  const [notes, setNotes] = useState("");
   
   // Fetch banks from BE
   useEffect(() => {
@@ -205,6 +210,15 @@ export default function TransactionSearch() {
     setMinAmount("");
     setMaxAmount("");
     setAmountAutoFillEnabled(true);
+    
+    setSelectedBankId("");
+    setSelectedAccountId("");
+    
+    setSelectedBrandId("");
+    setSelectedLocationId("");
+    setSelectedTypeId("");
+    
+    setNotes("");
   };
   
   const openTransactionGroup = (groupId: string) => {
@@ -339,7 +353,12 @@ export default function TransactionSearch() {
             
             <div className={styles.searchField}>
               <label className={styles.label}>Brand</label>
-              <select className={styles.select} disabled={loadingBrands || !!brandError}>
+              <select
+                className={styles.select}
+                value={selectedBrandId}
+                onChange={(e) => setSelectedBrandId(e.target.value)}
+                disabled={loadingBrands || !!brandError}
+              >
                 <option value="">
                   {loadingBrands
                     ? "Loading brands..."
@@ -363,6 +382,8 @@ export default function TransactionSearch() {
               
               <select
                 className={styles.select}
+                value={selectedLocationId}
+                onChange={(e) => setSelectedLocationId(e.target.value)}
                 disabled={loadingLocations || !!locationError}
               >
                 <option value="">
@@ -388,6 +409,8 @@ export default function TransactionSearch() {
               
               <select
                 className={styles.select}
+                value={selectedTypeId}
+                onChange={(e) => setSelectedTypeId(e.target.value)}
                 disabled={loadingTransactionTypes || !!transactionTypeError}
               >
                 <option value="">
@@ -414,6 +437,8 @@ export default function TransactionSearch() {
               <input
                 className={styles.input}
                 type="text"
+                value={notes}
+                onChange={(e) => setNotes(e.target.value)}
                 placeholder="Search notes..."
               />
             </div>
