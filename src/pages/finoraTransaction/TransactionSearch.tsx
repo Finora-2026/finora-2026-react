@@ -17,6 +17,15 @@ export default function TransactionSearch() {
   const [loading] = useState(false);
   const [searched] = useState(true);
   
+  const getToday = () => new Date().toISOString().split("T")[0];
+  const get30DaysAgo = () => {
+    const d = new Date();
+    d.setDate(d.getDate() - 30);
+    return d.toISOString().split("T")[0];
+  };
+  const [startDate, setStartDate] = useState<string>(get30DaysAgo());
+  const [endDate, setEndDate] = useState<string>(getToday());
+  
   // Mock dropdown data
   const banks = [
     { id: "1", name: "Chase" },
@@ -91,12 +100,22 @@ export default function TransactionSearch() {
             
             <div className={styles.searchField}>
               <label className={styles.label}>Start Date</label>
-              <input className={styles.input} type="date" />
+              <input
+                className={styles.input}
+                type="date"
+                value={startDate}
+                onChange={(e) => setStartDate(e.target.value)}
+              />
             </div>
             
             <div className={styles.searchField}>
               <label className={styles.label}>End Date</label>
-              <input className={styles.input} type="date" />
+              <input
+                className={styles.input}
+                type="date"
+                value={endDate}
+                onChange={(e) => setEndDate(e.target.value)}
+              />
             </div>
             
             <div className={styles.searchField}>
