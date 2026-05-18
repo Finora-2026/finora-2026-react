@@ -288,3 +288,148 @@
     height: 45px; /* Makes it easier to tap with a thumb */
   }
 }
+
+/* =========================
+   SEARCH FORM
+========================= */
+
+.searchForm {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.searchGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 18px;
+}
+
+.searchField {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.searchFieldFull {
+  grid-column: 1 / -1;
+}
+
+.label {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text);
+}
+
+.helpText {
+  font-size: 11px;
+  color: var(--text-muted, #888);
+  margin-top: -2px;
+}
+
+.input,
+.select {
+  width: 100%;
+  height: 44px;
+
+  padding: 0 14px;
+
+  border-radius: 12px;
+  border: 1px solid var(--border);
+
+  background: var(--bg);
+  color: var(--text);
+
+  font-size: 14px;
+
+  transition:
+          border-color 0.15s ease,
+          box-shadow 0.15s ease,
+          background 0.15s ease;
+
+  box-sizing: border-box;
+}
+
+.input:focus,
+.select:focus {
+  outline: none;
+  border-color: var(--accent);
+
+  box-shadow: 0 0 0 3px rgba(var(--accent-rgb, 0, 0, 0), 0.12);
+}
+
+.input::placeholder {
+  color: #999;
+}
+
+.searchActions {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.searchButton {
+  min-width: 140px;
+  height: 44px;
+
+  border: none;
+  border-radius: 12px;
+
+  font-size: 14px;
+  font-weight: 600;
+
+  cursor: pointer;
+
+  transition:
+          transform 0.1s ease,
+          filter 0.15s ease;
+}
+
+.searchButton:hover {
+  filter: brightness(1.03);
+}
+
+.searchButton:active {
+  transform: scale(0.98);
+}
+
+/* Mobile */
+@media (max-width: 600px) {
+  .searchGrid {
+    grid-template-columns: 1fr;
+    gap: 14px;
+  }
+
+  .searchActions {
+    flex-direction: column;
+  }
+
+  .searchButton {
+    width: 100%;
+  }
+}
+
+/* =========================
+   RESULTS SECTION
+========================= */
+
+.resultsSection {
+  margin-top: 36px;
+}
+
+.resultsHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+
+  margin-bottom: 16px;
+}
+
+.resultsTitle {
+  margin: 0;
+
+  font-size: 22px;
+  font-weight: 700;
+
+  color: var(--text);
+}
