@@ -1,4 +1,8 @@
-import { useState } from "react";
+import {useEffect, useState} from "react";
+
+import { useToast } from "../../components/ToastProvider/toastContext.ts";
+import { bankService, type BankResponseDto } from "../../utils/bankService.ts";
+
 import styles from "./TransactionUpdate.module.scss";
 
 type TransactionResult = {
@@ -14,6 +18,8 @@ type TransactionResult = {
 };
 
 export default function TransactionSearch() {
+  const { showToast } = useToast();
+  
   const [loading] = useState(false);
   const [searched] = useState(true);
   
@@ -31,12 +37,32 @@ export default function TransactionSearch() {
   // controls auto-fill behavior
   const [amountAutoFillEnabled, setAmountAutoFillEnabled] = useState(true);
   
-  // Mock dropdown data
-  const banks = [
-    { id: "1", name: "Chase" },
-    { id: "2", name: "Bank of America" },
-  ];
+  const [banks, setBanks] = useState<BankResponseDto[]>([]);
+  const [loadingBanks, setLoadingBanks] = useState(true);
+  const [bankError, setBankError] = useState<string | null>(null);
   
+  // Fetch banks from BE
+  useEffect(() => {
+    const loadBanks = async () => {
+      setLoadingBanks(true);
+      setBankError(null);
+      
+      try {
+        const data = await bankService.getAllBanks();
+        setBanks(data);
+      } catch (err) {
+        console.error("Failed to load banks", err);
+        setBanks([]);
+        setBankError("Failed to load banks");
+        showToast("Failed to load banks", "error");
+      } finally {
+        setLoadingBanks(false);
+      }
+    };
+    loadBanks();
+  }, [showToast]);
+  
+  // Mock dropdown data
   const brands = [
     { id: "1", name: "Amazon" },
     { id: "2", name: "Walmart" },
@@ -169,14 +195,22 @@ export default function TransactionSearch() {
             <div className={styles.searchField}>
               <label className={styles.label}>Bank</label>
               
-              <select className={styles.select}>
-                <option value="">-- Select Bank --</option>
+              <select className={styles.select} disabled={loadingBanks || !!bankError}>
+                <option value="">
+                  {loadingBanks
+                    ? "Loading banks..."
+                    : bankError
+                      ? "Unable to load banks"
+                      : "-- Select Bank --"}
+                </option>
                 
-                {banks.map((bank) => (
-                  <option key={bank.id} value={bank.id}>
-                    {bank.name}
-                  </option>
-                ))}
+                {!loadingBanks &&
+                  !bankError &&
+                  banks.map((bank) => (
+                    <option key={bank.id} value={bank.id}>
+                      {bank.name}
+                    </option>
+                  ))}
               </select>
             </div>
             
