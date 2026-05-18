@@ -520,7 +520,6 @@ export default function TransactionSearch() {
               <table className={styles.table}>
                 
                 <colgroup>
-                  <col style={{ width: "8%" }} />
                   <col style={{ width: "9%" }} />
                   <col style={{ width: "9%" }} />
                   <col style={{ width: "9%" }} />
@@ -532,7 +531,6 @@ export default function TransactionSearch() {
                 
                 <thead>
                 <tr>
-                  <th>ID</th>
                   <th>Date</th>
                   <th>Type</th>
                   <th>Brand</th>
@@ -557,11 +555,6 @@ export default function TransactionSearch() {
                       onClick={() => openTransactionGroup(transaction.transactionGroupId)}
                       className={styles.clickableRow}
                     >
-                      
-                      <td data-label="ID">
-                        {transaction.id}
-                      </td>
-                      
                       <td data-label="Date">
                         {new Date(transaction.transactionDate).toLocaleDateString()}
                       </td>
