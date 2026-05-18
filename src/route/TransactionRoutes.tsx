@@ -6,6 +6,7 @@ import TransactionListPending from "../pages/finoraTransaction/TransactionListPe
 import TransactionDetails from "../pages/finoraTransaction/TransactionDetails.tsx";
 import TransactionListPosted from "../pages/finoraTransaction/TransactionListPosted.tsx";
 import TransactionSearch from "../pages/finoraTransaction/TransactionSearch.tsx";
+import TransactionListRepeat from "../pages/finoraTransaction/TransactionListRepeat.tsx";
 
 export default function TransactionRoutes() {
   return (
@@ -13,6 +14,7 @@ export default function TransactionRoutes() {
       <Route index element={<Navigate to="list-pending" replace />} />
       <Route path="list-pending" element={<TransactionListPending />} />
       <Route path="list-posted" element={<TransactionListPosted />} />
+      <Route path="list-repeat" element={<TransactionListRepeat />} />
       <Route path="search" element={<TransactionSearch />} />
       <Route path="add" element={<TransactionUpdate />} />
       <Route path="update/:groupId" element={<TransactionUpdate />} />
