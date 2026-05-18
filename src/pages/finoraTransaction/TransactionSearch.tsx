@@ -224,53 +224,116 @@ export default function TransactionSearch() {
         </form>
         
         {/* RESULTS */}
-        <div>
-          <h4>Results ({results.length})</h4>
+        <div className={styles.resultsSection}>
+          
+          <div className={styles.resultsHeader}>
+            <h2 className={styles.resultsTitle}>
+              Results ({results.length})
+            </h2>
+          </div>
           
           {/* Loading State */}
-          {loading && <div>Loading transactions...</div>}
+          {loading && (
+            <div className={styles.message}>
+              Loading transactions...
+            </div>
+          )}
           
           {/* No Results */}
           {!loading && searched && results.length === 0 && (
-            <div>No transactions found.</div>
+            <div className={styles.message}>
+              No transactions found.
+            </div>
           )}
           
           {/* Results Table */}
           {!loading && results.length > 0 && (
-            <table>
-              <thead>
-              <tr>
-                <th>ID</th>
-                <th>Date</th>
-                <th>Type</th>
-                <th>Brand</th>
-                <th>Location</th>
-                <th>Amount</th>
-                <th>Notes</th>
-                <th>Bank</th>
-              </tr>
-              </thead>
-              
-              <tbody>
-              {results.map((transaction) => (
-                <tr
-                  key={transaction.id}
-                  onClick={() =>
-                    openTransactionGroup(transaction.groupId)
-                  }
-                >
-                  <td>{transaction.id}</td>
-                  <td>{transaction.date}</td>
-                  <td>{transaction.typeName}</td>
-                  <td>{transaction.brandName}</td>
-                  <td>{transaction.locationName}</td>
-                  <td>{transaction.amount}</td>
-                  <td>{transaction.notes}</td>
-                  <td>{transaction.bankName}</td>
+            <div className={styles.tableWrapper}>
+              <table className={styles.table}>
+                
+                <colgroup>
+                  <col style={{ width: "8%" }} />
+                  <col style={{ width: "9%" }} />
+                  <col style={{ width: "9%" }} />
+                  <col style={{ width: "9%" }} />
+                  <col style={{ width: "9%" }} />
+                  <col style={{ width: "9%" }} />
+                  <col style={{ width: "25%" }} />
+                  <col style={{ width: "10%" }} />
+                </colgroup>
+                
+                <thead>
+                <tr>
+                  <th>ID</th>
+                  <th>Date</th>
+                  <th>Type</th>
+                  <th>Brand</th>
+                  <th>Location</th>
+                  <th>Amount</th>
+                  <th>Notes</th>
+                  <th>Bank</th>
                 </tr>
-              ))}
-              </tbody>
-            </table>
+                </thead>
+                
+                <tbody>
+                {results.map((transaction) => {
+                  
+                  const amountClass =
+                    transaction.amount < 0
+                      ? styles.amountNegative
+                      : styles.amountPositive;
+                  
+                  return (
+                    <tr
+                      key={transaction.id}
+                      onClick={() =>
+                        openTransactionGroup(transaction.groupId)
+                      }
+                      className={styles.clickableRow}
+                    >
+                      
+                      <td data-label="ID">
+                        {transaction.id}
+                      </td>
+                      
+                      <td data-label="Date">
+                        {new Date(transaction.date).toLocaleDateString()}
+                      </td>
+                      
+                      <td data-label="Type">
+                        {transaction.typeName || "—"}
+                      </td>
+                      
+                      <td data-label="Brand">
+                        {transaction.brandName || "—"}
+                      </td>
+                      
+                      <td data-label="Location">
+                        {transaction.locationName || "—"}
+                      </td>
+                      
+                      <td
+                        data-label="Amount"
+                        className={amountClass}
+                      >
+                        {transaction.amount < 0
+                          ? `-$${Math.abs(transaction.amount).toFixed(2)}`
+                          : `$${transaction.amount.toFixed(2)}`}
+                      </td>
+                      
+                      <td data-label="Notes">
+                        {transaction.notes || "—"}
+                      </td>
+                      
+                      <td data-label="Bank">
+                        {transaction.bankName || "—"}
+                      </td>
+                    </tr>
+                  );
+                })}
+                </tbody>
+              </table>
+            </div>
           )}
         </div>
       </div>

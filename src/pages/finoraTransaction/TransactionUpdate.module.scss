@@ -408,3 +408,28 @@
     width: 100%;
   }
 }
+
+/* =========================
+   RESULTS SECTION
+========================= */
+
+.resultsSection {
+  margin-top: 36px;
+}
+
+.resultsHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+
+  margin-bottom: 16px;
+}
+
+.resultsTitle {
+  margin: 0;
+
+  font-size: 22px;
+  font-weight: 700;
+
+  color: var(--text);
+}
