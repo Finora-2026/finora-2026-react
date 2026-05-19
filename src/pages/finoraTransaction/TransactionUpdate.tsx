@@ -451,6 +451,9 @@ export default function TransactionUpdate() {
           locationId: tx.locationId || undefined,
           transactionTypeId: tx.transactionTypeId || undefined,
         })),
+        
+        repeatedFromGroupId:
+          mode === "repeat" ? groupId : undefined,
       };
       
       const updatePayload: TransactionGroupResponseDto = {
