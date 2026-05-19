@@ -152,6 +152,40 @@ export default function TransactionListRepeat() {
   const showDetails = (groupId: string) => {
     navigate(`../details/${groupId}`);
   }
+
+  const removeAllMarkers = async () => {
+    try {
+      const res = await transactionGroupService.disableAllRepeatableGroups();
+      showToast(
+        `${res.message}. Updated ${res.updatedCount} transaction groups.`,
+        "success"
+      );
+      await loadGroupsAndData();
+    } catch (error: unknown) {
+      console.error(error);
+      const message =
+        error instanceof Error
+          ? error.message
+          : "Failed to remove all repeat markers";
+      showToast(message, "error");
+    }
+  };
+
+  const repeatAll = async () => {
+    try {
+      const res = await transactionGroupService.repeatAllRepeatableGroups();
+      showToast(res.message || "Repeated all transaction groups", "success");
+      await loadGroupsAndData();
+      navigate(".."); // fallback to list/index
+    } catch (error: unknown) {
+      console.error(error);
+      const message =
+        error instanceof Error
+          ? error.message
+          : "Failed to repeat all transaction groups";
+      showToast(message, "error");
+    }
+  };
   
   return (
     <div className={styles.container}>
@@ -251,6 +285,23 @@ export default function TransactionListRepeat() {
               ))}
               </tbody>
             </table>
+          </div>
+        )}
+
+        {!loading && transactionGroups.length > 0 && (
+          <div className={styles.stackRow}>
+            <button
+              className={`${styles.button} ${styles.danger}`}
+              onClick={removeAllMarkers}
+            >
+              Remove all markers
+            </button>
+            <button
+              className={`${styles.button} ${styles.primary}`}
+              onClick={repeatAll}
+            >
+              Repeat All
+            </button>
           </div>
         )}
       </div>

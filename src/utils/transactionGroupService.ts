@@ -57,6 +57,17 @@ export type RepeatableGroupsResponse = {
   data: TransactionGroupResponseDto[];
 };
 
+export type DisableAllRepeatableGroupsResponse = {
+  success: boolean;
+  updatedCount: number;
+  message: string;
+};
+
+export type RepeatAllRepeatableGroupsResponse = {
+  success: boolean;
+  message: string;
+};
+
 /* =========================
    Helpers
 ========================= */
@@ -125,6 +136,38 @@ export const transactionGroupService = {
     if (!res.ok) {
       const msg = await res.text();
       throw new Error(msg || "Failed to update repeatable flag");
+    }
+    return await res.json();
+  },
+
+  // DISABLE ALL REPEATABLE GROUPS
+  disableAllRepeatableGroups: async (): Promise<DisableAllRepeatableGroupsResponse> => {
+    const res = await fetch(
+      `${BackendConfig.springApiUrl}/transaction-groups/repeatable/disable-all`,
+      {
+        method: "PUT",
+        headers: getHeaders(),
+      }
+    );
+    if (!res.ok) {
+      const msg = await res.text();
+      throw new Error(msg || "Failed to disable repeatable transaction groups");
+    }
+    return await res.json();
+  },
+
+  // REPEAT ALL REPEATABLE GROUPS
+  repeatAllRepeatableGroups: async (): Promise<RepeatAllRepeatableGroupsResponse> => {
+    const res = await fetch(
+      `${BackendConfig.springApiUrl}/transaction-groups/repeat-all`,
+      {
+        method: "POST",
+        headers: getHeaders(),
+      }
+    );
+    if (!res.ok) {
+      const msg = await res.text();
+      throw new Error(msg || "Failed to repeat transaction groups");
     }
     return await res.json();
   },
