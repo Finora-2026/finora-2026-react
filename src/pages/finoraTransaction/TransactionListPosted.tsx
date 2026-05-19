@@ -162,141 +162,156 @@ export default function TransactionListPosted() {
     navigate(`../../search/${command}`);
   };
   
-  // STATES
-  if (loading) {
-    return <div className={styles.message}>Loading posted transactions...</div>;
-  }
-  
-  if (error) {
-    return <div className={styles.error}>{error}</div>;
-  }
-  
-  if (!groups.length) {
-    return <div className={styles.message}>No posted transactions found.</div>;
-  }
-  
   return (
     <div className={styles.container}>
       <div className={styles.card}>
         <h1 className={styles.title}>Recent Posted Transactions</h1>
-        <div className={styles.tableWrapper}>
-          <table className={styles.table}>
-            <colgroup>
-              <col style={{ width: "11%" }} />
-              <col style={{ width: "9%" }} />
-              <col style={{ width: "10%" }} />
-              <col style={{ width: "10%" }} />
-              <col style={{ width: "10%" }} />
-              <col style={{ width: "35%" }} />
-              <col style={{ width: "15%" }} />
-            </colgroup>
-            <thead>
-            <tr>
-              <th>Date</th>
-              <th>Type</th>
-              <th>Brand</th>
-              <th>Location</th>
-              <th>Amount</th>
-              <th>Notes</th>
-              <th>Account</th>
-            </tr>
-            </thead>
-            
-            <tbody>
-            {groups.map((group) => (
-              <>
-                {/* GROUP HEADER ROW */}
-                <tr
-                  key={group.id}
-                  onClick={() => handleGroupClick(group.id)}
-                  className={styles.groupRow}
-                >
-                  <td colSpan={7}>
-                    Group id: {group.id} ({group.transactions.length} transactions) - Click for details
-                  </td>
-                </tr>
+        
+        {loading ? (
+          <div className={styles.message}>
+            Loading posted transactions...
+          </div>
+        ) : error ? (
+          <div className={styles.error}>
+            {error}
+          </div>
+        ) : !groups.length ? (
+          <div className={styles.message}>
+            No posted transactions found.
+          </div>
+        ) : (
+          <>
+            <div className={styles.tableWrapper}>
+              <table className={styles.table}>
+                <colgroup>
+                  <col style={{ width: "11%" }} />
+                  <col style={{ width: "9%" }} />
+                  <col style={{ width: "10%" }} />
+                  <col style={{ width: "10%" }} />
+                  <col style={{ width: "10%" }} />
+                  <col style={{ width: "35%" }} />
+                  <col style={{ width: "15%" }} />
+                </colgroup>
                 
-                {/* TRANSACTION ROWS */}
-                {group.transactions.map((tx) => {
-                  const amountData = getAmountDisplay(tx.amount);
-                  
-                  return (
+                <thead>
+                <tr>
+                  <th>Date</th>
+                  <th>Type</th>
+                  <th>Brand</th>
+                  <th>Location</th>
+                  <th>Amount</th>
+                  <th>Notes</th>
+                  <th>Account</th>
+                </tr>
+                </thead>
+                
+                <tbody>
+                {groups.map((group) => (
+                  <>
                     <tr
-                      key={tx.id}
-                      onClick={() => handleRowClick(group.id)}
-                      className={styles.clickableRow}
+                      key={group.id}
+                      onClick={() => handleGroupClick(group.id)}
+                      className={styles.groupRow}
                     >
-                      <td>{tx.date}</td>
-                      <td>
-                        {tx.typeId
-                          ? transactionTypeMap[tx.typeId] || tx.typeId
-                          : "—"}
-                      </td>
-                      <td>
-                        {tx.brandName
-                          ? brandMap[tx.brandName] || tx.brandName
-                          : "—"}
-                      </td>
-                      <td>
-                        {tx.locationName
-                          ? locationMap[tx.locationName] || tx.locationName
-                          : "—"}
-                      </td>
-                      <td className={amountData.className}>
-                        {amountData.display}
-                      </td>
-                      
-                      <td>{tx.notes}</td><td>
-                        {accountMap[tx.accountName] || tx.accountName}
+                      <td colSpan={7}>
+                        Group id: {group.id} ({group.transactions.length} transactions) - Click for details
                       </td>
                     </tr>
-                  );
-                })}
-              </>
-            ))}
-            </tbody>
-          </table>
-        </div>
-        
-        <div className={styles.row}>
-          <button
-            className={styles.button + " " + styles.secondary}
-            onClick={showCurrentReportingTransactions}>
-            Show current reporting transactions
-          </button>
-          <button
-            className={styles.button + " " + styles.secondary}
-            onClick={showRecentReportedTransactions}>
-            Show last reported transactions
-          </button>
-        </div>
-        
-        <div className={styles.row}>
-          <button
-            className={styles.button + " " + styles.secondary}
-            onClick={() => routeToSearchWithCommand("search30")}
-          >
-            Show last 30 days
-          </button>
-          <button
-            className={styles.button + " " + styles.secondary}
-            onClick={() => routeToSearchWithCommand("search90")}
-          >
-            Show last 90 days
-          </button>
-          <button
-            className={styles.button + " " + styles.secondary}
-            onClick={() => routeToSearchWithCommand("searchCurrentYear")}
-          >
-            Show current year
-          </button>
-          <button
-            className={styles.button + " " + styles.secondary}
-            onClick={() => routeToSearchWithCommand("searchLastYear")}
-          >
-            Show last year
-          </button>
-        </div>
+                    
+                    {group.transactions.map((tx) => {
+                      const amountData = getAmountDisplay(tx.amount);
+                      
+                      return (
+                        <tr
+                          key={tx.id}
+                          onClick={() => handleRowClick(group.id)}
+                          className={styles.clickableRow}
+                        >
+                          <td>{tx.date}</td>
+                          
+                          <td>
+                            {tx.typeId
+                              ? transactionTypeMap[tx.typeId] || tx.typeId
+                              : "—"}
+                          </td>
+                          
+                          <td>
+                            {tx.brandName
+                              ? brandMap[tx.brandName] || tx.brandName
+                              : "—"}
+                          </td>
+                          
+                          <td>
+                            {tx.locationName
+                              ? locationMap[tx.locationName] || tx.locationName
+                              : "—"}
+                          </td>
+                          
+                          <td className={amountData.className}>
+                            {amountData.display}
+                          </td>
+                          
+                          <td>{tx.notes}</td>
+                          
+                          <td>
+                            {accountMap[tx.accountName] || tx.accountName}
+                          </td>
+                        </tr>
+                      );
+                    })}
+                  </>
+                ))}
+                </tbody>
+              </table>
+            </div>
+            
+            <div className={styles.row}>
+              <button
+                className={styles.button + " " + styles.secondary}
+                onClick={showCurrentReportingTransactions}
+              >
+                Show current reporting transactions
+              </button>
+              
+              <button
+                className={styles.button + " " + styles.secondary}
+                onClick={showRecentReportedTransactions}
+              >
+                Show last reported transactions
+              </button>
+            </div>
+            
+            <div className={styles.row}>
+              <button
+                className={styles.button + " " + styles.secondary}
+                onClick={() => routeToSearchWithCommand("search30")}
+              >
+                Show last 30 days
+              </button>
+              
+              <button
+                className={styles.button + " " + styles.secondary}
+                onClick={() => routeToSearchWithCommand("search90")}
+              >
+                Show last 90 days
+              </button>
+              
+              <button
+                className={styles.button + " " + styles.secondary}
+                onClick={() => routeToSearchWithCommand("searchCurrentYear")}
+              >
+                Show current year
+              </button>
+              
+              <button
+                className={styles.button + " " + styles.secondary}
+                onClick={() => routeToSearchWithCommand("searchLastYear")}
+              >
+                Show last year
+              </button>
+            </div>
+          </>
+        )}
       </div>
     </div>
   );
