@@ -38,6 +38,7 @@ export type TransactionCreateDto = {
 
 export type TransactionGroupCreateDto = {
   transactions: TransactionCreateDto[];
+  repeatedFromGroupId?: string | null;
 };
 
 export type TransactionGroupCreateResponseDto = {
