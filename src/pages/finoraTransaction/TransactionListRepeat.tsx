@@ -1,5 +1,6 @@
-import { useEffect, useState } from "react";
+import {useCallback, useEffect, useState} from "react";
 import { useMemo } from "react";
+import {useNavigate} from "react-router-dom";
 import {useToast} from "../../components/ToastProvider/toastContext.ts";
 
 import { brandService, type BrandResponseDto } from "../../utils/brandService";
@@ -28,6 +29,7 @@ type TransactionGroupDto = {
 };
 
 export default function TransactionListRepeat() {
+  const navigate = useNavigate();
   const { showToast } = useToast();
   
   const [loading, setLoading] = useState(true);
@@ -40,60 +42,64 @@ export default function TransactionListRepeat() {
   const [accounts, setAccounts] = useState<AccountResponseDto[]>([]);
   
   // Fetch all data from BE
-  useEffect(() => {
-    const loadGroupsAndData = async () => {
-      try {
-        setLoading(true);
-        setError("");
-        const [
-          data,
-          brandsData,
-          locationsData,
-          typesData,
-          accountsData,
-        ] = await Promise.all([
-          transactionGroupService.getRepeatableGroups(),
-          brandService.getAllBrands(),
-          locationService.getAllLocations(),
-          transactionTypeService.getAllTransactionTypes(),
-          accountService.getAllAccounts(),
-        ]);
-        const mapped: TransactionGroupDto[] = data.map(
-          (group: TransactionGroupResponseDto) => ({
-            id: group.id,
-            transactions: group.transactions.map(
-              (tx: TransactionResponseDto) => ({
-                id: tx.id,
-                date: tx.transactionDate.split("T")[0],
-                typeId: tx.transactionTypeId ?? "",
-                brandName: tx.brandId ?? "",
-                locationName: tx.locationId ?? "",
-                amount: tx.amount,
-                notes: tx.notes ?? "",
-                accountName: tx.accountId,
-              })
-            ),
-          })
-        );
-        setTransactionGroups(mapped);
-        setBrands(brandsData);
-        setLocations(locationsData);
-        setTransactionTypes(typesData);
-        setAccounts(accountsData);
-      } catch (err: unknown) {
-        const message =
-          err instanceof Error
-            ? err.message
-            : "Failed to load repeatable groups and data from BE";
-        setError(message);
-        setTransactionGroups([]);
-        showToast(message, "error");
-      } finally {
-        setLoading(false);
-      }
-    };
-    loadGroupsAndData();
+  const loadGroupsAndData = useCallback(async () => {
+    try {
+      setLoading(true);
+      setError("");
+      const [
+        data,
+        brandsData,
+        locationsData,
+        typesData,
+        accountsData,
+      ] = await Promise.all([
+        transactionGroupService.getRepeatableGroups(),
+        brandService.getAllBrands(),
+        locationService.getAllLocations(),
+        transactionTypeService.getAllTransactionTypes(),
+        accountService.getAllAccounts(),
+      ]);
+      const mapped: TransactionGroupDto[] = data.map(
+        (group: TransactionGroupResponseDto) => ({
+          id: group.id,
+          transactions: group.transactions.map(
+            (tx: TransactionResponseDto) => ({
+              id: tx.id,
+              date: tx.transactionDate.split("T")[0],
+              typeId: tx.transactionTypeId ?? "",
+              brandName: tx.brandId ?? "",
+              locationName: tx.locationId ?? "",
+              amount: tx.amount,
+              notes: tx.notes ?? "",
+              accountName: tx.accountId,
+            })
+          ),
+        })
+      );
+      setTransactionGroups(mapped);
+      setBrands(brandsData);
+      setLocations(locationsData);
+      setTransactionTypes(typesData);
+      setAccounts(accountsData);
+    } catch (err: unknown) {
+      const message =
+        err instanceof Error
+          ? err.message
+          : "Failed to load repeatable groups and data from BE";
+      setError(message);
+      setTransactionGroups([]);
+      showToast(message, "error");
+    } finally {
+      setLoading(false);
+    }
   }, [showToast]);
+  
+  useEffect(() => {
+    const run = async () => {
+      await loadGroupsAndData();
+    };
+    run();
+  }, [loadGroupsAndData, showToast]);
   
   const brandMap = useMemo(
     () => Object.fromEntries(brands.map(b => [b.id, b.name])),
@@ -125,15 +131,26 @@ export default function TransactionListRepeat() {
     amount < 0 ? `-$${Math.abs(amount).toFixed(2)}` : `$${amount.toFixed(2)}`;
   
   const repeatGroup = (groupId: string) => {
-    showToast(`Mock repeating this group: ${groupId}`);
+    navigate(`../repeat/${groupId}`);
   };
   
-  const removeRepeatTag = (groupId: string) => {
-    showToast(`Mock remove repeating tag for this group: ${groupId}`);
+  const removeRepeatTag = async (groupId: string) => {
+    try {
+      await transactionGroupService.setTransactionGroupRepeatable(groupId, false);
+      showToast("Marked as non-repeatable. Refreshing...");
+      await loadGroupsAndData();
+    } catch (error: unknown) {
+      console.error(error);
+      const message =
+        error instanceof Error
+          ? error.message
+          : "Failed to mark transaction group as non-repeatable";
+      showToast(message, "error");
+    }
   };
   
   const showDetails = (groupId: string) => {
-    showToast(`Mock show details for this group: ${groupId}`);
+    navigate(`../details/${groupId}`);
   }
   
   return (
