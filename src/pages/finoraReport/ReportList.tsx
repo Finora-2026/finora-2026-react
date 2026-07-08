@@ -93,6 +93,22 @@ export default function ReportList() {
   const handleNotImplemented = (featureName: string) => {
     showToast(`${featureName} is not implemented yet`, "error");
   };
+
+  const getReportYear = (): number => {
+    const report = lastPostedReport ?? currentPendingReport;
+    if (report) {
+      return new Date(report.month).getFullYear();
+    }
+    return new Date().getFullYear();
+  };
+
+  const reportYear = getReportYear();
+  const yearButtons = [
+    reportYear,
+    reportYear - 1,
+    reportYear - 2,
+  ];
+  const hasReportYearSource = lastPostedReport !== null || currentPendingReport !== null;
   
   return (
     <div className={styles.container}>
@@ -143,23 +159,16 @@ export default function ReportList() {
         
         {/* Year Filter */}
         <div className={styles.yearFilter}>
-          <button
-            className={`${styles.button} ${styles.secondary}`}
-            onClick={() => handleNotImplemented("Year 2026")}>
-            2026
-          </button>
-          
-          <button
-            className={`${styles.button} ${styles.secondary}`}
-            onClick={() => handleNotImplemented("Year 2025")}>
-            2025
-          </button>
-          
-          <button
-            className={`${styles.button} ${styles.secondary}`}
-            onClick={() => handleNotImplemented("Year 2024")}>
-            2024
-          </button>
+          {yearButtons.map((year) => (
+            <button
+              key={year}
+              className={`${styles.button} ${styles.secondary}`}
+              disabled={!hasReportYearSource}
+              onClick={() => handleNotImplemented(`Year ${year}`)}
+            >
+              {year}
+            </button>
+          ))}
         </div>
         
         <div className={styles.yearSearch}>
