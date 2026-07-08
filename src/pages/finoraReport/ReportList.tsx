@@ -170,16 +170,19 @@ export default function ReportList() {
             </button>
           ))}
         </div>
-        
+
         <div className={styles.yearSearch}>
           <input
             className={styles.input}
             type="number"
             placeholder="Enter year"
+            disabled={!hasReportYearSource}
           />
           <button
             className={`${styles.button} ${styles.primary}`}
-            onClick={() => handleNotImplemented("Year Search")}>
+            disabled={!hasReportYearSource}
+            onClick={() => handleNotImplemented("Year Search")}
+          >
             Search
           </button>
         </div>
