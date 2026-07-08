@@ -1,7 +1,7 @@
 import {useNavigate} from "react-router-dom";
 import {useEffect, useState} from "react";
 
-import {reportService} from "../../utils/reportService.ts";
+import {type ReportDto, reportService} from "../../utils/reportService.ts";
 import { transactionGroupService } from "../../utils/transactionGroupService";
 import { useToast } from "../../components/ToastProvider/toastContext.ts";
 
@@ -20,7 +20,10 @@ export default function ReportList() {
   const navigate = useNavigate();
   const { showToast } = useToast();
 
-  const [hasLastPostedReport, setHasLastPostedReport] = useState(false);
+  const [currentPendingReport, setCurrentPendingReport] = useState<ReportDto | null>(null);
+  const [loadingCurrentReport, setLoadingCurrentReport] = useState(true);
+
+  const [lastPostedReport, setLastPostedReport] = useState<ReportDto | null>(null);
   const [loadingLastPostedReport, setLoadingLastPostedReport] = useState(true);
 
   const [availableGroupCount, setAvailableGroupCount] = useState<number>(0);
@@ -32,15 +35,32 @@ export default function ReportList() {
       try {
         setLoadingLastPostedReport(true);
         const report = await reportService.getLastPostedReport();
-        setHasLastPostedReport(report !== null);
+        setLastPostedReport(report);
       } catch (error: unknown) {
         console.error(error);
-        setHasLastPostedReport(false);
+        setLastPostedReport(null);
       } finally {
         setLoadingLastPostedReport(false);
       }
     };
     loadLastPostedReport();
+  }, []);
+
+  // Load current pending report
+  useEffect(() => {
+    const loadCurrentPendingReport = async () => {
+      try {
+        setLoadingCurrentReport(true);
+        const report = await reportService.getCurrentPendingReport();
+        setCurrentPendingReport(report);
+      } catch (error: unknown) {
+        console.error(error);
+        setCurrentPendingReport(null);
+      } finally {
+        setLoadingCurrentReport(false);
+      }
+    };
+    loadCurrentPendingReport();
   }, []);
 
   // Load available transaction groups for reporting
@@ -83,17 +103,25 @@ export default function ReportList() {
         <div className={styles.quickActions}>
           <button
             className={`${styles.button} ${styles.primary}`}
-            onClick={() => handleNotImplemented("Current Report / New Report")}>
-            Current Report / New Report
+            disabled={loadingCurrentReport}
+            onClick={() => handleNotImplemented(
+              currentPendingReport ? "Current Report" : "New Report"
+            )}
+          >
+            {loadingCurrentReport
+              ? "Loading..."
+              : currentPendingReport
+                ? "Current Report"
+                : "New Report"}
           </button>
           <button
             className={`${styles.button} ${styles.secondary}`}
-            disabled={loadingLastPostedReport || !hasLastPostedReport}
+            disabled={loadingLastPostedReport || !lastPostedReport}
             onClick={() => handleNotImplemented("Last Posted Report")}
           >
             {loadingLastPostedReport
               ? "Loading..."
-              : hasLastPostedReport
+              : lastPostedReport
                 ? "View Last Report"
                 : "No Posted Report"}
           </button>
