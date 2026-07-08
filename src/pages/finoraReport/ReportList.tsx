@@ -1,15 +1,22 @@
+import {useNavigate} from "react-router-dom";
 
 import styles from "./Report.module.scss";
 
+// Temporary mocking data for now
+const reports = [
+  { id: 1, month: "2026 June", status: "Posted" },
+  { id: 2, month: "2026 May", status: "Posted" },
+  { id: 3, month: "2026 April", status: "Pending" },
+  { id: 4, month: "2026 March", status: "Posted" },
+];
+
 export default function ReportList() {
   
-  // Temporary mocking data for now
-  const reports = [
-    { id: 1, month: "2026 June", status: "Posted" },
-    { id: 2, month: "2026 May", status: "Posted" },
-    { id: 3, month: "2026 April", status: "Pending" },
-    { id: 4, month: "2026 March", status: "Posted" },
-  ];
+  const navigate = useNavigate();
+  
+  const goToPostedTransactions = () => {
+    navigate("/finora/transactions/list-posted");
+  };
   
   return (
     <div className={styles.container}>
@@ -29,7 +36,10 @@ export default function ReportList() {
         {/* Summary */}
         <div className={styles.summary}>
           <p>Available posted transactions: 127 (Mocking)</p>
-          <button className={`${styles.button} ${styles.secondary}`}>
+          <button
+            className={`${styles.button} ${styles.secondary}`}
+            onClick={goToPostedTransactions}
+          >
             View
           </button>
         </div>
