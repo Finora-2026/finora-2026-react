@@ -1,6 +1,7 @@
 import {useNavigate} from "react-router-dom";
 import {useEffect, useState} from "react";
 
+import {reportService} from "../../utils/reportService.ts";
 import { transactionGroupService } from "../../utils/transactionGroupService";
 import { useToast } from "../../components/ToastProvider/toastContext.ts";
 
@@ -19,9 +20,30 @@ export default function ReportList() {
   const navigate = useNavigate();
   const { showToast } = useToast();
 
+  const [hasLastPostedReport, setHasLastPostedReport] = useState(false);
+  const [loadingLastPostedReport, setLoadingLastPostedReport] = useState(true);
+
   const [availableGroupCount, setAvailableGroupCount] = useState<number>(0);
   const [loadingCount, setLoadingCount] = useState(true);
 
+  // Load last posted report button
+  useEffect(() => {
+    const loadLastPostedReport = async () => {
+      try {
+        setLoadingLastPostedReport(true);
+        const report = await reportService.getLastPostedReport();
+        setHasLastPostedReport(report !== null);
+      } catch (error: unknown) {
+        console.error(error);
+        setHasLastPostedReport(false);
+      } finally {
+        setLoadingLastPostedReport(false);
+      }
+    };
+    loadLastPostedReport();
+  }, []);
+
+  // Load available transaction groups for reporting
   useEffect(() => {
     const loadAvailableGroupCount = async () => {
       try {
@@ -66,8 +88,14 @@ export default function ReportList() {
           </button>
           <button
             className={`${styles.button} ${styles.secondary}`}
-            onClick={() => handleNotImplemented("Last Posted Report")}>
-            Last Posted Report
+            disabled={loadingLastPostedReport || !hasLastPostedReport}
+            onClick={() => handleNotImplemented("Last Posted Report")}
+          >
+            {loadingLastPostedReport
+              ? "Loading..."
+              : hasLastPostedReport
+                ? "View Last Report"
+                : "No Posted Report"}
           </button>
         </div>
         
