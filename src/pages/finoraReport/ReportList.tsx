@@ -1,6 +1,9 @@
 import {useNavigate} from "react-router-dom";
+import {useEffect, useState} from "react";
 
+import { transactionGroupService } from "../../utils/transactionGroupService";
 import { useToast } from "../../components/ToastProvider/toastContext.ts";
+
 import styles from "./Report.module.scss";
 
 // Temporary mocking data for now
@@ -15,6 +18,31 @@ export default function ReportList() {
   
   const navigate = useNavigate();
   const { showToast } = useToast();
+
+  const [availableGroupCount, setAvailableGroupCount] = useState<number>(0);
+  const [loadingCount, setLoadingCount] = useState(true);
+
+  useEffect(() => {
+    const loadAvailableGroupCount = async () => {
+      try {
+        setLoadingCount(true);
+        const groups = await transactionGroupService.getAvailableReportGroups();
+        // Count transaction groups
+        setAvailableGroupCount(groups.length);
+      } catch (error: unknown) {
+        console.error(error);
+        const message =
+            error instanceof Error
+                ? error.message
+                : "Failed to load available transaction groups";
+        showToast(message, "error");
+        setAvailableGroupCount(0);
+      } finally {
+        setLoadingCount(false);
+      }
+    };
+    loadAvailableGroupCount();
+  }, [showToast]);
   
   const goToPostedTransactions = () => {
     navigate("/finora/transactions/list-posted");
@@ -45,7 +73,10 @@ export default function ReportList() {
         
         {/* Summary */}
         <div className={styles.summary}>
-          <p>Available posted transactions: 127 (Mocking)</p>
+          <p>
+            Available posted transaction groups:{" "}
+            {loadingCount ? "Loading..." : availableGroupCount}
+          </p>
           <button
             className={`${styles.button} ${styles.secondary}`}
             onClick={goToPostedTransactions}
