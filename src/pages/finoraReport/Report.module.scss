@@ -189,6 +189,11 @@
   box-shadow: 0 0 0 3px rgba(var(--accent-rgb, 0, 0, 0), 0.12);
 }
 
+.input:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  background: var(--border);
+}
 
 /* =========================
    MESSAGE / ERROR
