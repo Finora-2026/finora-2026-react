@@ -1,5 +1,6 @@
 import {useNavigate} from "react-router-dom";
 
+import { useToast } from "../../components/ToastProvider/toastContext.ts";
 import styles from "./Report.module.scss";
 
 // Temporary mocking data for now
@@ -13,9 +14,14 @@ const reports = [
 export default function ReportList() {
   
   const navigate = useNavigate();
+  const { showToast } = useToast();
   
   const goToPostedTransactions = () => {
     navigate("/finora/transactions/list-posted");
+  };
+  
+  const handleNotImplemented = (featureName: string) => {
+    showToast(`${featureName} is not implemented yet`, "error");
   };
   
   return (
@@ -25,10 +31,14 @@ export default function ReportList() {
         
         {/* Quick Actions */}
         <div className={styles.quickActions}>
-          <button className={`${styles.button} ${styles.primary}`}>
+          <button
+            className={`${styles.button} ${styles.primary}`}
+            onClick={() => handleNotImplemented("Current Report / New Report")}>
             Current Report / New Report
           </button>
-          <button className={`${styles.button} ${styles.secondary}`}>
+          <button
+            className={`${styles.button} ${styles.secondary}`}
+            onClick={() => handleNotImplemented("Last Posted Report")}>
             Last Posted Report
           </button>
         </div>
@@ -46,15 +56,21 @@ export default function ReportList() {
         
         {/* Year Filter */}
         <div className={styles.yearFilter}>
-          <button className={`${styles.button} ${styles.secondary}`}>
+          <button
+            className={`${styles.button} ${styles.secondary}`}
+            onClick={() => handleNotImplemented("Year 2026")}>
             2026
           </button>
           
-          <button className={`${styles.button} ${styles.secondary}`}>
+          <button
+            className={`${styles.button} ${styles.secondary}`}
+            onClick={() => handleNotImplemented("Year 2025")}>
             2025
           </button>
           
-          <button className={`${styles.button} ${styles.secondary}`}>
+          <button
+            className={`${styles.button} ${styles.secondary}`}
+            onClick={() => handleNotImplemented("Year 2024")}>
             2024
           </button>
         </div>
@@ -65,7 +81,9 @@ export default function ReportList() {
             type="number"
             placeholder="Enter year"
           />
-          <button className={`${styles.button} ${styles.primary}`}>
+          <button
+            className={`${styles.button} ${styles.primary}`}
+            onClick={() => handleNotImplemented("Year Search")}>
             Search
           </button>
         </div>
@@ -93,7 +111,7 @@ export default function ReportList() {
               <tr
                 key={report.id}
                 className={styles.clickableRow}
-                onClick={() => {}}
+                onClick={() => handleNotImplemented("Report Row Click")}
               >
                 <td>{report.month}</td>
                 <td>
@@ -107,14 +125,20 @@ export default function ReportList() {
                 <td>
                   <div className={styles.actionButtons}>
                     <button className={`${styles.button} ${styles.secondary}`}
-                      onClick={(e) => {e.stopPropagation();}}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleNotImplemented("View Report");
+                      }}
                     >
                       View
                     </button>
                     
                     <button
                       className={`${styles.button} ${styles.primary}`}
-                      onClick={(e) => {e.stopPropagation();}}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleNotImplemented("Download Report");
+                      }}
                     >
                       Download
                     </button>
