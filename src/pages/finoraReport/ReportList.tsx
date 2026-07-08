@@ -1,0 +1,156 @@
+import {useNavigate} from "react-router-dom";
+
+import { useToast } from "../../components/ToastProvider/toastContext.ts";
+import styles from "./Report.module.scss";
+
+// Temporary mocking data for now
+const reports = [
+  { id: 1, month: "2026 June", status: "Posted" },
+  { id: 2, month: "2026 May", status: "Posted" },
+  { id: 3, month: "2026 April", status: "Pending" },
+  { id: 4, month: "2026 March", status: "Posted" },
+];
+
+export default function ReportList() {
+  
+  const navigate = useNavigate();
+  const { showToast } = useToast();
+  
+  const goToPostedTransactions = () => {
+    navigate("/finora/transactions/list-posted");
+  };
+  
+  const handleNotImplemented = (featureName: string) => {
+    showToast(`${featureName} is not implemented yet`, "error");
+  };
+  
+  return (
+    <div className={styles.container}>
+      <div className={styles.card}>
+        <h1 className={styles.title}>Report List</h1>
+        
+        {/* Quick Actions */}
+        <div className={styles.quickActions}>
+          <button
+            className={`${styles.button} ${styles.primary}`}
+            onClick={() => handleNotImplemented("Current Report / New Report")}>
+            Current Report / New Report
+          </button>
+          <button
+            className={`${styles.button} ${styles.secondary}`}
+            onClick={() => handleNotImplemented("Last Posted Report")}>
+            Last Posted Report
+          </button>
+        </div>
+        
+        {/* Summary */}
+        <div className={styles.summary}>
+          <p>Available posted transactions: 127 (Mocking)</p>
+          <button
+            className={`${styles.button} ${styles.secondary}`}
+            onClick={goToPostedTransactions}
+          >
+            View
+          </button>
+        </div>
+        
+        {/* Year Filter */}
+        <div className={styles.yearFilter}>
+          <button
+            className={`${styles.button} ${styles.secondary}`}
+            onClick={() => handleNotImplemented("Year 2026")}>
+            2026
+          </button>
+          
+          <button
+            className={`${styles.button} ${styles.secondary}`}
+            onClick={() => handleNotImplemented("Year 2025")}>
+            2025
+          </button>
+          
+          <button
+            className={`${styles.button} ${styles.secondary}`}
+            onClick={() => handleNotImplemented("Year 2024")}>
+            2024
+          </button>
+        </div>
+        
+        <div className={styles.yearSearch}>
+          <input
+            className={styles.input}
+            type="number"
+            placeholder="Enter year"
+          />
+          <button
+            className={`${styles.button} ${styles.primary}`}
+            onClick={() => handleNotImplemented("Year Search")}>
+            Search
+          </button>
+        </div>
+        
+        {/* Report Table */}
+        <div className={styles.tableWrapper}>
+          <table className={styles.table}>
+            
+            <colgroup>
+              <col style={{ width: "40%" }} />
+              <col style={{ width: "25%" }} />
+              <col style={{ width: "35%" }} />
+            </colgroup>
+            
+            <thead>
+            <tr>
+              <th>Month</th>
+              <th>Status</th>
+              <th>Action</th>
+            </tr>
+            </thead>
+            
+            <tbody>
+            {reports.map((report) => (
+              <tr
+                key={report.id}
+                className={styles.clickableRow}
+                onClick={() => handleNotImplemented("Report Row Click")}
+              >
+                <td>{report.month}</td>
+                <td>
+                  <span className={`${styles.badge} ${report.status === "Posted"
+                        ? styles.badgeSuccess
+                        : styles.badgeWarning}`}
+                  >
+                    {report.status}
+                  </span>
+                </td>
+                <td>
+                  <div className={styles.actionButtons}>
+                    <button className={`${styles.button} ${styles.secondary}`}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleNotImplemented("View Report");
+                      }}
+                    >
+                      View
+                    </button>
+                    
+                    <button
+                      className={`${styles.button} ${styles.primary}`}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleNotImplemented("Download Report");
+                      }}
+                    >
+                      Download
+                    </button>
+                  
+                  </div>
+                </td>
+              </tr>
+            ))}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  );
+}
