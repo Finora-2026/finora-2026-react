@@ -94,6 +94,11 @@ export default function ReportList() {
     showToast(`${featureName} is not implemented yet`, "error");
   };
 
+  const goToReportView = (reportId: number) => {
+    showToast(`Mocking viewing this report id ${reportId}`);
+    navigate(`../view/${reportId}`);
+  };
+
   const getReportYear = (): number => {
     const report = lastPostedReport ?? currentPendingReport;
     if (report) {
@@ -226,7 +231,7 @@ export default function ReportList() {
                     <button className={`${styles.button} ${styles.secondary}`}
                       onClick={(e) => {
                         e.stopPropagation();
-                        handleNotImplemented("View Report");
+                        goToReportView(report.id);
                       }}
                     >
                       View

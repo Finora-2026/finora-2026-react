@@ -74,6 +74,18 @@
 /* =========================
    TABLE
 ========================= */
+.tablesContainer {
+  display: flex;
+  gap: 24px; /* Space between the two tables */
+  width: 100%;
+  margin-top: 24px;
+
+  .tableWrapper {
+    flex: 1;    /* Distributes space equally between both tables */
+    min-width: 0; /* Keeps layout from breaking if tables have long text */
+  }
+}
+
 .tableWrapper {
   overflow-x: auto;
 }
@@ -214,6 +226,13 @@
 /* =========================
    MOBILE
 ========================= */
+@media (max-width: 900px) {
+  .tablesContainer {
+    flex-direction: column; /* Stacks the tables on tablets/mobile so they don't squash */
+    gap: 16px;
+  }
+}
+
 @media (max-width: 600px) {
   .title {
     font-size: 25px;
