@@ -28,8 +28,11 @@ export default function TransactionSearch() {
   const getLastYearEnd = () => `${new Date().getFullYear() - 1}-12-31`;
   const searchCommand = location.state as { command?: string; reportId?: string } | null;
   const command = searchCommand?.command;
-  const reportId = searchCommand?.reportId;
-  const assignedReportId = reportId ?? "No Report Assigned!";
+  const incomingReportId = searchCommand?.reportId;
+  const [assignedReportId, setAssignedReportId] = useState<string | undefined>(
+    () => incomingReportId
+  );
+  const assignedReportDisplay = assignedReportId ?? "No Report Assigned!";
   const initialStartDate = command === "searchReport"
     ? ""
     : command === "searchLastYear"
@@ -240,15 +243,15 @@ export default function TransactionSearch() {
       brandId: selectedBrandId || undefined,
       locationId: selectedLocationId || undefined,
       typeId: selectedTypeId || undefined,
-      reportId,
+      reportId: assignedReportId,
       notes: notes || undefined,
     });
   };
 
   useEffect(() => {
-    if (command === "searchReport" && reportId) {
+    if (command === "searchReport" && incomingReportId) {
       const searchTimer = window.setTimeout(() => {
-        void runSearch({ reportId });
+        void runSearch({ reportId: incomingReportId });
       }, 0);
 
       return () => window.clearTimeout(searchTimer);
@@ -271,7 +274,7 @@ export default function TransactionSearch() {
     }, 0);
 
     return () => window.clearTimeout(searchTimer);
-  }, [command, reportId, runSearch]);
+  }, [command, incomingReportId, runSearch]);
   
   const onReset = () => {
     const startDate = getDaysAgo(30);
@@ -291,8 +294,9 @@ export default function TransactionSearch() {
     setSelectedTypeId("");
     
     setNotes("");
+    setAssignedReportId(undefined);
 
-    void runSearch({ startDate, endDate, reportId });
+    void runSearch({ startDate, endDate });
   };
   
   const openTransactionGroup = (groupId: string) => {
@@ -510,7 +514,7 @@ export default function TransactionSearch() {
               <input
                 className={styles.input}
                 type="text"
-                value={assignedReportId}
+                value={assignedReportDisplay}
                 readOnly
                 disabled
               />
