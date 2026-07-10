@@ -10,7 +10,71 @@ export type ReportDto = {
     isPosted: boolean;
 };
 
+export type ReportStatus = "NEW" | "PENDING" | "EMPTY" | "POSTED";
+export type ReportCreateDto = {
+    id: string | null;
+    status: ReportStatus;
+};
+
+export type ReportDetailsDto = {
+    currentReportId: string;
+    previousReportId: string | null;
+    nextReportId: string | null;
+    
+    month: string; // LocalDate comes as "YYYY-MM-DD"
+    reportStatus: ReportStatus;
+};
+
 export const reportService = {
+    
+    // Create a new report from BE, return pending report if one exists
+    createNewReport: async (): Promise<ReportCreateDto> => {
+        const token = authService.getToken();
+        const res = await fetch(
+          `${BackendConfig.springApiUrl}/reports/create`,
+          {
+              method: "POST",
+              headers: {
+                  "Content-Type": "application/json",
+                  Authorization: `Bearer ${token}`,
+              },
+          }
+        );
+        
+        if (!res.ok) {
+            const msg = await res.text();
+            throw new Error(msg || "Failed to create a new report");
+        }
+        
+        return await res.json();
+    },
+    
+    getReportDetails: async (reportId: string): Promise<ReportDetailsDto | null> => {
+        const token = authService.getToken();
+        
+        const res = await fetch(
+          `${BackendConfig.springApiUrl}/reports/${reportId}`,
+          {
+              method: "GET",
+              headers: {
+                  "Content-Type": "application/json",
+                  Authorization: `Bearer ${token}`,
+              },
+          }
+        );
+        
+        if (res.status === 404) {
+            return null;
+        }
+        
+        if (!res.ok) {
+            const msg = await res.text();
+            throw new Error(msg || "Failed to fetch report details");
+        }
+        
+        return await res.json();
+    },
+    
     getCurrentPendingReport: async (): Promise<ReportDto | null> => {
         const token = authService.getToken();
         const res = await fetch(

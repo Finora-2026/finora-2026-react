@@ -17,9 +17,7 @@ export const boxesFinoraMenu = [
         text: "Generate reports and analyze financial performance",
         speed: 95,
         buttons: [
-            { label: "New Report", to: "reports/new" },
-            { label: "Pending Report", to: "reports/pending" },
-            { label: "List All Reports", to: "reports/list" },
+            { label: "Report Dashboard", to: "reports/list" },
             { label: "Custom Report", to: "reports/custom" },
             { label: "Net Worth", to: "reports/net-worth" },
             { label: "Assets", to: "reports/assets" },

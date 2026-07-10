@@ -1,7 +1,7 @@
-import {useNavigate} from "react-router-dom";
-import {useEffect, useState} from "react";
+import { useNavigate } from "react-router-dom";
+import { useEffect, useState } from "react";
 
-import {type ReportDto, reportService} from "../../utils/reportService.ts";
+import { type ReportDto, reportService } from "../../utils/reportService.ts";
 import { transactionGroupService } from "../../utils/transactionGroupService";
 import { useToast } from "../../components/ToastProvider/toastContext.ts";
 
@@ -19,16 +19,19 @@ export default function ReportList() {
   
   const navigate = useNavigate();
   const { showToast } = useToast();
-
+  
   const [currentPendingReport, setCurrentPendingReport] = useState<ReportDto | null>(null);
   const [loadingCurrentReport, setLoadingCurrentReport] = useState(true);
-
+  
   const [lastPostedReport, setLastPostedReport] = useState<ReportDto | null>(null);
   const [loadingLastPostedReport, setLoadingLastPostedReport] = useState(true);
-
+  
   const [availableGroupCount, setAvailableGroupCount] = useState<number>(0);
   const [loadingCount, setLoadingCount] = useState(true);
-
+  
+  // Added local loading state for report generation execution
+  const [isProcessingReport, setIsProcessingReport] = useState(false);
+  
   // Load last posted report button
   useEffect(() => {
     const loadLastPostedReport = async () => {
@@ -45,7 +48,7 @@ export default function ReportList() {
     };
     loadLastPostedReport();
   }, []);
-
+  
   // Load current pending report
   useEffect(() => {
     const loadCurrentPendingReport = async () => {
@@ -62,7 +65,7 @@ export default function ReportList() {
     };
     loadCurrentPendingReport();
   }, []);
-
+  
   // Load available transaction groups for reporting
   useEffect(() => {
     const loadAvailableGroupCount = async () => {
@@ -74,9 +77,9 @@ export default function ReportList() {
       } catch (error: unknown) {
         console.error(error);
         const message =
-            error instanceof Error
-                ? error.message
-                : "Failed to load available transaction groups";
+          error instanceof Error
+            ? error.message
+            : "Failed to load available transaction groups";
         showToast(message, "error");
         setAvailableGroupCount(0);
       } finally {
@@ -86,6 +89,36 @@ export default function ReportList() {
     loadAvailableGroupCount();
   }, [showToast]);
   
+  // Handles the lifecycle creating a new report, or return a current pending one.
+  const handleCreateOrOpenReport = async () => {
+    try {
+      setIsProcessingReport(true);
+      const result = await reportService.createNewReport();
+      
+      if (result.status === "EMPTY") {
+        showToast("Cannot initialize a report. Please post your first transaction group to start.", "error");
+        return;
+      }
+      
+      if (result.status === "PENDING") {
+        showToast("Opening your existing active report, you have to finalize this one first...");
+      } else if (result.status === "NEW") {
+        showToast("Successfully generated a new pending report!");
+      }
+      
+      // Navigate to your report view using the returned String ID
+      if (result.id) {
+        navigate(`../view/${result.id}`);
+      }
+    } catch (error: unknown) {
+      console.error(error);
+      const msg = error instanceof Error ? error.message : "An error occurred handling report.";
+      showToast(msg, "error");
+    } finally {
+      setIsProcessingReport(false);
+    }
+  };
+  
   const goToPostedTransactions = () => {
     navigate("/finora/transactions/list-posted");
   };
@@ -93,12 +126,12 @@ export default function ReportList() {
   const handleNotImplemented = (featureName: string) => {
     showToast(`${featureName} is not implemented yet`, "error");
   };
-
-  const goToReportView = (reportId: number) => {
-    showToast(`Mocking viewing this report id ${reportId}`);
+  
+  const goToReportView = (reportId: number | string) => {
+    showToast(`Viewing report id ${reportId}`);
     navigate(`../view/${reportId}`);
   };
-
+  
   const getReportYear = (): number => {
     const report = lastPostedReport ?? currentPendingReport;
     if (report) {
@@ -106,7 +139,7 @@ export default function ReportList() {
     }
     return new Date().getFullYear();
   };
-
+  
   const reportYear = getReportYear();
   const yearButtons = [
     reportYear,
@@ -124,13 +157,11 @@ export default function ReportList() {
         <div className={styles.quickActions}>
           <button
             className={`${styles.button} ${styles.primary}`}
-            disabled={loadingCurrentReport}
-            onClick={() => handleNotImplemented(
-              currentPendingReport ? "Current Report" : "New Report"
-            )}
+            disabled={loadingCurrentReport || isProcessingReport}
+            onClick={handleCreateOrOpenReport}
           >
-            {loadingCurrentReport
-              ? "Loading..."
+            {loadingCurrentReport || isProcessingReport
+              ? "Processing..."
               : currentPendingReport
                 ? "Current Report"
                 : "New Report"}
@@ -138,7 +169,7 @@ export default function ReportList() {
           <button
             className={`${styles.button} ${styles.secondary}`}
             disabled={loadingLastPostedReport || !lastPostedReport}
-            onClick={() => handleNotImplemented("Last Posted Report")}
+            onClick={() => lastPostedReport && goToReportView(lastPostedReport.id)}
           >
             {loadingLastPostedReport
               ? "Loading..."
@@ -175,7 +206,7 @@ export default function ReportList() {
             </button>
           ))}
         </div>
-
+        
         <div className={styles.yearSearch}>
           <input
             className={styles.input}
@@ -215,13 +246,13 @@ export default function ReportList() {
               <tr
                 key={report.id}
                 className={styles.clickableRow}
-                onClick={() => handleNotImplemented("Report Row Click")}
+                onClick={() => goToReportView(report.id)}
               >
                 <td>{report.month}</td>
                 <td>
                   <span className={`${styles.badge} ${report.status === "Posted"
-                        ? styles.badgeSuccess
-                        : styles.badgeWarning}`}
+                    ? styles.badgeSuccess
+                    : styles.badgeWarning}`}
                   >
                     {report.status}
                   </span>
@@ -229,10 +260,10 @@ export default function ReportList() {
                 <td>
                   <div className={styles.actionButtons}>
                     <button className={`${styles.button} ${styles.secondary}`}
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        goToReportView(report.id);
-                      }}
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              goToReportView(report.id);
+                            }}
                     >
                       View
                     </button>

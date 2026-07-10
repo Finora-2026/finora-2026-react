@@ -13,6 +13,11 @@ export type TransactionGroupResponseDto = {
   transactions: TransactionResponseDto[];
 };
 
+export type ReportTransactionGroupsResponse = {
+  success: boolean;
+  data: TransactionGroupResponseDto[];
+};
+
 export type TransactionResponseDto = {
   id: string;
   transactionGroupId: string;
@@ -188,6 +193,28 @@ export const transactionGroupService = {
       throw new Error(msg || "Failed to fetch transaction group");
     }
     return await res.json();
+  },
+  
+  // GET TRANSACTION GROUPS BY REPORT ID
+  getGroupsByReportId: async (
+    reportId: string
+  ): Promise<TransactionGroupResponseDto[]> => {
+    const res = await fetch(
+      `${BackendConfig.springApiUrl}/transaction-groups/report/${reportId}`,
+      {
+        method: "GET",
+        headers: getHeaders(),
+      }
+    );
+    if (!res.ok) {
+      const msg = await res.text();
+      throw new Error(msg || "Failed to fetch transaction groups by report");
+    }
+    const json: ReportTransactionGroupsResponse = await res.json();
+    if (!json.success) {
+      throw new Error("Request failed (success=false)");
+    }
+    return json.data;
   },
   
   // GET AVAILABLE REPORT GROUPS
