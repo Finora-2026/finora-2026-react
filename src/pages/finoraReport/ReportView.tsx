@@ -320,25 +320,25 @@ export default function ReportView() {
         {/* Quick Actions */}
         <div className={styles.quickActions}>
           <button
-            className={`${styles.button} ${styles.primary}`}
+            className={`${styles.button} ${styles.secondary}`}
           >
             Load transactions
           </button>
           
           <button
-            className={`${styles.button} ${styles.primary}`}
+            className={`${styles.button} ${styles.secondary}`}
           >
             Remove transactions
           </button>
           
           <button
-            className={`${styles.button} ${styles.primary}`}
+            className={`${styles.button} ${styles.danger}`}
           >
             Finalize report
           </button>
           
           <button
-            className={`${styles.button} ${styles.primary}`}
+            className={`${styles.button} ${styles.danger}`}
           >
             Delete report
           </button>

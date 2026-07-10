@@ -143,6 +143,16 @@
   background: var(--btn-secondary-hover);
 }
 
+/* DANGER */
+.danger {
+  background: var(--btn-danger);
+  color: var(--btn-danger-text);
+}
+
+.danger:hover {
+  background: var(--btn-danger-hover);
+}
+
 /* DISABLED */
 .button:disabled {
   opacity: 0.5;
