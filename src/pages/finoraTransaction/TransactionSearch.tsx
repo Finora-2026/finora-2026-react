@@ -18,12 +18,14 @@ export default function TransactionSearch() {
   const location = useLocation();
   
   const getToday = () => new Date().toISOString().split("T")[0];
-  const get30DaysAgo = () => {
+  const getDaysAgo = (days: number) => {
     const d = new Date();
-    d.setDate(d.getDate() - 30);
+    d.setDate(d.getDate() - days);
     return d.toISOString().split("T")[0];
   };
-  const [startDate, setStartDate] = useState<string>(get30DaysAgo());
+  const command = (location.state as { command?: string } | null)?.command;
+  const initialSearchDays = command === "search90" ? 90 : 30;
+  const [startDate, setStartDate] = useState<string>(() => getDaysAgo(initialSearchDays));
   const [endDate, setEndDate] = useState<string>(getToday());
   
   const [minAmount, setMinAmount] = useState<string>("");
@@ -226,20 +228,20 @@ export default function TransactionSearch() {
   };
 
   useEffect(() => {
-    const command = (location.state as { command?: string } | null)?.command;
-    if (command !== "search30") return;
+    const searchDays = command === "search30" ? 30 : command === "search90" ? 90 : null;
+    if (searchDays === null) return;
 
-    const startDate = get30DaysAgo();
+    const startDate = getDaysAgo(searchDays);
     const endDate = getToday();
     const searchTimer = window.setTimeout(() => {
       void runSearch({ startDate, endDate });
     }, 0);
 
     return () => window.clearTimeout(searchTimer);
-  }, [location.state, runSearch]);
+  }, [command, runSearch]);
   
   const onReset = () => {
-    setStartDate(get30DaysAgo());
+    setStartDate(getDaysAgo(30));
     setEndDate(getToday());
     
     setMinAmount("");
