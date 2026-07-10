@@ -159,7 +159,7 @@ export default function TransactionListPosted() {
   
   const routeToSearchWithCommand = (command: string) => {
     showToast(`Running Search command: ${command}`, "success");
-    navigate(`../../search/${command}`);
+    navigate("../search", { state: { command } });
   };
   
   return (
