@@ -174,7 +174,7 @@ export default function TransactionDetails() {
   
   const goToReport = (reportId?: string | null) => {
     if (!reportId) return;
-    showToast(`Mocking report navigation to this reportId ${reportId}`);
+    navigate(`../../reports/view/${reportId}`);
   };
   
   const removeReport = async () => {
