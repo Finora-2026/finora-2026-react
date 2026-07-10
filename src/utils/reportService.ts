@@ -16,6 +16,21 @@ export type ReportCreateDto = {
     status: ReportStatus;
 };
 
+export type TransactionTypeSummaryDto = {
+    transactionTypeId: string;
+    transactionTypeName: string;
+    totalAmount: number;
+};
+
+export type AccountSummaryDto = {
+    accountId: string;
+    accountName: string;
+    bankId: string;
+    bankName: string;
+    accountType: string;
+    balance: number;
+};
+
 export type ReportDetailsDto = {
     currentReportId: string;
     previousReportId: string | null;
@@ -23,6 +38,9 @@ export type ReportDetailsDto = {
     
     month: string; // LocalDate comes as "YYYY-MM-DD"
     reportStatus: ReportStatus;
+    
+    typeSummary: TransactionTypeSummaryDto[];
+    accountSummary: AccountSummaryDto[];
 };
 
 export const reportService = {
