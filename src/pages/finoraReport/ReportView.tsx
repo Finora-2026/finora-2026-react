@@ -317,8 +317,32 @@ export default function ReportView() {
           </table>
         </div>
         
-        <p>Action zone: Load all Transactions, Remove all Transactions, Filter/Sort Button (Route to Transaction Search)</p>
-        <p>Danger zone (Cannot Undo): Posted this Report, Delete this Report </p>
+        {/* Quick Actions */}
+        <div className={styles.quickActions}>
+          <button
+            className={`${styles.button} ${styles.primary}`}
+          >
+            Load transactions
+          </button>
+          
+          <button
+            className={`${styles.button} ${styles.primary}`}
+          >
+            Remove transactions
+          </button>
+          
+          <button
+            className={`${styles.button} ${styles.primary}`}
+          >
+            Finalize report
+          </button>
+          
+          <button
+            className={`${styles.button} ${styles.primary}`}
+          >
+            Delete report
+          </button>
+        </div>
       </div>
     </div>
   );
