@@ -93,6 +93,8 @@ export default function ReportView() {
       </div>
     );
   }
+
+  const isPosted = report.reportStatus === "POSTED";
   
   return (
     <div className={styles.container}>
@@ -333,12 +335,14 @@ export default function ReportView() {
           
           <button
             className={`${styles.button} ${styles.danger}`}
+            disabled={isPosted}
           >
             Finalize report
           </button>
           
           <button
             className={`${styles.button} ${styles.danger}`}
+            disabled={isPosted}
           >
             Delete report
           </button>
