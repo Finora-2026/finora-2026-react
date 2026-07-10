@@ -483,6 +483,17 @@ export default function TransactionSearch() {
               </select>
             </div>
             
+            <div className={styles.searchField}>
+              <label className={styles.label}>Assigned Report</label>
+              <input
+                className={styles.input}
+                type="text"
+                value="No Report Assigned!"
+                readOnly
+                disabled
+              />
+            </div>
+
             <div className={`${styles.searchField} ${styles.searchFieldFull}`}>
               <label className={styles.label}>Notes contains</label>
               
