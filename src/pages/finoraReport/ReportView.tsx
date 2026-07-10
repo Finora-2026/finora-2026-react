@@ -69,6 +69,11 @@ export default function ReportView() {
     loadTransactionGroups();
   }, [reportId, showToast]);
   
+  const currencyFormatter = new Intl.NumberFormat("en-US", {
+    style: "currency",
+    currency: "USD",
+  });
+  
   if (loadingReport || loadingGroups) {
     return (
       <div className={styles.container}>
@@ -164,6 +169,19 @@ export default function ReportView() {
               </thead>
               
               <tbody>
+              {report.typeSummary.length === 0 ? (
+                <tr>
+                  <td colSpan={3}>No type summary available.</td>
+                </tr>
+              ) : (
+                report.typeSummary.map((summary) => (
+                  <tr key={summary.transactionTypeId}>
+                    <td>{summary.transactionTypeName}</td>
+                    <td>{currencyFormatter.format(summary.totalAmount)}</td>
+                    <td>—</td>
+                  </tr>
+                ))
+              )}
               </tbody>
             
             </table>
