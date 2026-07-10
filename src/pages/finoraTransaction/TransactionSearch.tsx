@@ -24,12 +24,17 @@ export default function TransactionSearch() {
     return d.toISOString().split("T")[0];
   };
   const getCurrentYearStart = () => `${new Date().getFullYear()}-01-01`;
+  const getLastYearStart = () => `${new Date().getFullYear() - 1}-01-01`;
+  const getLastYearEnd = () => `${new Date().getFullYear() - 1}-12-31`;
   const command = (location.state as { command?: string } | null)?.command;
-  const initialStartDate = command === "searchCurrentYear"
-    ? getCurrentYearStart()
-    : getDaysAgo(command === "search90" ? 90 : 30);
+  const initialStartDate = command === "searchLastYear"
+    ? getLastYearStart()
+    : command === "searchCurrentYear"
+      ? getCurrentYearStart()
+      : getDaysAgo(command === "search90" ? 90 : 30);
+  const initialEndDate = command === "searchLastYear" ? getLastYearEnd() : getToday();
   const [startDate, setStartDate] = useState<string>(() => initialStartDate);
-  const [endDate, setEndDate] = useState<string>(getToday());
+  const [endDate, setEndDate] = useState<string>(() => initialEndDate);
   
   const [minAmount, setMinAmount] = useState<string>("");
   const [maxAmount, setMaxAmount] = useState<string>("");
@@ -231,16 +236,18 @@ export default function TransactionSearch() {
   };
 
   useEffect(() => {
-    const startDate = command === "searchCurrentYear"
-      ? getCurrentYearStart()
-      : command === "search30"
-        ? getDaysAgo(30)
-        : command === "search90"
-          ? getDaysAgo(90)
-          : null;
+    const startDate = command === "searchLastYear"
+      ? getLastYearStart()
+      : command === "searchCurrentYear"
+        ? getCurrentYearStart()
+        : command === "search30"
+          ? getDaysAgo(30)
+          : command === "search90"
+            ? getDaysAgo(90)
+            : null;
     if (startDate === null) return;
 
-    const endDate = getToday();
+    const endDate = command === "searchLastYear" ? getLastYearEnd() : getToday();
     const searchTimer = window.setTimeout(() => {
       void runSearch({ startDate, endDate });
     }, 0);
