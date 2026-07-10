@@ -230,7 +230,7 @@ export default function ReportView() {
                   <tr
                     key={group.id}
                     className={styles.groupRow}
-                    onClick={() => navigate(`../details/${group.id}`)}
+                    onClick={() => navigate(`../../transactions/details/${group.id}`)}
                   >
                     <td colSpan={7}>
                       Group id: {group.id}
@@ -241,7 +241,7 @@ export default function ReportView() {
                     <tr
                       key={tx.id}
                       className={styles.clickableRow}
-                      onClick={() => navigate(`../details/${group.id}`)}
+                      onClick={() => navigate(`../../transactions/details/${group.id}`)}
                     >
                       
                       <td>
