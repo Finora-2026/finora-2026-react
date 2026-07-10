@@ -23,9 +23,12 @@ export default function TransactionSearch() {
     d.setDate(d.getDate() - days);
     return d.toISOString().split("T")[0];
   };
+  const getCurrentYearStart = () => `${new Date().getFullYear()}-01-01`;
   const command = (location.state as { command?: string } | null)?.command;
-  const initialSearchDays = command === "search90" ? 90 : 30;
-  const [startDate, setStartDate] = useState<string>(() => getDaysAgo(initialSearchDays));
+  const initialStartDate = command === "searchCurrentYear"
+    ? getCurrentYearStart()
+    : getDaysAgo(command === "search90" ? 90 : 30);
+  const [startDate, setStartDate] = useState<string>(() => initialStartDate);
   const [endDate, setEndDate] = useState<string>(getToday());
   
   const [minAmount, setMinAmount] = useState<string>("");
@@ -228,10 +231,15 @@ export default function TransactionSearch() {
   };
 
   useEffect(() => {
-    const searchDays = command === "search30" ? 30 : command === "search90" ? 90 : null;
-    if (searchDays === null) return;
+    const startDate = command === "searchCurrentYear"
+      ? getCurrentYearStart()
+      : command === "search30"
+        ? getDaysAgo(30)
+        : command === "search90"
+          ? getDaysAgo(90)
+          : null;
+    if (startDate === null) return;
 
-    const startDate = getDaysAgo(searchDays);
     const endDate = getToday();
     const searchTimer = window.setTimeout(() => {
       void runSearch({ startDate, endDate });
