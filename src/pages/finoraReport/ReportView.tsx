@@ -214,6 +214,12 @@ export default function ReportView() {
         <div className={styles.quickActions}>
           <button
             className={`${styles.button} ${styles.primary}`}
+            disabled={!reportId}
+            onClick={() =>
+              navigate("../../transactions/search", {
+                state: { command: "searchReport", reportId },
+              })
+            }
           >
             Query (Search)
           </button>

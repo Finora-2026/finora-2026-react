@@ -26,7 +26,9 @@ export default function TransactionSearch() {
   const getCurrentYearStart = () => `${new Date().getFullYear()}-01-01`;
   const getLastYearStart = () => `${new Date().getFullYear() - 1}-01-01`;
   const getLastYearEnd = () => `${new Date().getFullYear() - 1}-12-31`;
-  const command = (location.state as { command?: string } | null)?.command;
+  const searchCommand = location.state as { command?: string; reportId?: string } | null;
+  const command = searchCommand?.command;
+  const assignedReportId = searchCommand?.reportId ?? "No Report Assigned!";
   const initialStartDate = command === "searchLastYear"
     ? getLastYearStart()
     : command === "searchCurrentYear"
@@ -488,7 +490,7 @@ export default function TransactionSearch() {
               <input
                 className={styles.input}
                 type="text"
-                value="No Report Assigned!"
+                value={assignedReportId}
                 readOnly
                 disabled
               />
