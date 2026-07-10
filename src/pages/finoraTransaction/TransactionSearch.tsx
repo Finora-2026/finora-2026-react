@@ -274,8 +274,10 @@ export default function TransactionSearch() {
   }, [command, reportId, runSearch]);
   
   const onReset = () => {
-    setStartDate(getDaysAgo(30));
-    setEndDate(getToday());
+    const startDate = getDaysAgo(30);
+    const endDate = getToday();
+    setStartDate(startDate);
+    setEndDate(endDate);
     
     setMinAmount("");
     setMaxAmount("");
@@ -289,6 +291,8 @@ export default function TransactionSearch() {
     setSelectedTypeId("");
     
     setNotes("");
+
+    void runSearch({ startDate, endDate, reportId });
   };
   
   const openTransactionGroup = (groupId: string) => {
