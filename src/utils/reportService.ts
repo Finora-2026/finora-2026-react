@@ -170,4 +170,37 @@ export const reportService = {
 
         return await res.json();
     },
+    
+    downloadReportTransactions: async (reportId: string): Promise<void> => {
+        const token = authService.getToken();
+        
+        const res = await fetch(
+          `${BackendConfig.springApiUrl}/reports/${reportId}/download`,
+          {
+              method: "GET",
+              headers: {
+                  Authorization: `Bearer ${token}`,
+              },
+          }
+        );
+        
+        if (!res.ok) {
+            const msg = await res.text();
+            throw new Error(msg || "Failed to download report transactions");
+        }
+        
+        const blob = await res.blob();
+        
+        const url = window.URL.createObjectURL(blob);
+        
+        const link = document.createElement("a");
+        link.href = url;
+        link.download = `report-${reportId}-transactions.csv`;
+        
+        document.body.appendChild(link);
+        link.click();
+        
+        link.remove();
+        window.URL.revokeObjectURL(url);
+    },
 };
