@@ -22,6 +22,15 @@ export type TransactionTypeSummaryDto = {
     totalAmount: number;
 };
 
+export type AccountSummaryDto = {
+    accountId: string;
+    accountName: string;
+    bankId: string;
+    bankName: string;
+    accountType: string;
+    balance: number;
+};
+
 export type ReportDetailsDto = {
     currentReportId: string;
     previousReportId: string | null;
@@ -31,6 +40,7 @@ export type ReportDetailsDto = {
     reportStatus: ReportStatus;
     
     typeSummary: TransactionTypeSummaryDto[];
+    accountSummary: AccountSummaryDto[];
 };
 
 export const reportService = {

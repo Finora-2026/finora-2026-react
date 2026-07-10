@@ -205,6 +205,19 @@ export default function ReportView() {
               </thead>
               
               <tbody>
+              {report.accountSummary.length === 0 ? (
+                <tr>
+                  <td colSpan={3}>No account summary available.</td>
+                </tr>
+              ) : (
+                report.accountSummary.map((account) => (
+                  <tr key={account.accountId}>
+                    <td>{account.accountName}</td>
+                    <td>{account.accountType}</td>
+                    <td>{currencyFormatter.format(account.balance)}</td>
+                  </tr>
+                ))
+              )}
               </tbody>
             
             </table>
