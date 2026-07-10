@@ -10,7 +10,36 @@ export type ReportDto = {
     isPosted: boolean;
 };
 
+export type ReportStatus = "NEW" | "PENDING" | "EMPTY" | "POSTED";
+export type ReportCreateDto = {
+    id: string | null;
+    status: ReportStatus;
+};
+
 export const reportService = {
+    
+    // Create a new report from BE, return pending report if one exists
+    createNewReport: async (): Promise<ReportCreateDto> => {
+        const token = authService.getToken();
+        const res = await fetch(
+          `${BackendConfig.springApiUrl}/reports/create`,
+          {
+              method: "POST",
+              headers: {
+                  "Content-Type": "application/json",
+                  Authorization: `Bearer ${token}`,
+              },
+          }
+        );
+        
+        if (!res.ok) {
+            const msg = await res.text();
+            throw new Error(msg || "Failed to create a new report");
+        }
+        
+        return await res.json();
+    },
+    
     getCurrentPendingReport: async (): Promise<ReportDto | null> => {
         const token = authService.getToken();
         const res = await fetch(
