@@ -19,6 +19,7 @@ export default function ReportView() {
   
   const [transactionGroups, setTransactionGroups] = useState<TransactionGroupResponseDto[]>([]);
   const [loadingGroups, setLoadingGroups] = useState(true);
+  const [loadingAllTransactions, setLoadingAllTransactions] = useState(false);
   
   useEffect(() => {
     const loadReport = async () => {
@@ -95,6 +96,33 @@ export default function ReportView() {
   }
 
   const isPosted = report.reportStatus === "POSTED";
+
+  const handleLoadAllTransactions = async () => {
+    if (!reportId) return;
+
+    try {
+      setLoadingAllTransactions(true);
+      const result = await reportService.loadAllTransactions(reportId);
+      const [updatedReport, groups] = await Promise.all([
+        reportService.getReportDetails(reportId),
+        transactionGroupService.getGroupsByReportId(reportId),
+      ]);
+
+      setReport(updatedReport);
+      setTransactionGroups(groups);
+      showToast(
+        `${result.loadedGroupCount} transaction group(s) loaded into the report.`,
+        "success"
+      );
+    } catch (error: unknown) {
+      const message = error instanceof Error
+        ? error.message
+        : "Failed to load transactions into report";
+      showToast(message, "error");
+    } finally {
+      setLoadingAllTransactions(false);
+    }
+  };
   
   return (
     <div className={styles.container}>
@@ -323,8 +351,10 @@ export default function ReportView() {
         <div className={styles.quickActions}>
           <button
             className={`${styles.button} ${styles.secondary}`}
+            disabled={!reportId || loadingAllTransactions}
+            onClick={handleLoadAllTransactions}
           >
-            Load transactions
+            {loadingAllTransactions ? "Loading transactions..." : "Load transactions"}
           </button>
           
           <button
