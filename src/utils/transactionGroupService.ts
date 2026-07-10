@@ -256,4 +256,33 @@ export const transactionGroupService = {
     }
     return json.data;
   },
+  
+  // REMOVE GROUP FROM REPORT
+  removeGroupFromReport: async (
+    groupId: string
+  ): Promise<{ success: boolean; message: string }> => {
+    const res = await fetch(
+      `${BackendConfig.springApiUrl}/transaction-groups/${groupId}/report`,
+      {
+        method: "DELETE",
+        headers: getHeaders(),
+      }
+    );
+    
+    if (!res.ok) {
+      try {
+        const error = await res.json();
+        throw new Error(
+          error.message || "Failed to remove transaction group from report"
+        );
+      } catch {
+        const msg = await res.text();
+        throw new Error(
+          msg || "Failed to remove transaction group from report"
+        );
+      }
+    }
+    
+    return await res.json();
+  },
 };

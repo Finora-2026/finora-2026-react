@@ -177,6 +177,22 @@ export default function TransactionDetails() {
     showToast(`Mocking report navigation to this reportId ${reportId}`);
   };
   
+  const removeReport = async () => {
+    if (!groupId) return;
+    try {
+      await transactionGroupService.removeGroupFromReport(groupId);
+      showToast("Transaction group removed from report successfully", "success");
+      await loadGroup(groupId);
+    } catch (error: unknown) {
+      console.error(error);
+      const message =
+        error instanceof Error
+          ? error.message
+          : "Failed to remove transaction group from report";
+      showToast(message, "error");
+    }
+  };
+  
   const editButtonLabel = isLockedByReport ? "View Only" : "Edit this Group";
   
   return (
@@ -307,6 +323,14 @@ export default function TransactionDetails() {
               onClick={() => repeatThisGroup(groupId)}
             >
               Repeat This Group
+            </button>
+            
+            <button
+              className={styles.button + " " + styles.danger}
+              disabled={!reportId}
+              onClick={removeReport}
+            >
+              Remove Report
             </button>
           </div>
         </div>
