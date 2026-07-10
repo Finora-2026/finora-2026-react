@@ -1,4 +1,4 @@
-import {useCallback, useEffect, useMemo, useState} from "react";
+import {useCallback, useEffect, useMemo, useRef, useState} from "react";
 import {useLocation, useNavigate} from "react-router-dom";
 
 import { useToast } from "../../components/ToastProvider/toastContext.ts";
@@ -83,6 +83,7 @@ export default function TransactionSearch() {
   const [results, setResults] = useState<TransactionResponseDto[]>([]);
   const [loading, setLoading] = useState(false);
   const [searched, setSearched] = useState(false);
+  const skipNextAutoSearch = useRef(true);
   
   // Fetch banks from BE
   useEffect(() => {
@@ -275,8 +276,47 @@ export default function TransactionSearch() {
 
     return () => window.clearTimeout(searchTimer);
   }, [command, incomingReportId, runSearch]);
+
+  useEffect(() => {
+    if (skipNextAutoSearch.current) {
+      skipNextAutoSearch.current = false;
+      return;
+    }
+
+    const searchTimer = window.setTimeout(() => {
+      void runSearch({
+        startDate: startDate || undefined,
+        endDate: endDate || undefined,
+        minAmount: minAmount ? Number(minAmount) : undefined,
+        maxAmount: maxAmount ? Number(maxAmount) : undefined,
+        bankId: selectedBankId || undefined,
+        accountId: selectedAccountId || undefined,
+        brandId: selectedBrandId || undefined,
+        locationId: selectedLocationId || undefined,
+        typeId: selectedTypeId || undefined,
+        reportId: assignedReportId,
+        notes: notes || undefined,
+      });
+    }, 500);
+
+    return () => window.clearTimeout(searchTimer);
+  }, [
+    assignedReportId,
+    endDate,
+    maxAmount,
+    minAmount,
+    notes,
+    runSearch,
+    selectedAccountId,
+    selectedBankId,
+    selectedBrandId,
+    selectedLocationId,
+    selectedTypeId,
+    startDate,
+  ]);
   
   const onReset = () => {
+    skipNextAutoSearch.current = true;
     const startDate = getDaysAgo(30);
     const endDate = getToday();
     setStartDate(startDate);
