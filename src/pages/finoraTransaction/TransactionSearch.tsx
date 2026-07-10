@@ -1,5 +1,5 @@
-import {useEffect, useMemo, useState} from "react";
-import {useNavigate} from "react-router-dom";
+import {useCallback, useEffect, useMemo, useState} from "react";
+import {useLocation, useNavigate} from "react-router-dom";
 
 import { useToast } from "../../components/ToastProvider/toastContext.ts";
 import { bankService, type BankResponseDto } from "../../utils/bankService.ts";
@@ -15,15 +15,26 @@ import styles from "./TransactionUpdate.module.scss";
 export default function TransactionSearch() {
   const { showToast } = useToast();
   const navigate = useNavigate();
+  const location = useLocation();
   
   const getToday = () => new Date().toISOString().split("T")[0];
-  const get30DaysAgo = () => {
+  const getDaysAgo = (days: number) => {
     const d = new Date();
-    d.setDate(d.getDate() - 30);
+    d.setDate(d.getDate() - days);
     return d.toISOString().split("T")[0];
   };
-  const [startDate, setStartDate] = useState<string>(get30DaysAgo());
-  const [endDate, setEndDate] = useState<string>(getToday());
+  const getCurrentYearStart = () => `${new Date().getFullYear()}-01-01`;
+  const getLastYearStart = () => `${new Date().getFullYear() - 1}-01-01`;
+  const getLastYearEnd = () => `${new Date().getFullYear() - 1}-12-31`;
+  const command = (location.state as { command?: string } | null)?.command;
+  const initialStartDate = command === "searchLastYear"
+    ? getLastYearStart()
+    : command === "searchCurrentYear"
+      ? getCurrentYearStart()
+      : getDaysAgo(command === "search90" ? 90 : 30);
+  const initialEndDate = command === "searchLastYear" ? getLastYearEnd() : getToday();
+  const [startDate, setStartDate] = useState<string>(() => initialStartDate);
+  const [endDate, setEndDate] = useState<string>(() => initialEndDate);
   
   const [minAmount, setMinAmount] = useState<string>("");
   const [maxAmount, setMaxAmount] = useState<string>("");
@@ -187,29 +198,11 @@ export default function TransactionSearch() {
     [transactionTypes]
   );
   
-  const onSearch = async (e: React.FormEvent) => {
-    e.preventDefault();
-    
+  const runSearch = useCallback(async (request: TransactionSearchRequestDto) => {
     setLoading(true);
     setSearched(true);
     
     try {
-      const request: TransactionSearchRequestDto = {
-        startDate: startDate || undefined,
-        endDate: endDate || undefined,
-        
-        minAmount: minAmount ? Number(minAmount) : undefined,
-        maxAmount: maxAmount ? Number(maxAmount) : undefined,
-        
-        bankId: selectedBankId || undefined,
-        accountId: selectedAccountId || undefined,
-        brandId: selectedBrandId || undefined,
-        locationId: selectedLocationId || undefined,
-        typeId: selectedTypeId || undefined,
-        
-        notes: notes || undefined,
-      };
-      
       const data = await transactionService.searchTransactions(request);
       setResults(data);
     } catch (err) {
@@ -223,10 +216,47 @@ export default function TransactionSearch() {
     } finally {
       setLoading(false);
     }
+  }, [showToast]);
+
+  const onSearch = (e: React.FormEvent) => {
+    e.preventDefault();
+
+    void runSearch({
+      startDate: startDate || undefined,
+      endDate: endDate || undefined,
+      minAmount: minAmount ? Number(minAmount) : undefined,
+      maxAmount: maxAmount ? Number(maxAmount) : undefined,
+      bankId: selectedBankId || undefined,
+      accountId: selectedAccountId || undefined,
+      brandId: selectedBrandId || undefined,
+      locationId: selectedLocationId || undefined,
+      typeId: selectedTypeId || undefined,
+      notes: notes || undefined,
+    });
   };
+
+  useEffect(() => {
+    const startDate = command === "searchLastYear"
+      ? getLastYearStart()
+      : command === "searchCurrentYear"
+        ? getCurrentYearStart()
+        : command === "search30"
+          ? getDaysAgo(30)
+          : command === "search90"
+            ? getDaysAgo(90)
+            : null;
+    if (startDate === null) return;
+
+    const endDate = command === "searchLastYear" ? getLastYearEnd() : getToday();
+    const searchTimer = window.setTimeout(() => {
+      void runSearch({ startDate, endDate });
+    }, 0);
+
+    return () => window.clearTimeout(searchTimer);
+  }, [command, runSearch]);
   
   const onReset = () => {
-    setStartDate(get30DaysAgo());
+    setStartDate(getDaysAgo(30));
     setEndDate(getToday());
     
     setMinAmount("");
