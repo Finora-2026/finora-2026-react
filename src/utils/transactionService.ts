@@ -28,6 +28,7 @@ export interface TransactionSearchRequestDto {
   brandId?: string;
   locationId?: string;
   typeId?: string;
+  reportId?: string;
   
   notes?: string;
 }

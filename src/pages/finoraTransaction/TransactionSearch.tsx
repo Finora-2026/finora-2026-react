@@ -28,13 +28,20 @@ export default function TransactionSearch() {
   const getLastYearEnd = () => `${new Date().getFullYear() - 1}-12-31`;
   const searchCommand = location.state as { command?: string; reportId?: string } | null;
   const command = searchCommand?.command;
-  const assignedReportId = searchCommand?.reportId ?? "No Report Assigned!";
-  const initialStartDate = command === "searchLastYear"
+  const reportId = searchCommand?.reportId;
+  const assignedReportId = reportId ?? "No Report Assigned!";
+  const initialStartDate = command === "searchReport"
+    ? ""
+    : command === "searchLastYear"
     ? getLastYearStart()
     : command === "searchCurrentYear"
       ? getCurrentYearStart()
       : getDaysAgo(command === "search90" ? 90 : 30);
-  const initialEndDate = command === "searchLastYear" ? getLastYearEnd() : getToday();
+  const initialEndDate = command === "searchReport"
+    ? ""
+    : command === "searchLastYear"
+      ? getLastYearEnd()
+      : getToday();
   const [startDate, setStartDate] = useState<string>(() => initialStartDate);
   const [endDate, setEndDate] = useState<string>(() => initialEndDate);
   
@@ -233,11 +240,20 @@ export default function TransactionSearch() {
       brandId: selectedBrandId || undefined,
       locationId: selectedLocationId || undefined,
       typeId: selectedTypeId || undefined,
+      reportId,
       notes: notes || undefined,
     });
   };
 
   useEffect(() => {
+    if (command === "searchReport" && reportId) {
+      const searchTimer = window.setTimeout(() => {
+        void runSearch({ reportId });
+      }, 0);
+
+      return () => window.clearTimeout(searchTimer);
+    }
+
     const startDate = command === "searchLastYear"
       ? getLastYearStart()
       : command === "searchCurrentYear"
@@ -255,7 +271,7 @@ export default function TransactionSearch() {
     }, 0);
 
     return () => window.clearTimeout(searchTimer);
-  }, [command, runSearch]);
+  }, [command, reportId, runSearch]);
   
   const onReset = () => {
     setStartDate(getDaysAgo(30));
