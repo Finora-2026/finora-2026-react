@@ -1,25 +1,127 @@
+import { useEffect, useState } from "react";
+import { useNavigate, useParams } from "react-router-dom";
+
+import { type ReportDetailsDto, reportService } from "../../utils/reportService.ts";
+import { useToast } from "../../components/ToastProvider/toastContext.ts";
 
 import styles from "./Report.module.scss";
 
 export default function ReportView() {
+  
+  const { reportId } = useParams();
+  const navigate = useNavigate();
+  const { showToast } = useToast();
+  
+  const [report, setReport] = useState<ReportDetailsDto | null>(null);
+  const [loading, setLoading] = useState(true);
+  
+  useEffect(() => {
+    const loadReport = async () => {
+      
+      if (!reportId) {
+        return;
+      }
+      
+      try {
+        setLoading(true);
+        const result = await reportService.getReportDetails(reportId);
+        if (!result) {
+          showToast("Report not found", "error");
+          return;
+        }
+        setReport(result);
+      } catch (error: unknown) {
+        const message =
+          error instanceof Error
+            ? error.message
+            : "Failed to load report";
+        showToast(message, "error");
+      } finally {
+        setLoading(false);
+      }
+    };
+    loadReport();
+  }, [reportId, showToast]);
+  
+  if (loading) {
+    return (
+      <div className={styles.container}>
+        <div className={styles.card}>
+          Loading report...
+        </div>
+      </div>
+    );
+  }
+  
+  if (!report) {
+    return (
+      <div className={styles.container}>
+        <div className={styles.card}>
+          Report not found
+        </div>
+      </div>
+    );
+  }
+  
   return (
     <div className={styles.container}>
       <div className={styles.card}>
-        <h1 className={styles.title}>Report View 2026 June</h1>
-        <h1 className={styles.title}>Status: NEW | PENDING | POSTED | EMPTY</h1>
-
+        
+        <h1 className={styles.title}>
+          Report View {report.month}
+        </h1>
+        
+        <h1 className={styles.title}>
+          Status: {report.reportStatus}
+        </h1>
+        
+        
         {/* Quick Actions */}
         <div className={styles.quickActions}>
-          <button className={`${styles.button} ${styles.secondary}`}>Go Previous</button>
-          <button className={`${styles.button} ${styles.primary}`}>Report Summary</button>
-          <button className={`${styles.button} ${styles.primary}`}>Download Report</button>
-          <button className={`${styles.button} ${styles.secondary}`}>List Reports</button>
-          <button className={`${styles.button} ${styles.secondary}`}>Go Next</button>
+          <button
+            className={`${styles.button} ${styles.secondary}`}
+            disabled={!report.previousReportId}
+            onClick={() =>
+              navigate(`../view/${report.previousReportId}`)
+            }
+          >
+            Go Previous
+          </button>
+          
+          <button
+            className={`${styles.button} ${styles.primary}`}
+          >
+            Report Summary
+          </button>
+          
+          <button
+            className={`${styles.button} ${styles.primary}`}
+          >
+            Download Report
+          </button>
+          
+          <button
+            className={`${styles.button} ${styles.secondary}`}
+            onClick={() => navigate("../")}
+          >
+            List Reports
+          </button>
+          
+          <button
+            className={`${styles.button} ${styles.secondary}`}
+            disabled={!report.nextReportId}
+            onClick={() =>
+              navigate(`../view/${report.nextReportId}`)
+            }
+          >
+            Go Next
+          </button>
         </div>
-
+        
         {/* Report summary tables */}
         <div className={styles.tablesContainer}>
-          {/* Left Table */}
+          
+          {/* Type Summary */}
           <div className={styles.tableWrapper}>
             <table className={styles.table}>
               <colgroup>
@@ -34,11 +136,15 @@ export default function ReportView() {
                 <th>Type Notes</th>
               </tr>
               </thead>
-              <tbody></tbody>
+              
+              <tbody>
+              </tbody>
+            
             </table>
           </div>
-
-          {/* Right Table */}
+          
+          
+          {/* Account Summary */}
           <div className={styles.tableWrapper}>
             <table className={styles.table}>
               <colgroup>
@@ -53,11 +159,15 @@ export default function ReportView() {
                 <th>Balance</th>
               </tr>
               </thead>
-              <tbody></tbody>
+              
+              <tbody>
+              </tbody>
+            
             </table>
           </div>
         </div> {/* End of tablesContainer */}
-
+        
+        {/* Future transaction group component */}
         <p>Filter options (Type Filter, Account filter, notes, amount rage)</p>
 
         <p>Transaction Groups table (just like Posted Transaction layout)</p>
