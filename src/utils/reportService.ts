@@ -43,6 +43,11 @@ export type ReportDetailsDto = {
     accountSummary: AccountSummaryDto[];
 };
 
+export type LoadAllTransactionsResponseDto = {
+    message: string;
+    loadedGroupCount: number;
+};
+
 export const reportService = {
     
     // Create a new report from BE, return pending report if one exists
@@ -138,6 +143,29 @@ export const reportService = {
         if (!res.ok) {
             const msg = await res.text();
             throw new Error(msg || "Failed to fetch last posted report");
+        }
+
+        return await res.json();
+    },
+
+    loadAllTransactions: async (
+        reportId: string
+    ): Promise<LoadAllTransactionsResponseDto> => {
+        const token = authService.getToken();
+        const res = await fetch(
+            `${BackendConfig.springApiUrl}/reports/${reportId}/load-all-transactions`,
+            {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    Authorization: `Bearer ${token}`,
+                },
+            }
+        );
+
+        if (!res.ok) {
+            const error = await res.json().catch(() => null);
+            throw new Error(error?.message || "Failed to load transactions into report");
         }
 
         return await res.json();

@@ -33,7 +33,7 @@
   justify-content: center;
   gap: 8px;
   flex-wrap: wrap;
-  margin-bottom: 20px;
+  margin: 24px 0;
 }
 
 /* =========================
@@ -141,6 +141,16 @@
 
 .secondary:hover {
   background: var(--btn-secondary-hover);
+}
+
+/* DANGER */
+.danger {
+  background: var(--btn-danger);
+  color: var(--btn-danger-text);
+}
+
+.danger:hover {
+  background: var(--btn-danger-hover);
 }
 
 /* DISABLED */

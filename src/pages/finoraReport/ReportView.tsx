@@ -19,6 +19,7 @@ export default function ReportView() {
   
   const [transactionGroups, setTransactionGroups] = useState<TransactionGroupResponseDto[]>([]);
   const [loadingGroups, setLoadingGroups] = useState(true);
+  const [loadingAllTransactions, setLoadingAllTransactions] = useState(false);
   
   useEffect(() => {
     const loadReport = async () => {
@@ -93,6 +94,35 @@ export default function ReportView() {
       </div>
     );
   }
+
+  const isPosted = report.reportStatus === "POSTED";
+
+  const handleLoadAllTransactions = async () => {
+    if (!reportId) return;
+
+    try {
+      setLoadingAllTransactions(true);
+      const result = await reportService.loadAllTransactions(reportId);
+      const [updatedReport, groups] = await Promise.all([
+        reportService.getReportDetails(reportId),
+        transactionGroupService.getGroupsByReportId(reportId),
+      ]);
+
+      setReport(updatedReport);
+      setTransactionGroups(groups);
+      showToast(
+        `${result.loadedGroupCount} transaction group(s) loaded into the report.`,
+        "success"
+      );
+    } catch (error: unknown) {
+      const message = error instanceof Error
+        ? error.message
+        : "Failed to load transactions into report";
+      showToast(message, "error");
+    } finally {
+      setLoadingAllTransactions(false);
+    }
+  };
   
   return (
     <div className={styles.container}>
@@ -317,8 +347,36 @@ export default function ReportView() {
           </table>
         </div>
         
-        <p>Action zone: Load all Transactions, Remove all Transactions, Filter/Sort Button (Route to Transaction Search)</p>
-        <p>Danger zone (Cannot Undo): Posted this Report, Delete this Report </p>
+        {/* Quick Actions */}
+        <div className={styles.quickActions}>
+          <button
+            className={`${styles.button} ${styles.secondary}`}
+            disabled={!reportId || loadingAllTransactions}
+            onClick={handleLoadAllTransactions}
+          >
+            {loadingAllTransactions ? "Loading transactions..." : "Load transactions"}
+          </button>
+          
+          <button
+            className={`${styles.button} ${styles.secondary}`}
+          >
+            Remove transactions
+          </button>
+          
+          <button
+            className={`${styles.button} ${styles.danger}`}
+            disabled={isPosted}
+          >
+            Finalize report
+          </button>
+          
+          <button
+            className={`${styles.button} ${styles.danger}`}
+            disabled={isPosted}
+          >
+            Delete report
+          </button>
+        </div>
       </div>
     </div>
   );
