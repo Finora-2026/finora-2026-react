@@ -20,6 +20,7 @@ export default function ReportView() {
   const [transactionGroups, setTransactionGroups] = useState<TransactionGroupResponseDto[]>([]);
   const [loadingGroups, setLoadingGroups] = useState(true);
   const [loadingAllTransactions, setLoadingAllTransactions] = useState(false);
+  const [loadingDownload, setLoadingDownload] = useState(false);
   
   useEffect(() => {
     const loadReport = async () => {
@@ -74,6 +75,27 @@ export default function ReportView() {
     style: "currency",
     currency: "USD",
   });
+  
+  const handleDownloadReport = async () => {
+    if (!reportId) return;
+    
+    try {
+      setLoadingDownload(true);
+      
+      await reportService.downloadReportTransactions(reportId);
+      
+      showToast("Report downloaded successfully.", "success");
+    } catch (error: unknown) {
+      const message =
+        error instanceof Error
+          ? error.message
+          : "Failed to download report";
+      
+      showToast(message, "error");
+    } finally {
+      setLoadingDownload(false);
+    }
+  };
   
   if (loadingReport || loadingGroups) {
     return (
@@ -262,8 +284,10 @@ export default function ReportView() {
           
           <button
             className={`${styles.button} ${styles.primary}`}
+            disabled={!reportId || loadingDownload}
+            onClick={handleDownloadReport}
           >
-            Download Report
+            {loadingDownload ? "Downloading..." : "Download Report"}
           </button>
         </div>
         
