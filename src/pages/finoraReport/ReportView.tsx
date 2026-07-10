@@ -106,7 +106,6 @@ export default function ReportView() {
           Status: {report.reportStatus}
         </h1>
         
-        
         {/* Quick Actions */}
         <div className={styles.quickActions}>
           <button
@@ -120,22 +119,10 @@ export default function ReportView() {
           </button>
           
           <button
-            className={`${styles.button} ${styles.primary}`}
-          >
-            Report Summary
-          </button>
-          
-          <button
-            className={`${styles.button} ${styles.primary}`}
-          >
-            Download Report
-          </button>
-          
-          <button
             className={`${styles.button} ${styles.secondary}`}
             onClick={() => navigate("../")}
           >
-            List Reports
+            List All Reports
           </button>
           
           <button
@@ -187,7 +174,6 @@ export default function ReportView() {
             </table>
           </div>
           
-          
           {/* Account Summary */}
           <div className={styles.tableWrapper}>
             <table className={styles.table}>
@@ -224,8 +210,34 @@ export default function ReportView() {
           </div>
         </div> {/* End of tablesContainer */}
         
-        {/* Future transaction group component */}
-        <p>Filter options (Type Filter, Account filter, notes, amount rage)</p>
+        {/* Quick Actions */}
+        <div className={styles.quickActions}>
+          <button
+            className={`${styles.button} ${styles.primary}`}
+            disabled={!reportId}
+            onClick={() =>
+              navigate("../../transactions/search", {
+                state: { command: "searchReport", reportId },
+              })
+            }
+          >
+            Query (Search)
+          </button>
+          
+          <button
+            className={`${styles.button} ${styles.primary}`}
+          >
+            Report Summary
+          </button>
+          
+          <button
+            className={`${styles.button} ${styles.primary}`}
+          >
+            Download Report
+          </button>
+        </div>
+        
+        {/* Table list all tx groups */}
         <div className={styles.tableWrapper}>
           <table className={styles.table}>
             <colgroup>

@@ -1,4 +1,4 @@
-import {useCallback, useEffect, useMemo, useState} from "react";
+import {useCallback, useEffect, useMemo, useRef, useState} from "react";
 import {useLocation, useNavigate} from "react-router-dom";
 
 import { useToast } from "../../components/ToastProvider/toastContext.ts";
@@ -26,13 +26,25 @@ export default function TransactionSearch() {
   const getCurrentYearStart = () => `${new Date().getFullYear()}-01-01`;
   const getLastYearStart = () => `${new Date().getFullYear() - 1}-01-01`;
   const getLastYearEnd = () => `${new Date().getFullYear() - 1}-12-31`;
-  const command = (location.state as { command?: string } | null)?.command;
-  const initialStartDate = command === "searchLastYear"
+  const searchCommand = location.state as { command?: string; reportId?: string } | null;
+  const command = searchCommand?.command;
+  const incomingReportId = searchCommand?.reportId;
+  const [assignedReportId, setAssignedReportId] = useState<string | undefined>(
+    () => incomingReportId
+  );
+  const assignedReportDisplay = assignedReportId ?? "No Report Assigned!";
+  const initialStartDate = command === "searchReport"
+    ? ""
+    : command === "searchLastYear"
     ? getLastYearStart()
     : command === "searchCurrentYear"
       ? getCurrentYearStart()
       : getDaysAgo(command === "search90" ? 90 : 30);
-  const initialEndDate = command === "searchLastYear" ? getLastYearEnd() : getToday();
+  const initialEndDate = command === "searchReport"
+    ? ""
+    : command === "searchLastYear"
+      ? getLastYearEnd()
+      : getToday();
   const [startDate, setStartDate] = useState<string>(() => initialStartDate);
   const [endDate, setEndDate] = useState<string>(() => initialEndDate);
   
@@ -71,6 +83,7 @@ export default function TransactionSearch() {
   const [results, setResults] = useState<TransactionResponseDto[]>([]);
   const [loading, setLoading] = useState(false);
   const [searched, setSearched] = useState(false);
+  const skipNextAutoSearch = useRef(true);
   
   // Fetch banks from BE
   useEffect(() => {
@@ -231,11 +244,20 @@ export default function TransactionSearch() {
       brandId: selectedBrandId || undefined,
       locationId: selectedLocationId || undefined,
       typeId: selectedTypeId || undefined,
+      reportId: assignedReportId,
       notes: notes || undefined,
     });
   };
 
   useEffect(() => {
+    if (command === "searchReport" && incomingReportId) {
+      const searchTimer = window.setTimeout(() => {
+        void runSearch({ reportId: incomingReportId });
+      }, 0);
+
+      return () => window.clearTimeout(searchTimer);
+    }
+
     const startDate = command === "searchLastYear"
       ? getLastYearStart()
       : command === "searchCurrentYear"
@@ -253,11 +275,52 @@ export default function TransactionSearch() {
     }, 0);
 
     return () => window.clearTimeout(searchTimer);
-  }, [command, runSearch]);
+  }, [command, incomingReportId, runSearch]);
+
+  useEffect(() => {
+    if (skipNextAutoSearch.current) {
+      skipNextAutoSearch.current = false;
+      return;
+    }
+
+    const searchTimer = window.setTimeout(() => {
+      void runSearch({
+        startDate: startDate || undefined,
+        endDate: endDate || undefined,
+        minAmount: minAmount ? Number(minAmount) : undefined,
+        maxAmount: maxAmount ? Number(maxAmount) : undefined,
+        bankId: selectedBankId || undefined,
+        accountId: selectedAccountId || undefined,
+        brandId: selectedBrandId || undefined,
+        locationId: selectedLocationId || undefined,
+        typeId: selectedTypeId || undefined,
+        reportId: assignedReportId,
+        notes: notes || undefined,
+      });
+    }, 500);
+
+    return () => window.clearTimeout(searchTimer);
+  }, [
+    assignedReportId,
+    endDate,
+    maxAmount,
+    minAmount,
+    notes,
+    runSearch,
+    selectedAccountId,
+    selectedBankId,
+    selectedBrandId,
+    selectedLocationId,
+    selectedTypeId,
+    startDate,
+  ]);
   
   const onReset = () => {
-    setStartDate(getDaysAgo(30));
-    setEndDate(getToday());
+    skipNextAutoSearch.current = true;
+    const startDate = getDaysAgo(30);
+    const endDate = getToday();
+    setStartDate(startDate);
+    setEndDate(endDate);
     
     setMinAmount("");
     setMaxAmount("");
@@ -271,6 +334,9 @@ export default function TransactionSearch() {
     setSelectedTypeId("");
     
     setNotes("");
+    setAssignedReportId(undefined);
+
+    void runSearch({ startDate, endDate });
   };
   
   const openTransactionGroup = (groupId: string) => {
@@ -483,6 +549,17 @@ export default function TransactionSearch() {
               </select>
             </div>
             
+            <div className={styles.searchField}>
+              <label className={styles.label}>Assigned Report</label>
+              <input
+                className={styles.input}
+                type="text"
+                value={assignedReportDisplay}
+                readOnly
+                disabled
+              />
+            </div>
+
             <div className={`${styles.searchField} ${styles.searchFieldFull}`}>
               <label className={styles.label}>Notes contains</label>
               
